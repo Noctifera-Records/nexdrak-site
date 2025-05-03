@@ -76,7 +76,7 @@ export default function EventsPage() {
       <div className="max-w-4xl mx-auto mb-12 text-center">
         <h1 className="text-4xl font-bold mb-4">UPCOMING EVENTS</h1>
         <p className="text-gray-300">
-          Catch PULSE live at venues around the world. Experience the immersive audio-visual journey in person.
+          Catch NexDrak live at venues around the world. Experience the immersive audio-visual journey in person.
         </p>
       </div>
 
@@ -136,9 +136,11 @@ export default function EventsPage() {
       <div className="max-w-2xl mx-auto mt-16 p-8 bg-black/50 backdrop-blur-sm border border-green-500/20 rounded-xl text-center">
         <h2 className="text-2xl font-bold mb-4">PRIVATE BOOKINGS</h2>
         <p className="text-gray-300 mb-6">
-          Interested in booking PULSE for a private event or festival? Get in touch with our booking team.
+          Interested in booking NexDrak for a private event or festival? Get in touch with our booking team.
         </p>
-        <Button className="bg-green-500 hover:bg-green-600 text-black">CONTACT FOR BOOKING</Button>
+        <a href="mailto:mgmt@nexdrak.com?subject=Private%20Booking%20Inquiry" className="block w-full">
+          <Button className="bg-green-500 hover:bg-green-600 text-black">CONTACT FOR BOOKING</Button>
+        </a>
       </div>
     </div>
   )

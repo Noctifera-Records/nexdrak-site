@@ -15,7 +15,7 @@ interface Product {
 const products: Product[] = [
   {
     id: 1,
-    name: "PULSE Logo T-Shirt",
+    name: "EPIC Logo T-Shirt",
     price: 35,
     image: "/placeholder.svg?height=400&width=400",
     category: "clothing",
@@ -36,7 +36,7 @@ const products: Product[] = [
   },
   {
     id: 4,
-    name: "PULSE Snapback Cap",
+    name: "EPIC Snapback Cap",
     price: 28,
     image: "/placeholder.svg?height=400&width=400",
     category: "accessories",
@@ -50,7 +50,7 @@ const products: Product[] = [
   },
   {
     id: 6,
-    name: "PULSE LED Wristband",
+    name: "EPIC LED Wristband",
     price: 15,
     image: "/placeholder.svg?height=400&width=400",
     category: "accessories",
@@ -76,7 +76,7 @@ export default function MerchPage() {
     <div className="container mx-auto px-4 py-24 mt-10">
       <div className="max-w-4xl mx-auto mb-12 text-center">
         <h1 className="text-4xl font-bold mb-4">OFFICIAL MERCH</h1>
-        <p className="text-gray-300">Official PdULSE merchandise. Limited editions and exclusive designs.</p>
+        <p className="text-gray-300">Official NexDrak merchandise. Limited editions and exclusive designs.</p>
       </div>
 
       <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
@@ -142,7 +142,7 @@ export default function MerchPage() {
                 </Select>
                 <Button className="bg-green-500 hover:bg-green-600 text-black">
                   <ShoppingCart className="h-4 w-4 mr-2" />
-                  Add
+                  Go Buy
                 </Button>
               </div>
             </CardFooter>

@@ -1,23 +1,25 @@
-import { Play, Download, Share2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+'use client';
+
+import { Play, Download, Share2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Track {
-  id: number
-  title: string
-  album: string
-  duration: string
-  releaseDate: string
+  id: number;
+  title: string;
+  album: string;
+  duration: string;
+  releaseDate: string;
 }
 
 interface Album {
-  id: number
-  title: string
-  year: string
-  trackCount: number
-  image: string
-  tracks: Track[]
+  id: number;
+  title: string;
+  year: string;
+  trackCount: number;
+  image: string;
+  tracks: Track[];
 }
 
 const albums: Album[] = [
@@ -53,21 +55,57 @@ const albums: Album[] = [
       { id: 14, title: "Neon Nights", album: "Synth Horizon", duration: "6:05", releaseDate: "2023-08-10" },
     ],
   },
-]
+];
 
 const singles: Track[] = [
   { id: 15, title: "Midnight Drive", album: "Single", duration: "3:35", releaseDate: "2024-04-20" },
   { id: 16, title: "Cyber Dawn", album: "Single", duration: "4:15", releaseDate: "2024-02-15" },
   { id: 17, title: "Electric Soul", album: "Single", duration: "3:50", releaseDate: "2023-12-01" },
   { id: 18, title: "Digital Love", album: "Single", duration: "4:25", releaseDate: "2023-10-12" },
-]
+];
 
 export default function MusicPage() {
+  const handleShareAlbum = async (album: Album) => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `¡Escucha el álbum ${album.title} de NexDrak!`,
+          text: `Descubre las increíbles pistas del álbum ${album.title} (${album.year}).`,
+          url: window.location.href, // Puedes personalizar la URL si tienes una específica para cada álbum
+        });
+        console.log("¡Álbum compartido exitosamente!");
+      } catch (error) {
+        console.log("Error al compartir el álbum", error);
+      }
+    } else {
+      alert("La función de compartir no está disponible en este navegador.");
+      // Aquí podrías implementar una alternativa como copiar el enlace al portapapeles
+    }
+  };
+
+  const handleShareSingle = async (single: Track) => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `¡Escucha el sencillo ${single.title} de NexDrak!`,
+          text: `Disfruta del sencillo ${single.title}.`,
+          url: window.location.href, // Puedes personalizar la URL si tienes una específica para cada sencillo
+        });
+        console.log("¡Sencillo compartido exitosamente!");
+      } catch (error) {
+        console.log("Error al compartir el sencillo", error);
+      }
+    } else {
+      alert("La función de compartir no está disponible en este navegador.");
+      // Aquí podrías implementar una alternativa como copiar el enlace al portapapeles
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-24 mt-10">
       <div className="max-w-4xl mx-auto mb-12 text-center">
         <h1 className="text-4xl font-bold mb-4">MUSIC</h1>
-        <p className="text-gray-300">Explore PULSE's discography, from albums to singles and remixes.</p>
+        <p className="text-gray-300">Explore NexDrak's discography, from albums to singles and remixes.</p>
       </div>
 
       <Tabs defaultValue="albums" className="w-full">
@@ -106,9 +144,17 @@ export default function MusicPage() {
                       </Button>
                       <Button variant="outline" className="border-green-500/50 text-green-400 hover:bg-green-500/20">
                         <Download className="h-4 w-4 mr-2" />
-                        Download
+                        Get Wallpaper
                       </Button>
                       <Button variant="outline" className="border-green-500/50 text-green-400 hover:bg-green-500/20">
+                        <Download className="h-4 w-4 mr-2" />
+                        Download MP3
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="border-green-500/50 text-green-400 hover:bg-green-500/20"
+                        onClick={() => handleShareAlbum(album)}
+                      >
                         <Share2 className="h-4 w-4" />
                       </Button>
                     </div>
@@ -146,9 +192,9 @@ export default function MusicPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-1">
-                {singles.map((track, index) => (
+                {singles.map((single) => (
                   <div
-                    key={track.id}
+                    key={single.id}
                     className="flex items-center justify-between py-2 px-3 hover:bg-green-500/10 rounded-md group"
                   >
                     <div className="flex items-center gap-4">
@@ -156,16 +202,21 @@ export default function MusicPage() {
                         <Play className="h-4 w-4" />
                       </Button>
                       <div>
-                        <div>{track.title}</div>
+                        <div>{single.title}</div>
                         <div className="text-xs text-gray-500">
-                          Released: {new Date(track.releaseDate).toLocaleDateString()}
+                          Released: {new Date(single.releaseDate).toLocaleDateString()}
                         </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
-                      <span className="text-gray-500">{track.duration}</span>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100">
-                        <Download className="h-4 w-4" />
+                      <span className="text-gray-500">{single.duration}</span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 opacity-0 group-hover:opacity-100"
+                        onClick={() => handleShareSingle(single)}
+                      >
+                        <Share2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
@@ -192,11 +243,11 @@ export default function MusicPage() {
       <div className="max-w-2xl mx-auto mt-16 p-8 bg-black/50 backdrop-blur-sm border border-green-500/20 rounded-xl text-center">
         <h2 className="text-2xl font-bold mb-4">LICENSING</h2>
         <p className="text-gray-300 mb-6">
-          Interested in licensing PULSE's music for your project, film, or commercial? Get in touch with our licensing
+          Interested in licensing NexDrak's music for your project, film, or commercial? Get in touch with our licensing
           team.
         </p>
         <Button className="bg-green-500 hover:bg-green-600 text-black">CONTACT FOR LICENSING</Button>
       </div>
     </div>
-  )
+  );
 }

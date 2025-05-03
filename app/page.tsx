@@ -40,7 +40,7 @@ export default function Home() {
     <div className="relative min-h-screen flex flex-col">
       {/* Banner de Cookies */}
       {showCookieBanner && (
-        <div className="fixed top-16 right-4 bg-black/90 border border-green-500/30 rounded-lg p-4 shadow-2xl z-50 animate-in fade-in slide-in-from-top flex items-center gap-4 max-w-md w-full">
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-black/90 border border-green-500/30 rounded-lg p-4 shadow-2xl z-50 animate-in fade-in slide-in-from-bottom flex items-center gap-4 max-w-md w-full md:hidden">
           <p className="text-sm text-gray-300 flex-1">
             We use cookies to improve your website experience. By continuing to browse the site, you agree to our use of cookies.
           </p>
@@ -86,10 +86,12 @@ export default function Home() {
             <p className="text-3xl md:text-3xl font-display font-bold">&nbsp;RED EYE FLIGHT [OUT NOW]</p>
           </div>
           <div className="flex flex-wrap justify-center gap-4 mt-8">
-            <Button size="lg" className="bg-green-500 hover:bg-green-600 text-black rounded-md px-8">
-              <Play className="h-5 w-5 mr-2" />
-              LISTEN NOW
-            </Button>
+            <Link href="https://open.spotify.com/track/3bwbsBeKcSTxjSC03MtHtR">
+              <Button size="lg" className="bg-green-500 hover:bg-green-600 text-black rounded-md px-8">
+                <Play className="h-5 w-5 mr-2" />
+                LISTEN NOW
+              </Button>
+            </Link>
           </div>
         </div>
 

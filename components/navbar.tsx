@@ -40,7 +40,7 @@ export default function Navbar() {
             </Link>
           ))}
           <Button variant="outline" className="border-green-500 text-green-500 hover:bg-green-500/20 rounded-md px-6">
-            LOGIN
+            LOGIN (SOON)
           </Button>
         </nav>
 
@@ -48,36 +48,31 @@ export default function Navbar() {
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild className="md:hidden">
             <Button variant="ghost" size="icon">
-              <Menu className="h-6 w-6" />
+              {isOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
               <span className="sr-only">Toggle menu</span>
             </Button>
           </SheetTrigger>
           <SheetContent side="right" className="bg-black/95 border-l border-green-500/20">
-            {/* Add SheetTitle for accessibility */}
             <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-            <div className="flex flex-col h-full">
-              <div className="flex justify-end">
-                <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
-                  <X className="h-6 w-6" />
-                  <span className="sr-only">Close menu</span>
-                </Button>
-              </div>
-              <nav className="flex flex-col space-y-8 mt-8">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className="text-lg tracking-widest hover:text-green-400 transition-colors"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    {item.name}
-                  </Link>
-                ))}
-                <Button variant="outline" className="border-green-500 text-green-500 hover:bg-green-500/20 rounded-md">
-                  LOGIN
-                </Button>
-              </nav>
-            </div>
+            <nav className="flex flex-col h-full pt-8 space-y-8">
+              {navItems.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className="text-lg tracking-widest hover:text-green-400 transition-colors"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {item.name}
+                </Link>
+              ))}
+              <Button variant="outline" className="border-green-500 text-green-500 hover:bg-green-500/20 rounded-md">
+                LOGIN (SOON)
+              </Button>
+            </nav>
           </SheetContent>
         </Sheet>
       </div>

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Image from "next/image"
-import { Play, Pause } from "lucide-react"
+import { Play, Pause, ShoppingCart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 
@@ -13,72 +13,66 @@ interface Release {
   coverArt: string
   releaseDate: string
   audioSrc: string
+  purchaseLink: string
 }
 
 const releases: Release[] = [
   {
     id: 1,
-    title: "Neon Pulse",
+    title: "Red Eye Flight",
     type: "Single",
     coverArt: "/img/releases/rede.webp",
-    releaseDate: "May 1, 2025",
-    audioSrc:
-      "./music/dev.mp3",
+    releaseDate: "Mar 10, 2025",
+    audioSrc: "./samples/red3.ogg",
+    purchaseLink: "https://album.link/redeye"
   },
   {
     id: 2,
-    title: "Digital Dreams",
-    type: "Album",
-    coverArt: "/placeholder.svg?height=400&width=400",
-    releaseDate: "March 15, 2025",
-    audioSrc:
-      "https://cdn.pixabay.com/download/audio/2022/10/25/audio_946f463397.mp3?filename=electronic-future-beats-117997.mp3",
+    title: "Endless Rail",
+    type: "Single",
+    coverArt: "/img/releases/endless.webp",
+    releaseDate: "Ago 16, 2023",
+    audioSrc: "/samples/endless.ogg",
+    purchaseLink: "https://album.link/example"
   },
   {
     id: 3,
-    title: "Synth Horizon",
-    type: "EP",
-    coverArt: "/placeholder.svg?height=400&width=400",
-    releaseDate: "January 10, 2025",
-    audioSrc:
-      "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0c6ff1bab.mp3?filename=background-music-for-documentary-science-film-169615.mp3",
+    title: "Rewind",
+    type: "Single",
+    coverArt: "/img/releases/rewind.webp",
+    releaseDate: "Mar 3, 2021",
+    audioSrc: "/samples/rewind.ogg",
+    purchaseLink: "https://album.link/example"
   },
   {
     id: 4,
-    title: "Midnight Drive",
-    type: "Single",
-    coverArt: "/placeholder.svg?height=400&width=400",
-    releaseDate: "December 5, 2024",
-    audioSrc:
-      "https://cdn.pixabay.com/download/audio/2022/08/23/audio_d16737dc28.mp3?filename=electronic-future-beats-122862.mp3",
-  },
+    title: "Your Lie",
+    type: "EP",
+    coverArt: "/img/releases/yourlie.webp",
+    releaseDate: "June 2, 2020",
+    audioSrc: "/samples/yourlie.ogg",
+    purchaseLink: "https://album.link/example"
+  }
 ]
 
 export default function LatestReleases() {
   const [playingId, setPlayingId] = useState<number | null>(null)
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null)
 
-  // Modify the togglePlay function to handle audio element tracking
   const togglePlay = (release: Release) => {
     if (playingId === release.id) {
-      // Currently playing this track, so pause it
       audio?.pause()
       setPlayingId(null)
       setAudio(null)
     } else {
-      // Stop current audio if any
       if (audio) {
         audio.pause()
       }
 
-      // Play the new track
       const newAudio = new Audio(release.audioSrc)
-
-      // Mark the audio element as not connected yet
-      // @ts-ignore - adding custom property
+      // @ts-ignore - custom property for tracking
       newAudio._isConnected = false
 
-      // Add error handling
       newAudio.onerror = (e) => {
         console.error("Audio error:", e)
         setPlayingId(null)
@@ -116,14 +110,32 @@ export default function LatestReleases() {
               className="object-cover transition-transform group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              <Button
-                onClick={() => togglePlay(release)}
-                variant="outline"
-                size="icon"
-                className="rounded-full h-14 w-14 border-green-500 text-green-500 hover:bg-green-500/20"
-              >
-                {playingId === release.id ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
-              </Button>
+              <div className="flex items-center gap-4">
+                {/* Botón de compra */}
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="rounded-full h-14 w-14 border-green-500 text-green-500 hover:bg-green-500/20"
+                  asChild
+                >
+                  <a 
+                    href={release.purchaseLink} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                  >
+                    <ShoppingCart className="h-6 w-6" />
+                  </a>
+                </Button>
+                {/* Botón de reproducción/pausa */}
+                <Button
+                  onClick={() => togglePlay(release)}
+                  variant="outline"
+                  size="icon"
+                  className="rounded-full h-14 w-14 border-green-500 text-green-500 hover:bg-green-500/20"
+                >
+                  {playingId === release.id ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
+                </Button>
+              </div>
             </div>
           </div>
           <CardContent className="p-4">

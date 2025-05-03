@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 export default function Newsletter() {
   return (
     <div className="w-full max-w-2xl mx-auto bg-black/50 backdrop-blur-sm border border-green-500/20 rounded-xl p-8">
-      <h2 className="text-2xl font-bold mb-4 text-center">JOIN THE PULSE COMMUNITY</h2>
+      <h2 className="text-2xl font-bold mb-4 text-center">GET IN TOUCH</h2>
       <p className="text-gray-300 mb-6 text-center">
         Subscribe to get exclusive updates, early access to tickets, and special offers
       </p>
