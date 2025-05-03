@@ -7,8 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "echo Using npm",
-    "export": "next build"
+    "postinstall": "echo Using npm"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
