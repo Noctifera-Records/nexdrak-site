@@ -6,6 +6,8 @@ import { Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet"
 
+export const runtime = "edge";
+
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
 

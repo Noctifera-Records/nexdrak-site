@@ -2,6 +2,8 @@ import Image from "next/image"
 import { Instagram, Twitter, Youtube, AirplayIcon as Spotify, Facebook } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
+export const runtime = "edge";
+
 export default function AboutPage() {
   return (
     <div className="container mx-auto px-4 py-24 mt-10">
