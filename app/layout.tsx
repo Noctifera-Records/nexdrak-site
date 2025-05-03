@@ -6,8 +6,6 @@ import { ThemeProvider } from "@/components/theme-provider"
 import Navbar from "@/components/navbar"
 import MusicPlayer from "@/components/music-player"
 
-export const runtime = "edge";
-
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {

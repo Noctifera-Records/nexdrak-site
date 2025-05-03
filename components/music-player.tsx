@@ -14,8 +14,6 @@ import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import AudioVisualizer from "./audio-visualizer";
 
-export const runtime = "edge";
-
 interface Track {
     id: number;
     title: string;

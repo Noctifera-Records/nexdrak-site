@@ -9,8 +9,6 @@ import Newsletter from "@/components/newsletter";
 import SocialLinks from "@/components/social-links";
 import { useState, useEffect } from "react";
 
-export const runtime = "edge";
-
 export default function Home() {
   const [showCookieBanner, setShowCookieBanner] = useState(false);
 

@@ -1,7 +1,5 @@
 import { Button } from "@/components/ui/button"
 
-export const runtime = "edge";
-
 export default function Newsletter() {
   return (
     <div className="w-full max-w-2xl mx-auto bg-black/50 backdrop-blur-sm border border-green-500/20 rounded-xl p-8">

@@ -5,8 +5,6 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Home, RefreshCw, AlertTriangle } from "lucide-react"
 
-export const runtime = "edge";
-
 interface GlitchLine {
   id: number
   height: number

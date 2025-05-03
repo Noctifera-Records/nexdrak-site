@@ -8,8 +8,6 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-export const runtime = "edge";
-
 export default function ContactForm() {
   const [formState, setFormState] = useState({
     name: "",

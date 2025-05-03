@@ -3,8 +3,6 @@
 import { useRef, useEffect, useState } from "react"
 import { makeNoise2D } from "open-simplex-noise"
 
-export const runtime = "edge";
-
 interface AudioVisualizerProps {
   audioElement: HTMLAudioElement | null
   isPlaying: boolean

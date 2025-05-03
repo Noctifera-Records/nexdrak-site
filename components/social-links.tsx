@@ -1,8 +1,6 @@
 import { Instagram, Twitter, Youtube, Music, Facebook } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-export const runtime = "edge";
-
 export default function SocialLinks() {
   return (
     <div className="flex justify-center gap-4 flex-wrap">

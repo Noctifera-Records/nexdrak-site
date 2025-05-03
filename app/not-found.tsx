@@ -5,8 +5,6 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Home, ArrowLeft, Disc3 } from "lucide-react"
 
-export const runtime = "edge";
-
 // Define types for our glitch elements
 interface GlitchLine {
   id: number
