@@ -76,7 +76,7 @@ export default function MerchPage() {
     <div className="container mx-auto px-4 py-24 mt-10">
       <div className="max-w-4xl mx-auto mb-12 text-center">
         <h1 className="text-4xl font-bold mb-4">OFFICIAL MERCH</h1>
-        <p className="text-gray-300">Official PULSE merchandise. Limited editions and exclusive designs.</p>
+        <p className="text-gray-300">Official PdULSE merchandise. Limited editions and exclusive designs.</p>
       </div>
 
       <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
