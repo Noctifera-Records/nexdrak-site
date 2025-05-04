@@ -101,6 +101,13 @@ export default function MusicPlayer() {
         playCurrentTrack();
     }, [currentTrackIndex, playCurrentTrack]);
 
+    useEffect(() => {
+        if (audioRef.current) {
+            audioRef.current.volume = volume;
+            audioRef.current.muted = isMuted;
+        }
+    }, [volume, isMuted]);
+
     const togglePlay = () =>
         withCooldown(() => {
             if (isPlaying) {

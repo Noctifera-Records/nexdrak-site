@@ -83,6 +83,7 @@ export default function MusicPage() {
     }
   };
 
+
   const handleShareSingle = async (single: Track) => {
     if (navigator.share) {
       try {

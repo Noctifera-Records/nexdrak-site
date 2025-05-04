@@ -86,7 +86,7 @@ export default function Home() {
             <p className="text-3xl md:text-3xl font-display font-bold">&nbsp;RED EYE FLIGHT [OUT NOW]</p>
           </div>
           <div className="flex flex-wrap justify-center gap-4 mt-8">
-            <Link href="https://open.spotify.com/track/3bwbsBeKcSTxjSC03MtHtR">
+            <Link href="https://open.spotify.com/track/3bwbsBeKcSTxjSC03MtHtR" target="_blank" rel="noopener noreferrer">
               <Button size="lg" className="bg-green-500 hover:bg-green-600 text-black rounded-md px-8">
                 <Play className="h-5 w-5 mr-2" />
                 LISTEN NOW
