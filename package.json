@@ -1,6 +1,6 @@
 {
   "name": "nexdrak-site",
-  "version": "0.1.0",
+  "version": "1.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -42,9 +42,8 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "1.0.4",
-    "cookie": "^1.0.2",
+    "cookie": "1.0.2",
     "embla-carousel-react": "8.5.1",
-    "esbuild": "^0.25.3",
     "input-otp": "1.4.1",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.454.0",
@@ -60,7 +59,7 @@
     "sonner": "^1.7.1",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
-    "undici": "^7.8.0",
+    "undici": "7.8.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {
@@ -69,9 +68,19 @@
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vercel/node": "^5.1.15",
+    "@vercel/remix-builder": "^5.4.3",
+    "esbuild": "0.25.3",
     "postcss": "^8",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vercel": "^41.7.0"
+  },
+  "overrides": {
+    "esbuild": "0.25.3",
+    "cookie": "1.0.2",
+    "undici": "7.8.0",
+    "path-to-regexp": "6.3.0"
   },
   "packageManager": "npm@10.8.1"
 }
