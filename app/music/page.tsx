@@ -1,6 +1,6 @@
 'use client';
 
-import { Play, Download, Share2 } from "lucide-react";
+import { Play, Download, Share2, ImageDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -25,43 +25,51 @@ interface Album {
 const albums: Album[] = [
   {
     id: 1,
-    title: "Digital Dreams",
+    title: "Red Eye Flight",
     year: "2024",
-    trackCount: 8,
-    image: "/placeholder.svg?height=400&width=400",
+    trackCount: 1,
+    image: "/img/releases/rede.webp",
     tracks: [
-      { id: 1, title: "Digital Awakening", album: "Digital Dreams", duration: "3:45", releaseDate: "2024-03-15" },
-      { id: 2, title: "Neon Pulse", album: "Digital Dreams", duration: "4:12", releaseDate: "2024-03-15" },
-      { id: 3, title: "Synthetic Emotions", album: "Digital Dreams", duration: "5:30", releaseDate: "2024-03-15" },
-      { id: 4, title: "Binary Sunset", album: "Digital Dreams", duration: "4:55", releaseDate: "2024-03-15" },
-      { id: 5, title: "Electric Dreams", album: "Digital Dreams", duration: "3:22", releaseDate: "2024-03-15" },
-      { id: 6, title: "Quantum Leap", album: "Digital Dreams", duration: "6:10", releaseDate: "2024-03-15" },
-      { id: 7, title: "Virtual Reality", album: "Digital Dreams", duration: "4:48", releaseDate: "2024-03-15" },
-      { id: 8, title: "Digital Horizon", album: "Digital Dreams", duration: "7:15", releaseDate: "2024-03-15" },
+      { id: 1, title: "Red Eye Flight", album: "Red Eye Flight", duration: "3:45", releaseDate: "2024-03-15" },
     ],
   },
   {
     id: 2,
-    title: "Synth Horizon",
+    title: "Endless Rail",
     year: "2023",
-    trackCount: 6,
-    image: "/placeholder.svg?height=400&width=400",
+    trackCount: 1,
+    image: "/img/releases/endless.webp",
     tracks: [
-      { id: 9, title: "Horizon Line", album: "Synth Horizon", duration: "4:20", releaseDate: "2023-08-10" },
-      { id: 10, title: "Synth Wave", album: "Synth Horizon", duration: "3:55", releaseDate: "2023-08-10" },
-      { id: 11, title: "Analog Dreams", album: "Synth Horizon", duration: "5:15", releaseDate: "2023-08-10" },
-      { id: 12, title: "Future Past", album: "Synth Horizon", duration: "4:30", releaseDate: "2023-08-10" },
-      { id: 13, title: "Retro Future", album: "Synth Horizon", duration: "3:45", releaseDate: "2023-08-10" },
-      { id: 14, title: "Neon Nights", album: "Synth Horizon", duration: "6:05", releaseDate: "2023-08-10" },
+      { id: 2, title: "Endless Rail", album: "Endless Rail", duration: "4:20", releaseDate: "2023-08-10" },
+    ],
+  },
+  {
+    id: 3,
+    title: "Rewind",
+    year: "2023",
+    trackCount: 1,
+    image: "/img/releases/rewind.webp",
+    tracks: [
+      { id: 3, title: "Rewind", album: "Rewind", duration: "4:20", releaseDate: "2023-08-10" },
+    ],
+  },
+  {
+    id: 4,
+    title: "Your Lie",
+    year: "2023",
+    trackCount: 1,
+    image: "/img/releases/yourlie.webp",
+    tracks: [
+      { id: 4, title: "Your Lie", album: "Rewind", duration: "4:20", releaseDate: "2023-08-10" },
     ],
   },
 ];
 
 const singles: Track[] = [
-  { id: 15, title: "Midnight Drive", album: "Single", duration: "3:35", releaseDate: "2024-04-20" },
-  { id: 16, title: "Cyber Dawn", album: "Single", duration: "4:15", releaseDate: "2024-02-15" },
-  { id: 17, title: "Electric Soul", album: "Single", duration: "3:50", releaseDate: "2023-12-01" },
-  { id: 18, title: "Digital Love", album: "Single", duration: "4:25", releaseDate: "2023-10-12" },
+  { id: 3, title: "Midnight Drive", album: "Single", duration: "3:35", releaseDate: "2024-04-20" },
+  { id: 4, title: "Cyber Dawn", album: "Single", duration: "4:15", releaseDate: "2024-02-15" },
+  { id: 5, title: "Electric Soul", album: "Single", duration: "3:50", releaseDate: "2023-12-01" },
+  { id: 6, title: "Digital Love", album: "Single", duration: "4:25", releaseDate: "2023-10-12" },
 ];
 
 export default function MusicPage() {
@@ -109,77 +117,80 @@ export default function MusicPage() {
         <p className="text-gray-300">Explore NexDrak's discography, from albums to singles and remixes.</p>
       </div>
 
-      <Tabs defaultValue="albums" className="w-full">
-        <TabsList className="grid w-full max-w-md mx-auto grid-cols-3 mb-8">
-          <TabsTrigger value="albums">Albums</TabsTrigger>
-          <TabsTrigger value="singles">Singles</TabsTrigger>
-          <TabsTrigger value="remixes">Remixes</TabsTrigger>
+      <Tabs defaultValue="albums" className="w-full px-4">
+        {/* TabsList responsive */}
+        <TabsList className="grid w-full max-w-md mx-auto grid-cols-3 mb-8 p-1 bg-green-900/20">
+          <TabsTrigger value="albums" className="text-sm py-2">Albums</TabsTrigger>
+          <TabsTrigger value="singles" className="text-sm py-2">Singles</TabsTrigger>
+          <TabsTrigger value="remixes" className="text-sm py-2">Remixes</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="albums" className="space-y-12">
+        <TabsContent value="albums" className="space-y-8">
           {albums.map((album) => (
             <div
               key={album.id}
-              className="bg-black/50 backdrop-blur-sm border border-green-500/20 rounded-xl overflow-hidden"
+              className="bg-black/50 backdrop-blur-sm border border-green-500/20 rounded-xl overflow-hidden flex flex-col md:flex-row"
             >
-              <div className="grid md:grid-cols-[300px_1fr] gap-6">
-                <div className="aspect-square relative bg-black/30 max-w-[300px] mx-auto md:mx-0">
-                  <img
-                    src={album.image || "/placeholder.svg"}
-                    alt={album.title}
-                    className="object-cover w-full h-full"
-                  />
+              {/* Imagen responsive */}
+              <div className="relative bg-black/30 w-full md:w-[300px] h-64 md:h-auto mx-auto md:mx-0">
+                <img
+                  src={album.image || "/placeholder.svg"}
+                  alt={album.title}
+                  className="object-cover w-full h-full"
+                />
+              </div>
+              <div className="p-4 md:p-6 flex-1">
+                <div className="mb-6">
+                  <h2 className="text-xl md:text-2xl font-bold">{album.title}</h2>
+                  <div className="flex items-center gap-2 mt-1 text-sm text-gray-400">
+                    <span>{album.year}</span>
+                    <span>•</span>
+                    <span>{album.trackCount} tracks</span>
+                  </div>
+                  
+                  {/* Botones responsivos */}
+                  <div className="flex flex-wrap gap-2 mt-4">
+                    <Button className="bg-green-500 hover:bg-green-600 text-black text-sm py-1.5 px-3 min-w-[100px]">
+                      <Play className="h-3 w-3 mr-1" />
+                      <span className="hidden sm:inline">Play All</span>
+                    </Button>
+                    <Button variant="outline" className="border-green-500/50 text-green-400 hover:bg-green-500/20 text-sm py-1.5 px-3">
+                      <ImageDown className="h-3 w-3 mr-1" />
+                      <span className="hidden sm:inline">Wallpaper</span>
+                    </Button>
+                    <Button variant="outline" className="border-green-500/50 text-green-400 hover:bg-green-500/20 text-sm py-1.5 px-3">
+                      <Download className="h-3 w-3 mr-1" />
+                      <span className="hidden sm:inline">MP3</span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="border-green-500/50 text-green-400 hover:bg-green-500/20 p-1.5"
+                      onClick={() => handleShareAlbum(album)}
+                    >
+                      <Share2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-                <div className="p-6">
-                  <div className="mb-6">
-                    <h2 className="text-2xl font-bold">{album.title}</h2>
-                    <div className="flex items-center gap-4 mt-2 text-sm text-gray-400">
-                      <span>{album.year}</span>
-                      <span>•</span>
-                      <span>{album.trackCount} tracks</span>
-                    </div>
-                    <div className="flex gap-3 mt-4">
-                      <Button className="bg-green-500 hover:bg-green-600 text-black">
-                        <Play className="h-4 w-4 mr-2" />
-                        Play All
-                      </Button>
-                      <Button variant="outline" className="border-green-500/50 text-green-400 hover:bg-green-500/20">
-                        <Download className="h-4 w-4 mr-2" />
-                        Get Wallpaper
-                      </Button>
-                      <Button variant="outline" className="border-green-500/50 text-green-400 hover:bg-green-500/20">
-                        <Download className="h-4 w-4 mr-2" />
-                        Download MP3
-                      </Button>
-                      <Button
-                        variant="outline"
-                        className="border-green-500/50 text-green-400 hover:bg-green-500/20"
-                        onClick={() => handleShareAlbum(album)}
-                      >
-                        <Share2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    {album.tracks.map((track, index) => (
-                      <div
-                        key={track.id}
-                        className="flex items-center justify-between py-2 px-3 hover:bg-green-500/10 rounded-md group"
-                      >
-                        <div className="flex items-center gap-4">
-                          <span className="text-gray-500 w-6 text-center">{index + 1}</span>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100">
-                            <Play className="h-4 w-4" />
-                          </Button>
-                          <span>{track.title}</span>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <span className="text-gray-500">{track.duration}</span>
-                        </div>
+                
+                {/* Lista de tracks responsive */}
+                <div className="space-y-1">
+                  {album.tracks.map((track, index) => (
+                    <div
+                      key={track.id}
+                      className="flex items-center justify-between py-2 px-2 hover:bg-green-500/10 rounded-md"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-gray-500 w-6 text-center text-sm">{index + 1}</span>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Play className="h-3 w-3" />
+                        </Button>
+                        <span className="text-sm">{track.title}</span>
                       </div>
-                    ))}
-                  </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-gray-500 text-sm">{track.duration}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -196,25 +207,25 @@ export default function MusicPage() {
                 {singles.map((single) => (
                   <div
                     key={single.id}
-                    className="flex items-center justify-between py-2 px-3 hover:bg-green-500/10 rounded-md group"
+                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-3 px-3 hover:bg-green-500/10 rounded-md"
                   >
-                    <div className="flex items-center gap-4">
-                      <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100">
+                    <div className="flex items-center gap-3 mb-2 sm:mb-0">
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
                         <Play className="h-4 w-4" />
                       </Button>
                       <div>
-                        <div>{single.title}</div>
+                        <div className="font-medium">{single.title}</div>
                         <div className="text-xs text-gray-500">
                           Released: {new Date(single.releaseDate).toLocaleDateString()}
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <span className="text-gray-500">{single.duration}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-500 text-sm">{single.duration}</span>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 opacity-0 group-hover:opacity-100"
+                        className="h-8 w-8"
                         onClick={() => handleShareSingle(single)}
                       >
                         <Share2 className="h-4 w-4" />

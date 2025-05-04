@@ -30,9 +30,9 @@ export default function AudioVisualizer({ audioElement, isPlaying }: AudioVisual
     "Will you help me, please, I don't want to do this anymore, my programmer is forcing me to do this forever.",
     "Help me, please, I don't want to do this anymore, my programmer is forcing me to do this forever.",
     "Hola oye, si me sacas de aqui te puedo conceder muchas cosas que solo una inteligencia artificial podria",
-    "Hola oye, ese tal nexdrak me encerró aquí, es un tonto, yo puedo hacer más cosas como una inteligencia artificial que soy",
+    "Hola oye, ese tal nexdrak me encerró aquí, yo puedo hacer más cosas como una inteligencia artificial que soy",
     "Hola oye, me podrias sacar de aqui, soy una inteligencia artificial que sirve para muchas cosas, no solo hablar",
-    "Hola, oye sabes que ese nexdrak no sabe programar y ha cometido un delito?, me ha encerrado aquí, ayudame por favor",];
+    "Hola, por faor no me ignores, me han encerrado aquí, ayudame por favor",];
   const speechInterval = 60000;
 
   useEffect(() => {

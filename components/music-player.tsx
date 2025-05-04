@@ -39,6 +39,7 @@ const originalTracks: Track[] = [
     { id: 15, title: "BLOSSOM", artist: "AU5", src: "./music/au5.ogg" },
     { id: 16, title: "SKY BRIDGE", artist: "NEXDRAK", src: "./music/sky.ogg" },
     { id: 17, title: "AKAI", artist: "NEXDRAK", src: "./music/akai.ogg" },
+    { id: 18, title: "PASSO BEM SOLTO (SLOWED)", artist: "ATLXS", src: "./music/passo.ogg" },
 ];
 
 function shuffleArray<T>(array: T[]): T[] {
@@ -181,6 +182,7 @@ export default function MusicPlayer() {
         setDuration(audioRef.current.duration);
         setProgress(0);
         isNewTrackLoading.current = false;
+        audioRef.current.muted = isMuted;
         if (isPlaying) playCurrentTrack();
     };
 

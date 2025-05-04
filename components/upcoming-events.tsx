@@ -16,7 +16,7 @@ interface Event {
 const events: Event[] = [
   {
     id: 1,
-    title: "PULSE Live at Techno Sphere",
+    title: "NexDrak Live at Techno Sphere",
     date: "June 15, 2025",
     time: "10:00 PM - 2:00 AM",
     location: "Berlin, Germany",
@@ -34,7 +34,7 @@ const events: Event[] = [
   },
   {
     id: 3,
-    title: "PULSE Summer Tour - London",
+    title: "NexDrak Summer Tour - London",
     date: "July 22, 2025",
     time: "9:00 PM - 3:00 AM",
     location: "London, UK",
@@ -52,7 +52,7 @@ const events: Event[] = [
   },
   {
     id: 5,
-    title: "PULSE at Neon Nights",
+    title: "NexDrak at Neon Nights",
     date: "August 19, 2025",
     time: "11:00 PM - 5:00 AM",
     location: "Tokyo, Japan",
