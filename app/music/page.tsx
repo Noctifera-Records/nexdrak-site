@@ -26,11 +26,11 @@ const albums: Album[] = [
   {
     id: 1,
     title: "Red Eye Flight",
-    year: "2024",
+    year: "2025",
     trackCount: 1,
     image: "/img/releases/rede.webp",
     tracks: [
-      { id: 1, title: "Red Eye Flight", album: "Red Eye Flight", duration: "3:45", releaseDate: "2024-03-15" },
+      { id: 1, title: "Red Eye Flight", album: "Red Eye Flight", duration: "3:56", releaseDate: "2025-03-09" },
     ],
   },
   {
@@ -40,47 +40,59 @@ const albums: Album[] = [
     trackCount: 1,
     image: "/img/releases/endless.webp",
     tracks: [
-      { id: 2, title: "Endless Rail", album: "Endless Rail", duration: "4:20", releaseDate: "2023-08-10" },
+      { id: 2, title: "Endless Rail", album: "Endless Rail", duration: "3:38", releaseDate: "2023-08-15" },
     ],
   },
   {
     id: 3,
     title: "Rewind",
-    year: "2023",
+    year: "2022",
     trackCount: 1,
     image: "/img/releases/rewind.webp",
     tracks: [
-      { id: 3, title: "Rewind", album: "Rewind", duration: "4:20", releaseDate: "2023-08-10" },
+      { id: 3, title: "Rewind", album: "Rewind", duration: "4:53", releaseDate: "2022-03-22" },
     ],
   },
   {
     id: 4,
     title: "Your Lie",
-    year: "2023",
+    year: "2020",
     trackCount: 1,
     image: "/img/releases/yourlie.webp",
     tracks: [
-      { id: 4, title: "Your Lie", album: "Rewind", duration: "4:20", releaseDate: "2023-08-10" },
+      { id: 4, title: "Your Lie", album: "Your Lie", duration: "3:420", releaseDate: "2020-06-02" },
+      { id: 5, title: "Letter", album: "Your Lie", duration: "3:06", releaseDate: "2020-06-02" },
+      { id: 6, title: "Flowers", album: "Your Lie", duration: "4:14", releaseDate: "2020-06-02" },
     ],
   },
   {
-    id: 4,
-    title: "Your Lie",
+    id: 5,
+    title: "Even to Dream",
     year: "2023",
     trackCount: 1,
-    image: "/img/releases/yourlie.webp",
+    image: "/img/releases/e2d.webp",
     tracks: [
-      { id: 4, title: "Your Lie", album: "Rewind", duration: "4:20", releaseDate: "2023-08-10" },
+      { id: 7, title: "Even to Dream", album: "E2D", duration: "3:50", releaseDate: "2019-05-16" },
     ],
   },
   {
-    id: 4,
-    title: "Your Lie",
-    year: "2023",
+    id: 6,
+    title: "ExGirl",
+    year: "2017",
     trackCount: 1,
-    image: "/img/releases/yourlie.webp",
+    image: "/img/releases/exgirl.webp",
     tracks: [
-      { id: 4, title: "Your Lie", album: "Rewind", duration: "4:20", releaseDate: "2023-08-10" },
+      { id: 8, title: "ExGirl", album: "EX", duration: "4:10", releaseDate: "2017-07-25" },
+    ],
+  },
+  {
+    id: 7,
+    title: "Akai",
+    year: "2017",
+    trackCount: 1,
+    image: "/img/releases/akai.webp",
+    tracks: [
+      { id: 9, title: "Akai", album: "Akai", duration: "3:53", releaseDate: "2017-02-27" },
     ],
   },
 ];
@@ -110,7 +122,6 @@ export default function MusicPage() {
       // Aquí podrías implementar una alternativa como copiar el enlace al portapapeles
     }
   };
-
 
   const handleShareSingle = async (single: Track) => {
     if (navigator.share) {
