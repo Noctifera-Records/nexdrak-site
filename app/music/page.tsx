@@ -63,6 +63,26 @@ const albums: Album[] = [
       { id: 4, title: "Your Lie", album: "Rewind", duration: "4:20", releaseDate: "2023-08-10" },
     ],
   },
+  {
+    id: 4,
+    title: "Your Lie",
+    year: "2023",
+    trackCount: 1,
+    image: "/img/releases/yourlie.webp",
+    tracks: [
+      { id: 4, title: "Your Lie", album: "Rewind", duration: "4:20", releaseDate: "2023-08-10" },
+    ],
+  },
+  {
+    id: 4,
+    title: "Your Lie",
+    year: "2023",
+    trackCount: 1,
+    image: "/img/releases/yourlie.webp",
+    tracks: [
+      { id: 4, title: "Your Lie", album: "Rewind", duration: "4:20", releaseDate: "2023-08-10" },
+    ],
+  },
 ];
 
 const singles: Track[] = [
