@@ -98,10 +98,10 @@ const albums: Album[] = [
 ];
 
 const singles: Track[] = [
-  { id: 3, title: "Midnight Drive", album: "Single", duration: "3:35", releaseDate: "2024-04-20" },
-  { id: 4, title: "Cyber Dawn", album: "Single", duration: "4:15", releaseDate: "2024-02-15" },
-  { id: 5, title: "Electric Soul", album: "Single", duration: "3:50", releaseDate: "2023-12-01" },
-  { id: 6, title: "Digital Love", album: "Single", duration: "4:25", releaseDate: "2023-10-12" },
+  { id: 12, title: "Midnight Drive", album: "Single", duration: "3:35", releaseDate: "2024-04-20" },
+  { id: 13, title: "Cyber Dawn", album: "Single", duration: "4:15", releaseDate: "2024-02-15" },
+  { id: 14, title: "Electric Soul", album: "Single", duration: "3:50", releaseDate: "2023-12-01" },
+  { id: 15, title: "Digital Love", album: "Single", duration: "4:25", releaseDate: "2023-10-12" },
 ];
 
 export default function MusicPage() {
