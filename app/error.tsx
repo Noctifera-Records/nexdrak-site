@@ -22,18 +22,14 @@ export default function Error({
   error: Error & { digest?: string }
   reset: () => void
 }) {
-  const [horizontalLines, setHorizontalLines] = useState<GlitchLine[]>([])
+  const [glitchLines, setGlitchLines] = useState<GlitchLine[]>([])
   const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
-    // Log the error to an error reporting service
+    setIsClient(true)
     console.error(error)
 
-    // Initialize client-side only
-    setIsClient(true)
-
-    // Generate horizontal glitch lines
-    const hLines = Array.from({ length: 10 }).map((_, i) => ({
+    const lines = Array.from({ length: 10 }).map((_, i) => ({
       id: i,
       height: Math.random() * 3,
       width: Math.random() * 100,
@@ -42,17 +38,15 @@ export default function Error({
       duration: Math.random() * 5 + 2,
       opacity: Math.random() * 0.5 + 0.5,
     }))
-
-    setHorizontalLines(hLines)
+    setGlitchLines(lines)
   }, [error])
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center relative px-4 py-24">
-      {/* Glitch effect - only render when client-side */}
       {isClient && (
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute inset-0 z-0">
-            {horizontalLines.map((line) => (
+            {glitchLines.map((line) => (
               <div
                 key={line.id}
                 className="absolute bg-red-500/20"
@@ -80,7 +74,7 @@ export default function Error({
         <div className="space-y-4">
           <h2 className="text-2xl md:text-3xl font-bold">SOMETHING WENT WRONG</h2>
           <p className="text-lg text-gray-400">Looks like we hit a bad frequency. Our engineers have been notified.</p>
-          {error.message && (
+          {error?.message && (
             <p className="text-sm text-gray-500 bg-black/50 p-4 rounded-md border border-red-500/20 mt-4 max-w-lg mx-auto overflow-auto">
               {error.message}
             </p>
@@ -88,7 +82,7 @@ export default function Error({
         </div>
 
         <div className="flex flex-wrap justify-center gap-4 mt-8">
-          <Button onClick={reset} size="lg" className="bg-red-500 hover:bg-red-600 text-black">
+          <Button onClick={() => reset()} size="lg" className="bg-red-500 hover:bg-red-600 text-black">
             <RefreshCw className="mr-2 h-5 w-5" />
             TRY AGAIN
           </Button>
