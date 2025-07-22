@@ -26,11 +26,30 @@ const nextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
-  headers: async () => {
+  async headers() {
+    const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
+    const cspHeader = `
+      default-src 'self';
+      script-src 'self' 'nonce-${nonce}' 'strict-dynamic';
+      style-src 'self' 'unsafe-inline';
+      img-src 'self' data: *;
+      font-src 'self';
+      object-src 'none';
+      base-uri 'self';
+      form-action 'self';
+      frame-ancestors 'none';
+      block-all-mixed-content;
+      upgrade-insecure-requests;
+    `.replace(/\s{2,}/g, ' ').trim();
+
     return [
       {
         source: '/(.*)',
         headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: cspHeader,
+          },
           {
             key: 'X-Frame-Options',
             value: 'DENY',
@@ -47,6 +66,10 @@ const nextConfig = {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=()',
           },
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=63072000; includeSubDomains; preload',
+          },
         ],
       },
       {
@@ -62,13 +85,13 @@ const nextConfig = {
         source: '/robots.txt',
         headers: [
           {
-            key: 'Cache-Control',
+            key: 'Cache-control',
             value: 'public, max-age=86400, s-maxage=86400',
           },
         ],
       },
     ];
   },
-}
+};
 
-export default nextConfig
+export default nextConfig;
