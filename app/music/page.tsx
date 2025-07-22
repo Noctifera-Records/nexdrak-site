@@ -150,7 +150,7 @@ export default function MusicPage() {
 
       <Tabs defaultValue="albums" className="w-full px-4">
         {/* TabsList responsive */}
-        <TabsList className="grid w-full max-w-md mx-auto grid-cols-3 mb-8 p-1 bg-green-900/20">
+        <TabsList className="grid w-full max-w-md mx-auto grid-cols-3 mb-8 p-1 bg-white/10">
           <TabsTrigger value="albums" className="text-sm py-2">Albums</TabsTrigger>
           <TabsTrigger value="singles" className="text-sm py-2">Singles</TabsTrigger>
           <TabsTrigger value="remixes" className="text-sm py-2">Remixes</TabsTrigger>
@@ -160,7 +160,7 @@ export default function MusicPage() {
           {albums.map((album) => (
             <div
               key={album.id}
-              className="bg-black/50 backdrop-blur-sm border border-green-500/20 rounded-xl overflow-hidden flex flex-col md:flex-row"
+              className="bg-black/50 backdrop-blur-sm border border-white/20 rounded-xl overflow-hidden flex flex-col md:flex-row"
             >
               {/* Imagen responsive */}
               <div className="relative bg-black/30 w-full md:w-[300px] h-64 md:h-auto mx-auto md:mx-0">
@@ -181,21 +181,21 @@ export default function MusicPage() {
                   
                   {/* Botones responsivos */}
                   <div className="flex flex-wrap gap-2 mt-4">
-                    <Button className="bg-green-500 hover:bg-green-600 text-black text-sm py-1.5 px-3 min-w-[100px]">
+                    <Button className="bg-white hover:bg-gray-200 text-black text-sm py-1.5 px-3 min-w-[100px]">
                       <Play className="h-3 w-3 mr-1" />
                       <span className="hidden sm:inline">Play All</span>
                     </Button>
-                    <Button variant="outline" className="border-green-500/50 text-green-400 hover:bg-green-500/20 text-sm py-1.5 px-3">
+                    <Button variant="outline" className="border-white/50 text-white hover:bg-white/20 text-sm py-1.5 px-3">
                       <ImageDown className="h-3 w-3 mr-1" />
                       <span className="hidden sm:inline">Wallpaper</span>
                     </Button>
-                    <Button variant="outline" className="border-green-500/50 text-green-400 hover:bg-green-500/20 text-sm py-1.5 px-3">
+                    <Button variant="outline" className="border-white/50 text-white hover:bg-white/20 text-sm py-1.5 px-3">
                       <Download className="h-3 w-3 mr-1" />
                       <span className="hidden sm:inline">MP3</span>
                     </Button>
                     <Button
                       variant="outline"
-                      className="border-green-500/50 text-green-400 hover:bg-green-500/20 p-1.5"
+                      className="border-white/50 text-white hover:bg-white/20 p-1.5"
                       onClick={() => handleShareAlbum(album)}
                     >
                       <Share2 className="h-4 w-4" />
@@ -208,7 +208,7 @@ export default function MusicPage() {
                   {album.tracks.map((track, index) => (
                     <div
                       key={track.id}
-                      className="flex items-center justify-between py-2 px-2 hover:bg-green-500/10 rounded-md"
+                      className="flex items-center justify-between py-2 px-2 hover:bg-white/10 rounded-md"
                     >
                       <div className="flex items-center gap-2">
                         <span className="text-gray-500 w-6 text-center text-sm">{index + 1}</span>
@@ -229,7 +229,7 @@ export default function MusicPage() {
         </TabsContent>
 
         <TabsContent value="singles">
-          <Card className="bg-black/50 backdrop-blur-sm border-green-500/20">
+          <Card className="bg-black/50 backdrop-blur-sm border-white/20">
             <CardHeader>
               <CardTitle>Singles</CardTitle>
             </CardHeader>
@@ -238,7 +238,7 @@ export default function MusicPage() {
                 {singles.map((single) => (
                   <div
                     key={single.id}
-                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-3 px-3 hover:bg-green-500/10 rounded-md"
+                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-3 px-3 hover:bg-white/10 rounded-md"
                   >
                     <div className="flex items-center gap-3 mb-2 sm:mb-0">
                       <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -267,7 +267,7 @@ export default function MusicPage() {
               </div>
             </CardContent>
             <CardFooter>
-              <Button className="bg-green-500 hover:bg-green-600 text-black w-full">
+              <Button className="bg-white hover:bg-gray-200 text-black w-full">
                 <Play className="h-4 w-4 mr-2" />
                 Play All Singles
               </Button>
@@ -283,13 +283,13 @@ export default function MusicPage() {
         </TabsContent>
       </Tabs>
 
-      <div className="max-w-2xl mx-auto mt-16 p-8 bg-black/50 backdrop-blur-sm border border-green-500/20 rounded-xl text-center">
+      <div className="max-w-2xl mx-auto mt-16 p-8 bg-black/50 backdrop-blur-sm border border-white/20 rounded-xl text-center">
         <h2 className="text-2xl font-bold mb-4">LICENSING</h2>
         <p className="text-gray-300 mb-6">
           Interested in licensing NexDrak's music for your project, film, or commercial? Get in touch with our licensing
           team.
         </p>
-        <Button className="bg-green-500 hover:bg-green-600 text-black">CONTACT FOR LICENSING</Button>
+        <Button className="bg-white hover:bg-gray-200 text-black">CONTACT FOR LICENSING</Button>
       </div>
     </div>
   );

@@ -75,7 +75,7 @@ export default function NotFound() {
             {horizontalLines.map((line) => (
               <div
                 key={line.id}
-                className="absolute bg-green-500/20"
+                className="absolute bg-white/20"
                 style={{
                   height: `${line.height}px`,
                   width: `${line.width}%`,
@@ -91,7 +91,7 @@ export default function NotFound() {
             {verticalLines.map((line) => (
               <div
                 key={line.id}
-                className="absolute bg-green-500/20"
+                className="absolute bg-white/20"
                 style={{
                   width: `${line.width}px`,
                   height: `${line.height}%`,
@@ -108,10 +108,10 @@ export default function NotFound() {
 
       <div className="z-10 text-center space-y-8 max-w-2xl mx-auto">
         <div className="flex items-center justify-center mb-6">
-          <Disc3 className="h-24 w-24 text-green-500 animate-spin-slow" />
+          <Disc3 className="h-24 w-24 text-white animate-spin-slow" />
         </div>
 
-        <h1 className="text-8xl md:text-9xl font-bold tracking-tighter text-green-500 glitch-text">404</h1>
+        <h1 className="text-8xl md:text-9xl font-bold tracking-tighter text-white glitch-text">404</h1>
 
         <div className="space-y-4">
           <h2 className="text-3xl md:text-4xl font-bold">SORRY BUT TRACK NOT FOUND</h2>
@@ -119,7 +119,7 @@ export default function NotFound() {
         </div>
 
         <div className="flex flex-wrap justify-center gap-4 mt-8">
-          <Button asChild size="lg" className="bg-green-500 hover:bg-green-600 text-black">
+          <Button asChild size="lg" className="bg-white hover:bg-gray-200 text-black">
             <Link href="/">
               <Home className="mr-2 h-5 w-5" />
               BACK TO HOME
@@ -130,7 +130,7 @@ export default function NotFound() {
             variant="outline"
             size="lg"
             onClick={() => window.history.back()}
-            className="border-green-500 text-green-500 hover:bg-green-500/20"
+            className="border-white text-white hover:bg-white/20"
           >
             <ArrowLeft className="mr-2 h-5 w-5" />
             GO BACK
@@ -138,7 +138,7 @@ export default function NotFound() {
         </div>
 
         <div className="text-sm text-gray-500 mt-8">
-          Redirecting to home in <span className="text-green-500">{count}</span> seconds...
+          Redirecting to home in <span className="text-white">{count}</span> seconds...
         </div>
       </div>
 

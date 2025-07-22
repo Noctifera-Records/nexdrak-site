@@ -83,7 +83,7 @@ export default function MerchPage() {
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-400">Filter by:</span>
           <Select defaultValue="all">
-            <SelectTrigger className="w-[180px] bg-black/50 border-green-500/20">
+            <SelectTrigger className="w-[180px] bg-black/50 border-white/20">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
@@ -99,7 +99,7 @@ export default function MerchPage() {
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-400">Sort by:</span>
           <Select defaultValue="featured">
-            <SelectTrigger className="w-[180px] bg-black/50 border-green-500/20">
+            <SelectTrigger className="w-[180px] bg-black/50 border-white/20">
               <SelectValue placeholder="Sort" />
             </SelectTrigger>
             <SelectContent>
@@ -114,7 +114,7 @@ export default function MerchPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {products.map((product) => (
-          <Card key={product.id} className="bg-black/50 backdrop-blur-sm border-green-500/20 overflow-hidden">
+          <Card key={product.id} className="bg-black/50 backdrop-blur-sm border-white/20 overflow-hidden">
             <div className="aspect-square relative bg-black/30">
               <Image
                 src={product.image || "/placeholder.svg"}
@@ -125,12 +125,12 @@ export default function MerchPage() {
             </div>
             <CardContent className="p-4">
               <h3 className="font-semibold text-lg">{product.name}</h3>
-              <p className="text-green-400 font-bold mt-1">${product.price}</p>
+              <p className="text-white font-bold mt-1">${product.price}</p>
             </CardContent>
             <CardFooter className="p-4 pt-0">
               <div className="grid grid-cols-2 gap-2 w-full">
                 <Select defaultValue="m">
-                  <SelectTrigger className="bg-black/50 border-green-500/20">
+                  <SelectTrigger className="bg-black/50 border-white/20">
                     <SelectValue placeholder="Size" />
                   </SelectTrigger>
                   <SelectContent>
@@ -140,7 +140,7 @@ export default function MerchPage() {
                     <SelectItem value="xl">XL</SelectItem>
                   </SelectContent>
                 </Select>
-                <Button className="bg-green-500 hover:bg-green-600 text-black">
+                <Button className="bg-white hover:bg-gray-200 text-black">
                   <ShoppingCart className="h-4 w-4 mr-2" />
                   Go Buy
                 </Button>
@@ -150,12 +150,12 @@ export default function MerchPage() {
         ))}
       </div>
 
-      <div className="max-w-2xl mx-auto mt-16 p-8 bg-black/50 backdrop-blur-sm border border-green-500/20 rounded-xl text-center">
+      <div className="max-w-2xl mx-auto mt-16 p-8 bg-black/50 backdrop-blur-sm border border-white/20 rounded-xl text-center">
         <h2 className="text-2xl font-bold mb-4">CUSTOM ORDERS</h2>
         <p className="text-gray-300 mb-6">
           Looking for custom merchandise for your event or group? Contact us for bulk orders and custom designs.
         </p>
-        <Button className="bg-green-500 hover:bg-green-600 text-black">CONTACT FOR CUSTOM ORDERS</Button>
+        <Button className="bg-white hover:bg-gray-200 text-black">CONTACT FOR CUSTOM ORDERS</Button>
       </div>
     </div>
   )

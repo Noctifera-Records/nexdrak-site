@@ -82,7 +82,7 @@ export default function EventsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {events.map((event) => (
-          <Card key={event.id} className="bg-black/50 backdrop-blur-sm border-green-500/20">
+          <Card key={event.id} className="bg-black/50 backdrop-blur-sm border-white/20">
             <CardHeader>
               <div className="flex justify-between items-start">
                 <CardTitle className="text-xl">{event.title}</CardTitle>
@@ -95,7 +95,7 @@ export default function EventsPage() {
                     CANCELLED
                   </Badge>
                 ) : (
-                  <Badge variant="outline" className="bg-green-500/20 text-green-300 border-green-500/50">
+                  <Badge variant="outline" className="bg-white/20 text-white border-white/50">
                     TICKETS AVAILABLE
                   </Badge>
                 )}
@@ -103,15 +103,15 @@ export default function EventsPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-2">
-                <CalendarDays className="h-4 w-4 text-green-500" />
+                <CalendarDays className="h-4 w-4 text-white" />
                 <span>{event.date}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-green-500" />
+                <Clock className="h-4 w-4 text-white" />
                 <span>{event.time}</span>
               </div>
               <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-green-500" />
+                <MapPin className="h-4 w-4 text-white" />
                 <span>
                   {event.venue}, {event.location}
                 </span>
@@ -122,7 +122,7 @@ export default function EventsPage() {
                 className={`w-full ${
                   event.status === "sold-out" || event.status === "cancelled"
                     ? "bg-gray-700 hover:bg-gray-700 cursor-not-allowed"
-                    : "bg-green-500 hover:bg-green-600 text-black"
+                    : "bg-white hover:bg-gray-200 text-black"
                 }`}
                 disabled={event.status === "sold-out" || event.status === "cancelled"}
               >
@@ -133,13 +133,13 @@ export default function EventsPage() {
         ))}
       </div>
 
-      <div className="max-w-2xl mx-auto mt-16 p-8 bg-black/50 backdrop-blur-sm border border-green-500/20 rounded-xl text-center">
+      <div className="max-w-2xl mx-auto mt-16 p-8 bg-black/50 backdrop-blur-sm border border-white/20 rounded-xl text-center">
         <h2 className="text-2xl font-bold mb-4">PRIVATE BOOKINGS</h2>
         <p className="text-gray-300 mb-6">
           Interested in booking NexDrak for a private event or festival? Get in touch with our booking team.
         </p>
         <a href="mailto:mgmt@nexdrak.com?subject=Private%20Booking%20Inquiry" className="block w-full">
-          <Button className="bg-green-500 hover:bg-green-600 text-black">CONTACT FOR BOOKING</Button>
+          <Button className="bg-white hover:bg-gray-200 text-black">CONTACT FOR BOOKING</Button>
         </a>
       </div>
     </div>

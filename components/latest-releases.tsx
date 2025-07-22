@@ -101,7 +101,7 @@ export default function LatestReleases() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {releases.map((release) => (
-        <Card key={release.id} className="bg-black/50 backdrop-blur-sm border-green-500/20 overflow-hidden group">
+        <Card key={release.id} className="bg-black/50 backdrop-blur-sm border-white/20 overflow-hidden group">
           <div className="relative aspect-square">
             <Image
               src={release.coverArt || "/placeholder.svg"}
@@ -115,7 +115,7 @@ export default function LatestReleases() {
                 <Button
                   variant="outline"
                   size="icon"
-                  className="rounded-full h-14 w-14 border-green-500 text-green-500 hover:bg-green-500/20"
+                  className="rounded-full h-14 w-14 border-white text-white hover:bg-white/20"
                   asChild
                 >
                   <a 
@@ -131,7 +131,7 @@ export default function LatestReleases() {
                   onClick={() => togglePlay(release)}
                   variant="outline"
                   size="icon"
-                  className="rounded-full h-14 w-14 border-green-500 text-green-500 hover:bg-green-500/20"
+                  className="rounded-full h-14 w-14 border-white text-white hover:bg-white/20"
                 >
                   {playingId === release.id ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
                 </Button>
@@ -150,7 +150,7 @@ export default function LatestReleases() {
                 onClick={() => togglePlay(release)}
                 variant="ghost"
                 size="icon"
-                className="text-green-500 hover:text-green-400 hover:bg-transparent -mt-1 -mr-2"
+                className="text-white hover:text-gray-300 hover:bg-transparent -mt-1 -mr-2"
               >
                 {playingId === release.id ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
               </Button>

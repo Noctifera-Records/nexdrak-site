@@ -12,7 +12,7 @@ export default function AboutPage() {
 
       <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
         <div>
-          <h2 className="text-2xl font-bold mb-4 text-green-500">THE ARTIST</h2>
+          <h2 className="text-2xl font-bold mb-4 text-white">THE ARTIST</h2>
           <div className="space-y-4 text-gray-300">
             <p>
             NexDrak aka. “Nex” emerged from the underground electronic scene in 2017, setting 
@@ -39,15 +39,15 @@ export default function AboutPage() {
         </div>
       </div>
 
-      <div className="bg-black/50 backdrop-blur-sm border border-green-500/20 rounded-xl p-8 mb-20">
+      <div className="bg-black/50 backdrop-blur-sm border border-white/20 rounded-xl p-8 mb-20">
         <h2 className="text-2xl font-bold mb-6 text-center">MUSICAL JOURNEY</h2>
         <div className="space-y-8">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="md:w-1/4 flex flex-col items-center md:items-end">
-              <div className="text-green-500 font-bold text-xl">2014</div>
-              <div className="h-full w-px bg-green-500/30 my-2 hidden md:block"></div>
+              <div className="text-white font-bold text-xl">2014</div>
+              <div className="h-full w-px bg-white/30 my-2 hidden md:block"></div>
             </div>
-            <div className="md:w-3/4 bg-black/30 p-6 rounded-lg border border-green-500/10">
+            <div className="md:w-3/4 bg-black/30 p-6 rounded-lg border border-white/10">
               <h3 className="font-bold mb-2">Beginnings </h3>
               <p className="text-gray-300">
               Start creating remixes and edits of several Vocaloid (CircusP) songs like “iNFeCTioN” and “Thunder Storm”.  
@@ -59,10 +59,10 @@ export default function AboutPage() {
 
           <div className="flex flex-col md:flex-row gap-4">
             <div className="md:w-1/4 flex flex-col items-center md:items-end">
-              <div className="text-green-500 font-bold text-xl">2015</div>
-              <div className="h-full w-px bg-green-500/30 my-2 hidden md:block"></div>
+              <div className="text-white font-bold text-xl">2015</div>
+              <div className="h-full w-px bg-white/30 my-2 hidden md:block"></div>
             </div>
-            <div className="md:w-3/4 bg-black/30 p-6 rounded-lg border border-green-500/10">
+            <div className="md:w-3/4 bg-black/30 p-6 rounded-lg border border-white/10">
               <h3 className="font-bold mb-2">Start on YouTube</h3>
               <p className="text-gray-300">
               In this year he created his music channel and resubmitted many of his songs on this channel and formally adopted the name “NexDrak”, 
@@ -74,10 +74,10 @@ export default function AboutPage() {
 
           <div className="flex flex-col md:flex-row gap-4">
             <div className="md:w-1/4 flex flex-col items-center md:items-end">
-              <div className="text-green-500 font-bold text-xl">2017</div>
-              <div className="h-full w-px bg-green-500/30 my-2 hidden md:block"></div>
+              <div className="text-white font-bold text-xl">2017</div>
+              <div className="h-full w-px bg-white/30 my-2 hidden md:block"></div>
             </div>
-            <div className="md:w-3/4 bg-black/30 p-6 rounded-lg border border-green-500/10">
+            <div className="md:w-3/4 bg-black/30 p-6 rounded-lg border border-white/10">
               <h3 className="font-bold mb-2">Beat Basis</h3>
               <p className="text-gray-300">
                 In this year he managed to consolidate himself as an emotive principle with tracks like “Your Smile” and “Time Out”.
@@ -87,10 +87,10 @@ export default function AboutPage() {
 
           <div className="flex flex-col md:flex-row gap-4">
             <div className="md:w-1/4 flex flex-col items-center md:items-end">
-              <div className="text-green-500 font-bold text-xl">2018</div>
-              <div className="h-full w-px bg-green-500/30 my-2 hidden md:block"></div>
+              <div className="text-white font-bold text-xl">2018</div>
+              <div className="h-full w-px bg-white/30 my-2 hidden md:block"></div>
             </div>
-            <div className="md:w-3/4 bg-black/30 p-6 rounded-lg border border-green-500/10">
+            <div className="md:w-3/4 bg-black/30 p-6 rounded-lg border border-white/10">
               <h3 className="font-bold mb-2">Growth</h3>
               <p className="text-gray-300">
                 Thanks to his singles like “Even to Dream” and “Akai” he positioned himself as a reference in the London Dubstep community.
@@ -100,10 +100,10 @@ export default function AboutPage() {
 
           <div className="flex flex-col md:flex-row gap-4">
             <div className="md:w-1/4 flex flex-col items-center md:items-end">
-              <div className="text-green-500 font-bold text-xl">2020</div>
-              <div className="h-full w-px bg-green-500/30 my-2 hidden md:block"></div>
+              <div className="text-white font-bold text-xl">2020</div>
+              <div className="h-full w-px bg-white/30 my-2 hidden md:block"></div>
             </div>
-            <div className="md:w-3/4 bg-black/30 p-6 rounded-lg border border-green-500/10">
+            <div className="md:w-3/4 bg-black/30 p-6 rounded-lg border border-white/10">
               <h3 className="font-bold mb-2">Live Showcase</h3>
               <p className="text-gray-300">
               In 2020 he made his first presentation in CDMX, with the support of The Chainsmokers, this presentation was not as disastrous as he expected, 
@@ -115,10 +115,10 @@ export default function AboutPage() {
 
           <div className="flex flex-col md:flex-row gap-4">
             <div className="md:w-1/4 flex flex-col items-center md:items-end">
-              <div className="text-green-500 font-bold text-xl">2018 - Present</div>
-              <div className="h-full w-px bg-green-500/30 my-2 hidden md:block"></div>
+              <div className="text-white font-bold text-xl">2018 - Present</div>
+              <div className="h-full w-px bg-white/30 my-2 hidden md:block"></div>
             </div>
-            <div className="md:w-3/4 bg-black/30 p-6 rounded-lg border border-green-500/10">
+            <div className="md:w-3/4 bg-black/30 p-6 rounded-lg border border-white/10">
               <h3 className="font-bold mb-2">Fall, The future and The road</h3>
               <p className="text-gray-300">
                 At this stage the pandemic played an important challenge in his career, from here on his releases were more inconsistent, 
@@ -132,7 +132,7 @@ export default function AboutPage() {
 
       <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
         <div className="order-2 md:order-1">
-          <h2 className="text-2xl font-bold mb-4 text-green-500">LIVE EXPERIENCE</h2>
+          <h2 className="text-2xl font-bold mb-4 text-white">LIVE EXPERIENCE</h2>
           <div className="space-y-4 text-gray-300">
             <p>
               A NexDrak live performance is more than just music: it's a fully immersive sensory journey. 
@@ -158,30 +158,30 @@ export default function AboutPage() {
       <div className="text-center mb-16">
         <h2 className="text-2xl font-bold mb-6">CONNECT WITH PULSE</h2>
         <div className="flex justify-center gap-4 flex-wrap">
-          <Button variant="outline" size="lg" className="border-green-500/50 text-green-400 hover:bg-green-500/20">
+          <Button variant="outline" size="lg" className="border-white/50 text-white hover:bg-white/20">
             <Instagram className="h-5 w-5 mr-2" />
             Instagram
           </Button>
-          <Button variant="outline" size="lg" className="border-green-500/50 text-green-400 hover:bg-green-500/20">
+          <Button variant="outline" size="lg" className="border-white/50 text-white hover:bg-white/20">
             <Twitter className="h-5 w-5 mr-2" />
             Twitter
           </Button>
-          <Button variant="outline" size="lg" className="border-green-500/50 text-green-400 hover:bg-green-500/20">
+          <Button variant="outline" size="lg" className="border-white/50 text-white hover:bg-white/20">
             <Youtube className="h-5 w-5 mr-2" />
             YouTube
           </Button>
-          <Button variant="outline" size="lg" className="border-green-500/50 text-green-400 hover:bg-green-500/20">
+          <Button variant="outline" size="lg" className="border-white/50 text-white hover:bg-white/20">
             <Spotify className="h-5 w-5 mr-2" />
             Spotify
           </Button>
-          <Button variant="outline" size="lg" className="border-green-500/50 text-green-400 hover:bg-green-500/20">
+          <Button variant="outline" size="lg" className="border-white/50 text-white hover:bg-white/20">
             <Facebook className="h-5 w-5 mr-2" />
             Facebook
           </Button>
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto p-8 bg-black/50 backdrop-blur-sm border border-green-500/20 rounded-xl text-center">
+      <div className="max-w-2xl mx-auto p-8 bg-black/50 backdrop-blur-sm border border-white/20 rounded-xl text-center">
         <h2 className="text-2xl font-bold mb-4">CONTACT</h2>
         <div className="grid md:grid-cols-2 gap-6 text-left mb-6">
           <div>
@@ -197,7 +197,7 @@ export default function AboutPage() {
             <p className="text-gray-300">info@nexdrak.com</p>
           </div>
         </div>
-        <Button className="bg-green-500 hover:bg-green-600 text-black">CONTACT FORM</Button>
+        <Button className="bg-white hover:bg-gray-200 text-black">CONTACT FORM</Button>
       </div>
     </div>
   )

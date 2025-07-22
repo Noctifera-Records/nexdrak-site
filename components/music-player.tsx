@@ -211,7 +211,7 @@ export default function MusicPlayer() {
                 </div>
             )}
             <div
-                className={`fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-md border-t border-green-500/20 transition-all duration-300 ${
+                className={`fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-md border-t border-white/20 transition-all duration-300 ${
                     isExpanded ? "h-32" : "h-16"
                 }`}
             >
@@ -266,7 +266,7 @@ export default function MusicPlayer() {
                                 size="icon"
                                 onClick={togglePlay}
                                 disabled={isCooldown}
-                                className="rounded-full border-green-500 text-green-500 hover:bg-green-500/20"
+                                className="rounded-full border-white text-white hover:bg-white/20"
                             >
                                 {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
                             </Button>

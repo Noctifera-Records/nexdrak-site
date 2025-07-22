@@ -1,132 +1,126 @@
 "use client"
 
-import type React from "react"
-
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import LoadingSpinner from "./loading-spinner"
+
+interface ContactFormData {
+  name: string
+  email: string
+  subject: string
+  message: string
+}
 
 export default function ContactForm() {
-  const [formState, setFormState] = useState({
+  const [formData, setFormData] = useState<ContactFormData>({
     name: "",
     email: "",
     subject: "",
-    message: "",
+    message: ""
   })
-
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isSuccess, setIsSuccess] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [error, setError] = useState("")
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormState((prev) => ({ ...prev, [name]: value }))
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }))
   }
 
-  const handleSelectChange = (value: string) => {
-    setFormState((prev) => ({ ...prev, subject: value }))
-  }
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsSubmitting(true)
+    setIsLoading(true)
+    setError("")
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false)
-      setIsSuccess(true)
-      setFormState({
-        name: "",
-        email: "",
-        subject: "",
-        message: "",
-      })
+    try {
+      // Simular llamada a API
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      setIsSubmitted(true)
+      setFormData({ name: "", email: "", subject: "", message: "" })
+    } catch (err) {
+      setError("Failed to send message. Please try again.")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
-      // Reset success message after 5 seconds
-      setTimeout(() => {
-        setIsSuccess(false)
-      }, 5000)
-    }, 1500)
+  if (isSubmitted) {
+    return (
+      <div className="w-full max-w-2xl mx-auto bg-black/50 backdrop-blur-sm border border-white/20 rounded-xl p-8 text-center">
+        <div className="text-white text-3xl mb-4">✓</div>
+        <h2 className="text-2xl font-bold mb-4">MESSAGE SENT!</h2>
+        <p className="text-gray-300 mb-6">
+          Thanks for reaching out. I'll get back to you as soon as possible.
+        </p>
+        <Button 
+          onClick={() => setIsSubmitted(false)}
+          className="bg-white hover:bg-gray-200 text-black"
+        >
+          SEND ANOTHER MESSAGE
+        </Button>
+      </div>
+    )
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <label htmlFor="name" className="text-sm font-medium">
-            Name
-          </label>
-          <Input
-            id="name"
+    <div className="w-full max-w-2xl mx-auto bg-black/50 backdrop-blur-sm border border-white/20 rounded-xl p-8">
+      <h2 className="text-2xl font-bold mb-6 text-center">GET IN TOUCH</h2>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input
+            type="text"
             name="name"
-            value={formState.name}
+            placeholder="Your Name"
+            value={formData.name}
             onChange={handleChange}
-            placeholder="Your name"
+            className="px-4 py-3 bg-black/50 border border-white/30 rounded-md focus:outline-none focus:ring-2 focus:ring-white text-white placeholder-gray-400"
             required
-            className="bg-black/50 border-green-500/30 focus:border-green-500 focus:ring-green-500"
+            disabled={isLoading}
           />
-        </div>
-
-        <div className="space-y-2">
-          <label htmlFor="email" className="text-sm font-medium">
-            Email
-          </label>
-          <Input
-            id="email"
-            name="email"
+          <input
             type="email"
-            value={formState.email}
+            name="email"
+            placeholder="Your Email"
+            value={formData.email}
             onChange={handleChange}
-            placeholder="Your email address"
+            className="px-4 py-3 bg-black/50 border border-white/30 rounded-md focus:outline-none focus:ring-2 focus:ring-white text-white placeholder-gray-400"
             required
-            className="bg-black/50 border-green-500/30 focus:border-green-500 focus:ring-green-500"
+            disabled={isLoading}
           />
         </div>
-      </div>
-
-      <div className="space-y-2">
-        <label htmlFor="subject" className="text-sm font-medium">
-          Subject
-        </label>
-        <Select value={formState.subject} onValueChange={handleSelectChange}>
-          <SelectTrigger className="bg-black/50 border-green-500/30">
-            <SelectValue placeholder="Select a subject" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="booking">Booking Inquiry</SelectItem>
-            <SelectItem value="press">Press/Media</SelectItem>
-            <SelectItem value="collaboration">Collaboration</SelectItem>
-            <SelectItem value="feedback">Feedback</SelectItem>
-            <SelectItem value="other">Other</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-2">
-        <label htmlFor="message" className="text-sm font-medium">
-          Message
-        </label>
-        <Textarea
-          id="message"
-          name="message"
-          value={formState.message}
+        <input
+          type="text"
+          name="subject"
+          placeholder="Subject"
+          value={formData.subject}
           onChange={handleChange}
-          placeholder="Your message"
+          className="w-full px-4 py-3 bg-black/50 border border-white/30 rounded-md focus:outline-none focus:ring-2 focus:ring-white text-white placeholder-gray-400"
           required
-          className="min-h-[150px] bg-black/50 border-green-500/30 focus:border-green-500 focus:ring-green-500"
+          disabled={isLoading}
         />
-      </div>
-
-      {isSuccess && (
-        <div className="bg-green-500/20 border border-green-500/30 text-green-400 px-4 py-3 rounded-md">
-          Your message has been sent successfully. We'll get back to you soon!
-        </div>
+        <textarea
+          name="message"
+          placeholder="Your Message"
+          value={formData.message}
+          onChange={handleChange}
+          rows={5}
+          className="w-full px-4 py-3 bg-black/50 border border-white/30 rounded-md focus:outline-none focus:ring-2 focus:ring-white text-white placeholder-gray-400 resize-none"
+          required
+          disabled={isLoading}
+        />
+        <Button 
+          type="submit" 
+          className="w-full bg-white hover:bg-gray-200 text-black py-3"
+          disabled={isLoading}
+        >
+          {isLoading ? <LoadingSpinner size="sm" /> : "SEND MESSAGE"}
+        </Button>
+      </form>
+      {error && (
+        <p className="text-red-400 text-sm mt-4 text-center">{error}</p>
       )}
-
-      <Button type="submit" disabled={isSubmitting} className="w-full bg-green-500 hover:bg-green-600 text-black">
-        {isSubmitting ? "Sending..." : "SEND MESSAGE"}
-      </Button>
-    </form>
+    </div>
   )
 }

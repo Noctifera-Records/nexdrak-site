@@ -34,12 +34,12 @@ export default function Navbar() {
             <Link
               key={item.name}
               href={item.href}
-              className="text-sm tracking-widest hover:text-green-400 transition-colors"
+              className="text-sm tracking-widest hover:text-white transition-colors"
             >
               {item.name}
             </Link>
           ))}
-          <Button variant="outline" className="border-green-500 text-green-500 hover:bg-green-500/20 rounded-md px-6">
+          <Button variant="outline" className="border-white text-white hover:bg-white/20 rounded-md px-6">
             LOGIN (SOON)
           </Button>
         </nav>
@@ -56,20 +56,20 @@ export default function Navbar() {
               <span className="sr-only">Toggle menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="right" className="bg-black/95 border-l border-green-500/20">
+          <SheetContent side="right" className="bg-black/95 border-l border-white/20">
             <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
             <nav className="flex flex-col h-full pt-8 space-y-8">
               {navItems.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="text-lg tracking-widest hover:text-green-400 transition-colors"
+                  className="text-lg tracking-widest hover:text-white transition-colors"
                   onClick={() => setIsOpen(false)}
                 >
                   {item.name}
                 </Link>
               ))}
-              <Button variant="outline" className="border-green-500 text-green-500 hover:bg-green-500/20 rounded-md">
+              <Button variant="outline" className="border-white text-white hover:bg-white/20 rounded-md">
                 LOGIN (SOON)
               </Button>
             </nav>
