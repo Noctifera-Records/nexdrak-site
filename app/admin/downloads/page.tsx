@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import DownloadsTable from './downloads-table'
 
+export const runtime = 'edge'
+
 export default async function AdminDownloadsPage() {
   const supabase = await createClient()
   

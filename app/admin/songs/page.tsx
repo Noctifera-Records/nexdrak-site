@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import SongsTable from './songs-table'
 
+export const runtime = 'edge'
+
 export default async function SongsPage() {
   const supabase = await createClient()
   

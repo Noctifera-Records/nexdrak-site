@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import ReleasesTable from './releases-table'
 
+export const runtime = 'edge'
+
 export default async function ReleasesPage() {
   const supabase = await createClient()
   

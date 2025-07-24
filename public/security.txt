@@ -1,0 +1,6 @@
+Contact: mailto:admin@nexdrak.com
+Expires: 2025-12-31T07:07:00.000Z
+Acknowledgments: https://nexdrak.com/hall-of-fame
+Preferred-Languages: en, es, ru
+Canonical: https://nexdrak.com/security.txt
+Policy: https://nexdrak.com/security-policy
