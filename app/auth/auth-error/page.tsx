@@ -4,8 +4,9 @@ import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { AlertCircle, Home, RefreshCw } from 'lucide-react'
+import { Suspense } from 'react'
 
-export default function AuthError() {
+function AuthErrorContent() {
   const searchParams = useSearchParams()
   const error = searchParams.get('error')
 
@@ -13,27 +14,27 @@ export default function AuthError() {
     switch (errorCode) {
       case 'bad_code_verifier':
         return {
-          title: 'Error de Verificación',
-          message: 'El enlace de verificación ha expirado o ya fue usado. Por favor, solicita un nuevo enlace de restablecimiento de contraseña.',
-          suggestion: 'Intenta solicitar un nuevo enlace desde la página de login.'
+          title: 'Verification Error',
+          message: 'The verification link has expired or has already been used. Please request a new password reset link.',
+          suggestion: 'Try requesting a new link from the login page.'
         }
       case 'no_code':
         return {
-          title: 'Enlace Inválido',
-          message: 'El enlace de verificación no es válido o está incompleto.',
-          suggestion: 'Verifica que hayas copiado el enlace completo desde tu correo electrónico.'
+          title: 'Invalid Link',
+          message: 'The verification link is invalid or incomplete.',
+          suggestion: 'Make sure you copied the complete link from your email.'
         }
       case 'callback_error':
         return {
-          title: 'Error de Autenticación',
-          message: 'Ocurrió un error durante el proceso de autenticación.',
-          suggestion: 'Por favor, intenta nuevamente o contacta al soporte si el problema persiste.'
+          title: 'Authentication Error',
+          message: 'An error occurred during the authentication process.',
+          suggestion: 'Please try again or contact support if the problem persists.'
         }
       default:
         return {
-          title: 'Error de Autenticación',
-          message: error || 'Ocurrió un error desconocido durante la autenticación.',
-          suggestion: 'Por favor, intenta nuevamente.'
+          title: 'Authentication Error',
+          message: error || 'An unknown error occurred during authentication.',
+          suggestion: 'Please try again.'
         }
     }
   }
@@ -66,7 +67,7 @@ export default function AuthError() {
           >
             <Link href="/login">
               <RefreshCw className="h-4 w-4 mr-2" />
-              Intentar Nuevamente
+              Try Again
             </Link>
           </Button>
           
@@ -77,20 +78,35 @@ export default function AuthError() {
           >
             <Link href="/">
               <Home className="h-4 w-4 mr-2" />
-              Volver al Inicio
+              Back to Home
             </Link>
           </Button>
         </div>
 
         <div className="text-xs text-gray-500 space-y-2">
-          <p>Si el problema persiste, verifica que:</p>
+          <p>If the problem persists, verify that:</p>
           <ul className="text-left space-y-1">
-            <li>• El enlace no haya expirado (válido por 1 hora)</li>
-            <li>• No hayas usado el enlace anteriormente</li>
-            <li>• Tu conexión a internet sea estable</li>
+            <li>• The link has not expired (valid for 1 hour)</li>
+            <li>• You have not used the link previously</li>
+            <li>• Your internet connection is stable</li>
           </ul>
         </div>
       </div>
     </div>
+  )
+}
+
+export default function AuthError() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-black text-white">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    }>
+      <AuthErrorContent />
+    </Suspense>
   )
 }
