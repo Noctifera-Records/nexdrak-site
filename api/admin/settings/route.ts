@@ -1,8 +1,10 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 
+// Configuración para Cloudflare Pages
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
+export const revalidate = false;
 
 export async function GET(request: Request) {
   const supabase = await createClient();
