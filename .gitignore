@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/sql
 
 # next.js
 /.next/
@@ -9,6 +10,17 @@
 
 # production
 /build
+build/bin
+build/other_templetes
+example_images
+frontend/dist
+frontend/node_modules
+dist
+test
+dist-ssr
+Docs
+1Docs
+*.local
 
 # debug
 npm-debug.log*
@@ -29,3 +41,28 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.next
+.bolt
+.gemini
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+README.md

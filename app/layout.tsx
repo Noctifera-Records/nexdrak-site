@@ -4,7 +4,8 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import Navbar from "@/components/navbar"
-import MusicPlayer from "@/components/music-player"
+import BackgroundAnimation from "@/components/background-animation"
+import { NotificationProvider } from "@/components/notification-system"
 import StructuredData from "./structured-data"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -125,9 +126,11 @@ export default function RootLayout({
       </head>
       <body className={`${inter.className} bg-black text-white min-h-screen flex flex-col`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          <Navbar />
-          <main className="flex-1 relative">{children}</main>
-          <MusicPlayer />
+          <NotificationProvider>
+            <BackgroundAnimation />
+            <Navbar />
+            <main className="flex-1 relative pt-20">{children}</main>
+          </NotificationProvider>
         </ThemeProvider>
       </body>
     </html>

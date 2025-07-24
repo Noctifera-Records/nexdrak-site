@@ -1,13 +1,14 @@
 "use client"
 
 import { useState } from "react"
-import Image from "next/image"
+import Image, { ImageProps } from "next/image"
 
 interface OptimizedImageProps {
   src: string
   alt: string
   width?: number
   height?: number
+  fill?: boolean
   className?: string
   priority?: boolean
   draggable?: boolean
@@ -18,9 +19,10 @@ export default function OptimizedImage({
   alt,
   width,
   height,
+  fill,
   className = "",
   priority = false,
-  draggable = false
+  draggable = false,
 }: OptimizedImageProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
@@ -31,15 +33,14 @@ export default function OptimizedImage({
         <div className="absolute inset-0 bg-gray-800 animate-pulse rounded" />
       )}
       {hasError ? (
-        <div className="flex items-center justify-center bg-gray-800 text-gray-400 rounded">
+        <div className="flex items-center justify-center bg-gray-800 text-gray-400 rounded h-full w-full">
           <span>Image not available</span>
         </div>
       ) : (
         <Image
           src={src}
           alt={alt}
-          width={width}
-          height={height}
+          {...(fill ? { fill: true } : { width, height })}
           className={className}
           priority={priority}
           draggable={draggable}
@@ -47,11 +48,6 @@ export default function OptimizedImage({
           onError={() => {
             setIsLoading(false)
             setHasError(true)
-          }}
-          style={{
-            objectFit: 'contain',
-            opacity: isLoading ? 0 : 1,
-            transition: 'opacity 0.3s ease-in-out'
           }}
         />
       )}

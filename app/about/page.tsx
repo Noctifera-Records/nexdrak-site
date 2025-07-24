@@ -30,11 +30,12 @@ export default function AboutPage() {
         </div>
         <div className="relative aspect-square select-none pointer-events-none">
           <Image
-            src="/img/others/xayah.jpg?height=600&width=600"
+            src="/img/others/xayah.jpg"
             alt="NexDrak Artist Photo"
             fill
             className="object-cover rounded-xl"
-            draggable="false"
+            draggable={false}
+            priority
           />
         </div>
       </div>
@@ -147,10 +148,11 @@ export default function AboutPage() {
         </div>
         <div className="relative aspect-video order-1 md:order-2">
           <Image
-            src="/placeholder.svg?height=400&width=600"
-            alt="PULSE Live Performance"
+            src="img/live_experience.png"
+            alt="NexDrak Live Performance"
             fill
             className="object-cover rounded-xl"
+            draggable={false}
           />
         </div>
       </div>

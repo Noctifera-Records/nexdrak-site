@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -27,29 +26,10 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV === 'production',
   },
   async headers() {
-    const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
-    const cspHeader = `
-      default-src 'self';
-      script-src 'self' 'nonce-${nonce}' 'strict-dynamic';
-      style-src 'self' 'unsafe-inline';
-      img-src 'self' data: *;
-      font-src 'self';
-      object-src 'none';
-      base-uri 'self';
-      form-action 'self';
-      frame-ancestors 'none';
-      block-all-mixed-content;
-      upgrade-insecure-requests;
-    `.replace(/\s{2,}/g, ' ').trim();
-
     return [
       {
         source: '/(.*)',
         headers: [
-          {
-            key: 'Content-Security-Policy',
-            value: cspHeader,
-          },
           {
             key: 'X-Frame-Options',
             value: 'DENY',
@@ -65,10 +45,6 @@ const nextConfig = {
           {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=()',
-          },
-          {
-            key: 'Strict-Transport-Security',
-            value: 'max-age=63072000; includeSubDomains; preload',
           },
         ],
       },

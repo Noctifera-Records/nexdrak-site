@@ -1,158 +1,156 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
-import { Play, Pause, ShoppingCart } from "lucide-react"
+import { Play, Pause, ExternalLink, Music } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { createClient } from "@/lib/supabase/client"
 
-interface Release {
+interface Song {
   id: number
   title: string
-  type: string
-  coverArt: string
-  releaseDate: string
-  audioSrc: string
-  purchaseLink: string
+  artist: string
+  stream_url: string
+  cover_image_url?: string
+  type: 'album' | 'single'
+  album_name?: string
+  track_number?: number
+  release_date?: string
+  created_at: string
 }
 
-const releases: Release[] = [
-  {
-    id: 1,
-    title: "Red Eye Flight",
-    type: "Single",
-    coverArt: "/img/releases/rede.webp",
-    releaseDate: "Mar 10, 2025",
-    audioSrc: "./samples/red3.ogg",
-    purchaseLink: "https://album.link/redeye"
-  },
-  {
-    id: 2,
-    title: "Endless Rail",
-    type: "Single",
-    coverArt: "/img/releases/endless.webp",
-    releaseDate: "Ago 16, 2023",
-    audioSrc: "/samples/endless.ogg",
-    purchaseLink: "https://album.link/example"
-  },
-  {
-    id: 3,
-    title: "Rewind",
-    type: "Single",
-    coverArt: "/img/releases/rewind.webp",
-    releaseDate: "Mar 3, 2021",
-    audioSrc: "/samples/rewind.ogg",
-    purchaseLink: "https://album.link/example"
-  },
-  {
-    id: 4,
-    title: "Your Lie",
-    type: "EP",
-    coverArt: "/img/releases/yourlie.webp",
-    releaseDate: "June 2, 2020",
-    audioSrc: "/samples/yourlie.ogg",
-    purchaseLink: "https://album.link/example"
-  }
-]
-
 export default function LatestReleases() {
-  const [playingId, setPlayingId] = useState<number | null>(null)
-  const [audio, setAudio] = useState<HTMLAudioElement | null>(null)
+  const [songs, setSongs] = useState<Song[]>([])
+  const [loading, setLoading] = useState(true)
+  const supabase = createClient()
 
-  const togglePlay = (release: Release) => {
-    if (playingId === release.id) {
-      audio?.pause()
-      setPlayingId(null)
-      setAudio(null)
-    } else {
-      if (audio) {
-        audio.pause()
+  useEffect(() => {
+    const fetchLatestSongs = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('songs')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(4)
+
+        if (error) {
+          console.error('Error fetching songs:', error)
+          return
+        }
+
+        setSongs(data || [])
+      } catch (error) {
+        console.error('Error:', error)
+      } finally {
+        setLoading(false)
       }
-
-      const newAudio = new Audio(release.audioSrc)
-      // @ts-ignore - custom property for tracking
-      newAudio._isConnected = false
-
-      newAudio.onerror = (e) => {
-        console.error("Audio error:", e)
-        setPlayingId(null)
-        setAudio(null)
-      }
-
-      const playPromise = newAudio.play()
-      if (playPromise !== undefined) {
-        playPromise.catch((error) => {
-          console.error("Playback error:", error)
-          setPlayingId(null)
-          setAudio(null)
-        })
-      }
-
-      newAudio.onended = () => {
-        setPlayingId(null)
-        setAudio(null)
-      }
-
-      setAudio(newAudio)
-      setPlayingId(release.id)
     }
+
+    fetchLatestSongs()
+  }, [supabase])
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    })
+  }
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[...Array(4)].map((_, i) => (
+          <Card key={i} className="bg-black/50 backdrop-blur-sm border-white/20 overflow-hidden">
+            <div className="aspect-square bg-gray-800 animate-pulse" />
+            <CardContent className="p-4">
+              <div className="h-4 bg-gray-700 rounded animate-pulse mb-2" />
+              <div className="h-3 bg-gray-700 rounded animate-pulse w-2/3" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    )
+  }
+
+  if (songs.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <Music className="h-16 w-16 text-gray-600 mx-auto mb-4" />
+        <p className="text-gray-400 text-lg">No hay música disponible</p>
+        <p className="text-gray-500 text-sm">Las canciones aparecerán aquí cuando se agreguen</p>
+      </div>
+    )
   }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {releases.map((release) => (
-        <Card key={release.id} className="bg-black/50 backdrop-blur-sm border-white/20 overflow-hidden group">
+      {songs.map((song) => (
+        <Card key={song.id} className="bg-black/50 backdrop-blur-sm border-white/20 overflow-hidden group">
           <div className="relative aspect-square">
-            <Image
-              src={release.coverArt || "/placeholder.svg"}
-              alt={release.title}
-              fill
-              className="object-cover transition-transform group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              <div className="flex items-center gap-4">
-                {/* Botón de compra */}
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="rounded-full h-14 w-14 border-white text-white hover:bg-white/20"
-                  asChild
-                >
-                  <a 
-                    href={release.purchaseLink} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                  >
-                    <ShoppingCart className="h-6 w-6" />
-                  </a>
-                </Button>
-                {/* Botón de reproducción/pausa */}
-                <Button
-                  onClick={() => togglePlay(release)}
-                  variant="outline"
-                  size="icon"
-                  className="rounded-full h-14 w-14 border-white text-white hover:bg-white/20"
-                >
-                  {playingId === release.id ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
-                </Button>
+            {song.cover_image_url ? (
+              <Image
+                src={song.cover_image_url}
+                alt={song.title}
+                fill
+                className="object-cover transition-transform group-hover:scale-105"
+              />
+            ) : (
+              <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+                <Music className="h-16 w-16 text-gray-600" />
               </div>
+            )}
+            
+            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <Button
+                variant="outline"
+                size="icon"
+                className="rounded-full h-14 w-14 border-white text-white hover:bg-white/20"
+                asChild
+              >
+                <a 
+                  href={song.stream_url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                >
+                  <ExternalLink className="h-6 w-6" />
+                </a>
+              </Button>
             </div>
           </div>
           <CardContent className="p-4">
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="font-bold text-lg">{release.title}</h3>
-                <p className="text-sm text-gray-400">
-                  {release.type} • {release.releaseDate}
+                <h3 className="font-bold text-lg">{song.title}</h3>
+                <p className="text-sm text-gray-500">{song.artist}</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className={`text-xs px-2 py-1 rounded ${
+                    song.type === 'album' ? 'bg-blue-500/20 text-blue-300' : 'bg-green-500/20 text-green-300'
+                  }`}>
+                    {song.type === 'album' ? 'Álbum' : 'Single'}
+                  </span>
+                  {song.album_name && (
+                    <span className="text-xs text-gray-400">{song.album_name}</span>
+                  )}
+                </div>
+                <p className="text-xs text-gray-400 mt-1">
+                  {song.release_date ? formatDate(song.release_date) : formatDate(song.created_at)}
                 </p>
               </div>
               <Button
-                onClick={() => togglePlay(release)}
                 variant="ghost"
                 size="icon"
                 className="text-white hover:text-gray-300 hover:bg-transparent -mt-1 -mr-2"
+                asChild
               >
-                {playingId === release.id ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
+                <a 
+                  href={song.stream_url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                >
+                  <ExternalLink className="h-5 w-5" />
+                </a>
               </Button>
             </div>
           </CardContent>

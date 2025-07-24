@@ -13,7 +13,7 @@ export default function StructuredData() {
           "https://open.spotify.com/artist/nexdrak",
           "https://soundcloud.com/nexdrak",
           "https://www.youtube.com/@nexdrak",
-          "https://twitter.com/nexdrak",
+          "https://x.com/nexdrak",
           "https://instagram.com/nexdrak"
         ],
         "genre": ["Electronic", "Dubstep", "Darkwave", "Synth", "EDM"],

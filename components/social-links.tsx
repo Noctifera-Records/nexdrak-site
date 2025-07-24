@@ -14,7 +14,7 @@ export default function SocialLinks() {
         </Button>
       </Link>
 
-      <Link href="https://twitter.com/nexdrak" target="_blank" rel="noopener noreferrer">
+      <Link href="https://x.com/nexdrak" target="_blank" rel="noopener noreferrer">
         <Button variant="outline" size="lg" className="border-white/50 text-white hover:bg-white/20" asChild>
           <span>
             <Twitter className="h-5 w-5 mr-2" />

@@ -1,135 +1,162 @@
-import { CalendarDays, MapPin, Clock } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+"use client";
+
+import { useState, useEffect } from "react";
+import { CalendarDays, MapPin, ExternalLink, Calendar } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { createClient } from "@/lib/supabase/client";
 
 interface Event {
-  id: number
-  title: string
-  date: string
-  time: string
-  location: string
-  venue: string
-  status: "upcoming" | "sold-out" | "cancelled"
+  id: number;
+  title: string;
+  date: string;
+  location: string | null;
+  ticket_url: string | null;
+  created_at: string;
 }
 
-const events: Event[] = [
-  {
-    id: 1,
-    title: "NexDrak Live at Techno Sphere",
-    date: "June 15, 2025",
-    time: "10:00 PM - 2:00 AM",
-    location: "Berlin, Germany",
-    venue: "Techno Sphere Club",
-    status: "upcoming",
-  },
-  {
-    id: 2,
-    title: "Electronic Fusion Festival",
-    date: "July 8, 2025",
-    time: "8:00 PM - 6:00 AM",
-    location: "Amsterdam, Netherlands",
-    venue: "Fusion Arena",
-    status: "upcoming",
-  },
-  {
-    id: 3,
-    title: "NexDrak Summer Tour - London",
-    date: "July 22, 2025",
-    time: "9:00 PM - 3:00 AM",
-    location: "London, UK",
-    venue: "Electric Warehouse",
-    status: "upcoming",
-  },
-  {
-    id: 4,
-    title: "Digital Dreams Festival",
-    date: "August 5, 2025",
-    time: "7:00 PM - 4:00 AM",
-    location: "Barcelona, Spain",
-    venue: "Beachfront Stage",
-    status: "upcoming",
-  },
-  {
-    id: 5,
-    title: "NexDrak at Neon Nights",
-    date: "August 19, 2025",
-    time: "11:00 PM - 5:00 AM",
-    location: "Tokyo, Japan",
-    venue: "Neon Club Tokyo",
-    status: "sold-out",
-  },
-  {
-    id: 6,
-    title: "Electronic Horizons",
-    date: "September 3, 2025",
-    time: "10:00 PM - 4:00 AM",
-    location: "New York, USA",
-    venue: "Horizon Hall",
-    status: "upcoming",
-  },
-]
-
 interface UpcomingEventsProps {
-  limit?: number
+  limit?: number;
 }
 
 export default function UpcomingEvents({ limit }: UpcomingEventsProps) {
-  const displayEvents = limit ? events.slice(0, limit) : events
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const supabase = createClient();
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("events")
+          .select("*")
+          .gte("date", new Date().toISOString().split("T")[0])
+          .order("date", { ascending: true })
+          .limit(limit || 10);
+
+        if (error) {
+          console.error("Error fetching events:", error);
+          return;
+        }
+
+        setEvents(data || []);
+      } catch (error) {
+        console.error("Error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, [supabase, limit]);
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("es-ES", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  const isUpcoming = (dateString: string) => {
+    return new Date(dateString) >= new Date();
+  };
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[...Array(limit || 3)].map((_, i) => (
+          <Card
+            key={i}
+            className="bg-black/50 backdrop-blur-sm border-white/20"
+          >
+            <CardContent className="p-6 space-y-4">
+              <div className="h-6 bg-gray-700 rounded animate-pulse" />
+              <div className="space-y-2">
+                <div className="h-4 bg-gray-700 rounded animate-pulse" />
+                <div className="h-4 bg-gray-700 rounded animate-pulse w-3/4" />
+              </div>
+            </CardContent>
+            <CardFooter className="px-6 pb-6 pt-0">
+              <div className="h-10 bg-gray-700 rounded animate-pulse w-full" />
+            </CardFooter>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
+  if (events.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <Calendar className="h-16 w-16 text-gray-600 mx-auto mb-4" />
+        <p className="text-gray-400 text-lg">No upcoming events</p>
+        <p className="text-gray-500 text-sm">
+          Upcoming events will appear here as they are scheduled.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {displayEvents.map((event) => (
-        <Card key={event.id} className="bg-black/50 backdrop-blur-sm border-white/20">
+      {events.map((event) => (
+        <Card
+          key={event.id}
+          className="bg-black/50 backdrop-blur-sm border-white/20"
+        >
           <CardContent className="p-6 space-y-4">
             <div className="flex justify-between items-start">
               <h3 className="text-xl font-bold">{event.title}</h3>
-              {event.status === "sold-out" ? (
-                <Badge variant="outline" className="bg-red-500/20 text-red-300 border-red-500/50">
-                  SOLD OUT
-                </Badge>
-              ) : event.status === "cancelled" ? (
-                <Badge variant="outline" className="bg-gray-500/20 text-gray-300 border-gray-500/50">
-                  CANCELLED
-                </Badge>
-              ) : (
-                <Badge variant="outline" className="bg-white/20 text-white border-white/50">
-                  TICKETS AVAILABLE
-                </Badge>
-              )}
+              <Badge
+                variant="outline"
+                className="bg-blue-500/20 text-blue-300 border-blue-500/50"
+              >
+                NEXT
+              </Badge>
             </div>
 
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <CalendarDays className="h-4 w-4 text-white" />
-                <span>{event.date}</span>
+                <span>{formatDate(event.date)}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-white" />
-                <span>{event.time}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-white" />
-                <span>
-                  {event.venue}, {event.location}
-                </span>
-              </div>
+              {event.location && (
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-white" />
+                  <span>{event.location}</span>
+                </div>
+              )}
             </div>
           </CardContent>
           <CardFooter className="px-6 pb-6 pt-0">
-            <Button
-              className={`w-full ${
-                event.status === "sold-out" || event.status === "cancelled"
-                  ? "bg-gray-700 hover:bg-gray-700 cursor-not-allowed"
-                  : "bg-white hover:bg-gray-200 text-black"
-              }`}
-              disabled={event.status === "sold-out" || event.status === "cancelled"}
-            >
-              {event.status === "sold-out" ? "SOLD OUT" : event.status === "cancelled" ? "CANCELLED" : "GET TICKETS"}
-            </Button>
+            {event.ticket_url ? (
+              <Button
+                className="w-full bg-white hover:bg-gray-200 text-black"
+                asChild
+              >
+                <a
+                  href={event.ticket_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center"
+                >
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  BUY TICKETS
+                </a>
+              </Button>
+            ) : (
+              <Button
+                className="w-full bg-gray-700 hover:bg-gray-700 cursor-not-allowed"
+                disabled
+              >
+                COMING SOON
+              </Button>
+            )}
           </CardFooter>
         </Card>
       ))}
     </div>
-  )
+  );
 }
