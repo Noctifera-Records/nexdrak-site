@@ -23,22 +23,7 @@ const nextConfig = {
     optimizePackageImports: ["lucide-react", "@radix-ui/react-icons"],
     serverComponentsExternalPackages: [],
   },
-  // Configuración global para Edge Runtime
-  async rewrites() {
-    return [
-      {
-        source: "/api/admin/:path*",
-        destination: "/api/admin/:path*",
-        has: [
-          {
-            type: "header",
-            key: "x-runtime",
-            value: "edge",
-          },
-        ],
-      },
-    ];
-  },
+
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
