@@ -23,19 +23,9 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  // Fetch emails from auth.users table
-  const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
-
-  if (authError) {
-    return NextResponse.json({ error: authError.message }, { status: 500 });
-  }
-
-  const usersWithEmails = profiles.map(profile => {
-    const authUser = authUsers.users.find(au => au.id === profile.id);
-    return { ...profile, email: authUser?.email || 'N/A' };
-  });
-
-  return NextResponse.json(usersWithEmails);
+  // Note: Email fetching requires admin operations not available in Edge Runtime
+  // Consider storing email in profiles table or using Supabase Edge Functions
+  return NextResponse.json(profiles);
 }
 
 export async function PUT(request: Request) {
@@ -87,19 +77,13 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
   }
 
-  // Delete from profiles table first
+  // Only delete from profiles table - auth user deletion requires admin operations
+  // Note: This will leave the auth user but remove their profile access
   const { error: profileError } = await supabase.from('profiles').delete().eq('id', id);
 
   if (profileError) {
     return NextResponse.json({ error: profileError.message }, { status: 500 });
   }
 
-  // Then delete from auth.users table
-  const { error: authError } = await supabase.auth.admin.deleteUser(id);
-
-  if (authError) {
-    return NextResponse.json({ error: authError.message }, { status: 500 });
-  }
-
-  return NextResponse.json({ message: 'User deleted successfully' });
+  return NextResponse.json({ message: 'User profile deleted successfully' });
 }

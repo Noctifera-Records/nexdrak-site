@@ -1,10 +1,7 @@
 /** @type {import('@cloudflare/next-on-pages').Config} */
 const config = {
-  // Compatibility configuration
-  compatibility: {
-    nodejs: true,
-    edge: true,
-  },
+  // All routes now use Edge Runtime for Cloudflare Pages compatibility
+  skipMiddlewareCompatibilityCheck: true,
 };
 
 module.exports = config;

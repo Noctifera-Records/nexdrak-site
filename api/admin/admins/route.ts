@@ -23,19 +23,9 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  // Fetch emails from auth.users table
-  const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
-
-  if (authError) {
-    return NextResponse.json({ error: authError.message }, { status: 500 });
-  }
-
-  const adminsWithEmails = profiles.map(profile => {
-    const authUser = authUsers.users.find(au => au.id === profile.id);
-    return { id: profile.id, email: authUser?.email || 'N/A' };
-  });
-
-  return NextResponse.json(adminsWithEmails);
+  // Note: Email fetching requires admin operations not available in Edge Runtime
+  // Consider storing email in profiles table or using Supabase Edge Functions
+  return NextResponse.json(profiles);
 }
 
 export async function POST(request: Request) {
@@ -52,24 +42,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
-  const { email, password } = await request.json();
-
-  if (!email || !password) {
-    return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
-  }
-
-  const { data, error } = await supabase.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true, // Automatically confirm email for admin
-    user_metadata: { role: 'admin' }, // Set role in user_metadata for trigger
-  });
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
-  return NextResponse.json({ message: 'Admin created successfully', userId: data.user?.id });
+  // Admin creation requires admin operations not available in Edge Runtime
+  // This functionality needs to be implemented using Supabase Edge Functions
+  return NextResponse.json({ error: 'Admin creation not available in Edge Runtime. Use Supabase dashboard or Edge Functions.' }, { status: 501 });
 }
 
 export async function DELETE(request: Request) {
@@ -92,19 +67,13 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: 'Admin ID is required' }, { status: 400 });
   }
 
-  // Delete from profiles table first
+  // Only delete from profiles table - auth user deletion requires admin operations
+  // Note: This will leave the auth user but remove their admin access
   const { error: profileError } = await supabase.from('profiles').delete().eq('id', id);
 
   if (profileError) {
     return NextResponse.json({ error: profileError.message }, { status: 500 });
   }
 
-  // Then delete from auth.users table
-  const { error: authError } = await supabase.auth.admin.deleteUser(id);
-
-  if (authError) {
-    return NextResponse.json({ error: authError.message }, { status: 500 });
-  }
-
-  return NextResponse.json({ message: 'Admin deleted successfully' });
+  return NextResponse.json({ message: 'Admin profile deleted successfully' });
 }
