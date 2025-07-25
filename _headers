@@ -1,4 +1,4 @@
-# Headers específicos para Cloudflare Pages
+# Specific headers for Cloudflare Pages
 /*
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
@@ -10,3 +10,8 @@
 
 /_next/static/*
   Cache-Control: public, max-age=31536000, immutable
+
+# Security headers for admin routes
+/api/admin/*
+  Cache-Control: no-cache, no-store, must-revalidate
+  X-Robots-Tag: noindex

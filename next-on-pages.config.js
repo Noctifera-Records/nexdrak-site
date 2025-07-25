@@ -1,8 +1,8 @@
 /** @type {import('@cloudflare/next-on-pages').Config} */
 const config = {
-  // Configuración de compatibilidad
+  // Compatibility configuration
   compatibility: {
-    nodejs: false,
+    nodejs: true,
     edge: true,
   },
 };
