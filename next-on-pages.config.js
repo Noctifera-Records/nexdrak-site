@@ -1,7 +1,10 @@
 /** @type {import('@cloudflare/next-on-pages').Config} */
 const config = {
-  // All routes now use Edge Runtime for Cloudflare Pages compatibility
+  // Windows compatibility settings
   skipMiddlewareCompatibilityCheck: true,
+  experimental: {
+    runtime: 'edge',
+  },
 };
 
 module.exports = config;
