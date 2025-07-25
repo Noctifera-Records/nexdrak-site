@@ -15,3 +15,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY = ""
 # Configuration for Node.js compatibility
 [env.production]
 compatibility_flags = ["nodejs_compat"]
+
+# Rate limiting and performance optimizations
+[limits]
+cpu_ms = 50

@@ -22,6 +22,31 @@ const nextConfig = {
     optimizeCss: true,
     optimizePackageImports: ["lucide-react", "@radix-ui/react-icons"],
     serverComponentsExternalPackages: [],
+    webpackBuildWorker: true,
+  },
+  
+  // Optimize bundle splitting to reduce concurrent requests
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        cacheGroups: {
+          default: {
+            minChunks: 1,
+            priority: -20,
+            reuseExistingChunk: true,
+          },
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            priority: -10,
+            chunks: 'all',
+            maxSize: 244000, // Reduce chunk size to avoid rate limits
+          },
+        },
+      };
+    }
+    return config;
   },
 
   compiler: {
@@ -48,6 +73,19 @@ const nextConfig = {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=()",
           },
+          {
+            key: "Cache-Control",
+            value: "public, max-age=3600, s-maxage=3600",
+          },
+        ],
+      },
+      {
+        source: "/_next/static/(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
         ],
       },
       {
@@ -64,6 +102,15 @@ const nextConfig = {
         headers: [
           {
             key: "Cache-control",
+            value: "public, max-age=86400, s-maxage=86400",
+          },
+        ],
+      },
+      {
+        source: "/(apple-touch-icon|favicon|site.webmanifest)",
+        headers: [
+          {
+            key: "Cache-Control",
             value: "public, max-age=86400, s-maxage=86400",
           },
         ],
