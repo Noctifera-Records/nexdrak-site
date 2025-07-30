@@ -14,9 +14,9 @@ const nextConfig = {
   },
   compress: true,
   poweredByHeader: false,
-  generateEtags: true,
+  generateEtags: false, // Disable ETags to reduce requests
   trailingSlash: false,
-  reactStrictMode: true,
+  reactStrictMode: false, // Disable strict mode to prevent double renders
 
   experimental: {
     optimizeCss: true,
@@ -25,35 +25,19 @@ const nextConfig = {
     webpackBuildWorker: true,
   },
   
-  // Optimize bundle splitting to reduce concurrent requests
+  // Completely disable code splitting to prevent 429 errors
   webpack: (config, { isServer }) => {
     if (!isServer) {
-      config.optimization.splitChunks = {
-        chunks: 'all',
-        maxAsyncRequests: 5, // Limit concurrent requests
-        maxInitialRequests: 3, // Limit initial requests
-        cacheGroups: {
-          default: {
-            minChunks: 1,
-            priority: -20,
-            reuseExistingChunk: true,
-          },
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            priority: -10,
-            chunks: 'all',
-            maxSize: 200000, // Further reduce chunk size
-            minSize: 20000,
-          },
-          common: {
-            name: 'common',
-            minChunks: 2,
-            priority: -5,
-            chunks: 'all',
-            maxSize: 150000,
-          },
-        },
+      // Disable all code splitting
+      config.optimization.splitChunks = false;
+      
+      // Reduce the number of entry points
+      config.optimization.runtimeChunk = false;
+      
+      // Minimize the number of requests
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        // Ensure single bundle
       };
     }
     return config;

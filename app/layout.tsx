@@ -9,6 +9,8 @@ import { NotificationProvider } from "@/components/notification-system"
 import OptimizedLoader from "@/components/optimized-loader"
 import ResourcePreloader from "@/components/resource-preloader"
 import ErrorBoundary from "@/components/error-boundary"
+import SafeAppWrapper from "@/components/safe-app-wrapper"
+import ResourceErrorHandler from "@/components/resource-error-handler"
 import StructuredData from "./structured-data"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -128,18 +130,21 @@ export default function RootLayout({
         <StructuredData />
       </head>
       <body className={`${inter.className} bg-black text-white min-h-screen flex flex-col`}>
-        <ResourcePreloader />
-        <ErrorBoundary>
-          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-            <NotificationProvider>
-              <OptimizedLoader>
-                <BackgroundAnimation />
-                <Navbar />
-                <main className="flex-1 relative pt-20">{children}</main>
-              </OptimizedLoader>
-            </NotificationProvider>
-          </ThemeProvider>
-        </ErrorBoundary>
+        <ResourceErrorHandler />
+        <SafeAppWrapper>
+          <ResourcePreloader />
+          <ErrorBoundary>
+            <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+              <NotificationProvider>
+                <OptimizedLoader>
+                  <BackgroundAnimation />
+                  <Navbar />
+                  <main className="flex-1 relative pt-20">{children}</main>
+                </OptimizedLoader>
+              </NotificationProvider>
+            </ThemeProvider>
+          </ErrorBoundary>
+        </SafeAppWrapper>
       </body>
     </html>
   )
