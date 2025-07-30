@@ -8,17 +8,46 @@ interface OptimizedLoaderProps {
 
 export default function OptimizedLoader({ children }: OptimizedLoaderProps) {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [showLoader, setShowLoader] = useState(true);
 
   useEffect(() => {
-    // Add a small delay to prevent too many simultaneous requests
-    const timer = setTimeout(() => {
+    // Check if page is already loaded
+    if (document.readyState === 'complete') {
       setIsLoaded(true);
-    }, 100);
+      setShowLoader(false);
+      return;
+    }
 
-    return () => clearTimeout(timer);
+    // Set a maximum loading time to prevent infinite loading
+    const maxLoadTime = setTimeout(() => {
+      setIsLoaded(true);
+      setShowLoader(false);
+    }, 2000);
+
+    // Listen for page load completion
+    const handleLoad = () => {
+      clearTimeout(maxLoadTime);
+      setIsLoaded(true);
+      setShowLoader(false);
+    };
+
+    // Add minimal delay only on first load
+    const minDelay = setTimeout(() => {
+      if (document.readyState === 'complete') {
+        handleLoad();
+      } else {
+        window.addEventListener('load', handleLoad);
+      }
+    }, 50);
+
+    return () => {
+      clearTimeout(maxLoadTime);
+      clearTimeout(minDelay);
+      window.removeEventListener('load', handleLoad);
+    };
   }, []);
 
-  if (!isLoaded) {
+  if (showLoader && !isLoaded) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="animate-pulse text-white">Loading...</div>

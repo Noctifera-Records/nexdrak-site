@@ -47,7 +47,7 @@
       "url": "/music",
       "icons": [
         {
-          "src": "/favicon-192x192.png",
+          "src": "/android-chrome-192x192.png",
           "sizes": "192x192"
         }
       ]
@@ -59,7 +59,7 @@
       "url": "/events",
       "icons": [
         {
-          "src": "/favicon-192x192.png",
+          "src": "/android-chrome-192x192.png",
           "sizes": "192x192"
         }
       ]

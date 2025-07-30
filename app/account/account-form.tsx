@@ -1,23 +1,23 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { createClient } from '@/lib/supabase/client';
-import { useNotifications } from '@/components/notification-system';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { createClient } from "@/lib/supabase/client";
+import { useNotifications } from "@/components/notification-system";
 
 export default function AccountForm() {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [formData, setFormData] = useState({
-    email: '',
-    username: '',
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
+    email: "",
+    username: "",
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
   const [loading, setLoading] = useState(false);
   const [loadingProfile, setLoadingProfile] = useState(true);
@@ -27,10 +27,12 @@ export default function AccountForm() {
 
   useEffect(() => {
     const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
       if (!user) {
-        router.push('/login');
+        router.push("/login");
         return;
       }
 
@@ -38,17 +40,17 @@ export default function AccountForm() {
 
       // Obtener perfil
       const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
         .single();
 
       if (profile) {
         setProfile(profile);
-        setFormData(prev => ({
+        setFormData((prev: typeof formData) => ({
           ...prev,
-          email: user.email || '',
-          username: profile.username || ''
+          email: user.email || "",
+          username: profile.username || "",
         }));
       }
 
@@ -59,9 +61,9 @@ export default function AccountForm() {
   }, [router, supabase]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
+    setFormData((prev: typeof formData) => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     }));
   };
 
@@ -72,17 +74,17 @@ export default function AccountForm() {
       // Verificar si el username ya existe (si cambió)
       if (formData.username !== profile.username) {
         const { data: existingUsername } = await supabase
-          .from('profiles')
-          .select('username')
-          .eq('username', formData.username)
-          .neq('id', user.id)
+          .from("profiles")
+          .select("username")
+          .eq("username", formData.username)
+          .neq("id", user.id)
           .single();
 
         if (existingUsername) {
           showNotification({
-            type: 'error',
-            title: 'Nombre de usuario no disponible',
-            message: 'Este nombre de usuario ya está en uso'
+            type: "error",
+            title: "Nombre de usuario no disponible",
+            message: "Este nombre de usuario ya está en uso",
           });
           setLoading(false);
           return;
@@ -91,18 +93,18 @@ export default function AccountForm() {
 
       // Actualizar perfil
       const { error: profileError } = await supabase
-        .from('profiles')
+        .from("profiles")
         .update({
           username: formData.username,
-          email: formData.email
+          email: formData.email,
         })
-        .eq('id', user.id);
+        .eq("id", user.id);
 
       if (profileError) {
         showNotification({
-          type: 'error',
-          title: 'Error al actualizar perfil',
-          message: profileError.message
+          type: "error",
+          title: "Error al actualizar perfil",
+          message: profileError.message,
         });
         return;
       }
@@ -110,43 +112,42 @@ export default function AccountForm() {
       // Actualizar email si cambió
       if (formData.email !== user.email) {
         const { error: emailError } = await supabase.auth.updateUser({
-          email: formData.email
+          email: formData.email,
         });
 
         if (emailError) {
           showNotification({
-            type: 'error',
-            title: 'Error al actualizar email',
-            message: emailError.message
+            type: "error",
+            title: "Error al actualizar email",
+            message: emailError.message,
           });
           return;
         }
 
         showNotification({
-          type: 'info',
-          title: 'Email actualizado',
-          message: 'Revisa tu nuevo email para confirmar el cambio'
+          type: "info",
+          title: "Email actualizado",
+          message: "Revisa tu nuevo email para confirmar el cambio",
         });
       }
 
       showNotification({
-        type: 'success',
-        title: 'Perfil actualizado',
-        message: 'Tu información ha sido actualizada exitosamente'
+        type: "success",
+        title: "Perfil actualizado",
+        message: "Tu información ha sido actualizada exitosamente",
       });
 
       // Actualizar estado local
-      setProfile(prev => ({
+      setProfile((prev: any) => ({
         ...prev,
         username: formData.username,
-        email: formData.email
+        email: formData.email,
       }));
-
     } catch (error) {
       showNotification({
-        type: 'error',
-        title: 'Error inesperado',
-        message: 'Ocurrió un error al actualizar el perfil'
+        type: "error",
+        title: "Error inesperado",
+        message: "Ocurrió un error al actualizar el perfil",
       });
     } finally {
       setLoading(false);
@@ -156,27 +157,27 @@ export default function AccountForm() {
   const updatePassword = async () => {
     if (!formData.newPassword || !formData.confirmPassword) {
       showNotification({
-        type: 'error',
-        title: 'Error de validación',
-        message: 'Completa todos los campos de contraseña'
+        type: "error",
+        title: "Error de validación",
+        message: "Completa todos los campos de contraseña",
       });
       return;
     }
 
     if (formData.newPassword !== formData.confirmPassword) {
       showNotification({
-        type: 'error',
-        title: 'Error de validación',
-        message: 'Las contraseñas no coinciden'
+        type: "error",
+        title: "Error de validación",
+        message: "Las contraseñas no coinciden",
       });
       return;
     }
 
     if (formData.newPassword.length < 6) {
       showNotification({
-        type: 'error',
-        title: 'Error de validación',
-        message: 'La contraseña debe tener al menos 6 caracteres'
+        type: "error",
+        title: "Error de validación",
+        message: "La contraseña debe tener al menos 6 caracteres",
       });
       return;
     }
@@ -185,37 +186,36 @@ export default function AccountForm() {
 
     try {
       const { error } = await supabase.auth.updateUser({
-        password: formData.newPassword
+        password: formData.newPassword,
       });
 
       if (error) {
         showNotification({
-          type: 'error',
-          title: 'Error al cambiar contraseña',
-          message: error.message
+          type: "error",
+          title: "Error al cambiar contraseña",
+          message: error.message,
         });
         return;
       }
 
       showNotification({
-        type: 'success',
-        title: 'Contraseña actualizada',
-        message: 'Tu contraseña ha sido cambiada exitosamente'
+        type: "success",
+        title: "Contraseña actualizada",
+        message: "Tu contraseña ha sido cambiada exitosamente",
       });
 
       // Limpiar campos de contraseña
-      setFormData(prev => ({
+      setFormData((prev: typeof formData) => ({
         ...prev,
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
       }));
-
     } catch (error) {
       showNotification({
-        type: 'error',
-        title: 'Error inesperado',
-        message: 'Ocurrió un error al cambiar la contraseña'
+        type: "error",
+        title: "Error inesperado",
+        message: "Ocurrió un error al cambiar la contraseña",
       });
     } finally {
       setLoading(false);
@@ -239,7 +239,9 @@ export default function AccountForm() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="email" className="text-white">Email</Label>
+            <Label htmlFor="email" className="text-white">
+              Email
+            </Label>
             <Input
               id="email"
               name="email"
@@ -251,7 +253,9 @@ export default function AccountForm() {
           </div>
 
           <div>
-            <Label htmlFor="username" className="text-white">Username</Label>
+            <Label htmlFor="username" className="text-white">
+              Username
+            </Label>
             <Input
               id="username"
               name="username"
@@ -267,7 +271,7 @@ export default function AccountForm() {
             disabled={loading}
             className="bg-blue-600 hover:bg-blue-700 text-white"
           >
-            {loading ? 'Updating...' : 'Update Profile'}
+            {loading ? "Updating..." : "Update Profile"}
           </Button>
         </CardContent>
       </Card>
@@ -279,7 +283,9 @@ export default function AccountForm() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="newPassword" className="text-white">New Password</Label>
+            <Label htmlFor="newPassword" className="text-white">
+              New Password
+            </Label>
             <Input
               id="newPassword"
               name="newPassword"
@@ -292,7 +298,9 @@ export default function AccountForm() {
           </div>
 
           <div>
-            <Label htmlFor="confirmPassword" className="text-white">Confirm New Password</Label>
+            <Label htmlFor="confirmPassword" className="text-white">
+              Confirm New Password
+            </Label>
             <Input
               id="confirmPassword"
               name="confirmPassword"
@@ -309,7 +317,7 @@ export default function AccountForm() {
             disabled={loading}
             className="bg-red-600 hover:bg-red-700 text-white"
           >
-            {loading ? 'Changing...' : 'Change Password'}
+            {loading ? "Changing..." : "Change Password"}
           </Button>
         </CardContent>
       </Card>
@@ -322,10 +330,12 @@ export default function AccountForm() {
         <CardContent>
           <div className="space-y-2 text-sm">
             <p className="text-gray-300">
-              <span className="font-semibold">Type of account:</span> {profile?.role === 'admin' ? 'Administrador' : 'Usuario'}
+              <span className="font-semibold">Type of account:</span>{" "}
+              {profile?.role === "admin" ? "Administrador" : "Usuario"}
             </p>
             <p className="text-gray-300">
-              <span className="font-semibold">Member since:</span> {new Date(user?.created_at).toLocaleDateString('es-ES')}
+              <span className="font-semibold">Member since:</span>{" "}
+              {new Date(user?.created_at).toLocaleDateString("es-ES")}
             </p>
             <p className="text-gray-300">
               <span className="font-semibold">User ID:</span> {user?.id}

@@ -30,6 +30,8 @@ const nextConfig = {
     if (!isServer) {
       config.optimization.splitChunks = {
         chunks: 'all',
+        maxAsyncRequests: 5, // Limit concurrent requests
+        maxInitialRequests: 3, // Limit initial requests
         cacheGroups: {
           default: {
             minChunks: 1,
@@ -41,7 +43,15 @@ const nextConfig = {
             name: 'vendors',
             priority: -10,
             chunks: 'all',
-            maxSize: 244000, // Reduce chunk size to avoid rate limits
+            maxSize: 200000, // Further reduce chunk size
+            minSize: 20000,
+          },
+          common: {
+            name: 'common',
+            minChunks: 2,
+            priority: -5,
+            chunks: 'all',
+            maxSize: 150000,
           },
         },
       };
@@ -76,6 +86,10 @@ const nextConfig = {
           {
             key: "Cache-Control",
             value: "public, max-age=3600, s-maxage=3600",
+          },
+          {
+            key: "Connection",
+            value: "keep-alive",
           },
         ],
       },
