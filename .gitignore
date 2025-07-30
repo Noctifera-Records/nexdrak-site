@@ -17,10 +17,12 @@ frontend/dist
 frontend/node_modules
 dist
 test
+tests
 dist-ssr
 Docs
 1Docs
 *.local
+/docs
 
 # debug
 npm-debug.log*

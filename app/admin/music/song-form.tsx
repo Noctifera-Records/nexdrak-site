@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { createClient } from '@/lib/supabase/client';
+import { SongsService } from '@/lib/supabase/songs-operations';
 import { AdminImageUpload } from '@/components/image-upload';
 
 interface Song {
@@ -41,7 +41,8 @@ export function SongForm({ song, onClose }: SongFormProps) {
   });
   const [loading, setLoading] = useState(false);
   const [existingAlbums, setExistingAlbums] = useState<string[]>([]);
-  const supabase = createClient();
+  const [error, setError] = useState<string>('');
+  const songsService = new SongsService();
 
   useEffect(() => {
     fetchExistingAlbums();
@@ -62,67 +63,42 @@ export function SongForm({ song, onClose }: SongFormProps) {
 
   const fetchExistingAlbums = async () => {
     try {
-      const { data, error } = await supabase
-        .from('songs')
-        .select('album_name')
-        .eq('type', 'album')
-        .not('album_name', 'is', null);
-
-      if (error) {
-        console.error('Error fetching albums:', error);
-        return;
-      }
-
-      const albums = [...new Set(data?.map(item => item.album_name).filter(Boolean))];
+      const albums = await songsService.getExistingAlbums();
       setExistingAlbums(albums);
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error fetching albums:', error);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
 
     try {
       const songData = {
-        title: formData.title.trim(),
-        artist: formData.artist.trim(),
-        stream_url: formData.stream_url.trim(),
-        cover_image_url: formData.cover_image_url.trim() || null,
+        title: formData.title,
+        artist: formData.artist,
+        stream_url: formData.stream_url,
+        cover_image_url: formData.cover_image_url || null,
         type: formData.type,
-        album_name: formData.type === 'album' ? formData.album_name.trim() || null : null,
-        track_number: formData.type === 'album' && formData.track_number ? parseInt(formData.track_number) : null,
+        album_name: formData.album_name || null,
+        track_number: formData.track_number ? parseInt(formData.track_number) : null,
         release_date: formData.release_date || null
       };
 
-      let error;
-
       if (song) {
         // Update existing song
-        const result = await supabase
-          .from('songs')
-          .update(songData)
-          .eq('id', song.id);
-        error = result.error;
+        await songsService.updateSong(song.id, songData);
       } else {
         // Create new song
-        const result = await supabase
-          .from('songs')
-          .insert([songData]);
-        error = result.error;
-      }
-
-      if (error) {
-        console.error('Error saving song:', error);
-        alert('Error al guardar la canción');
-        return;
+        await songsService.createSong(songData);
       }
 
       onClose();
-    } catch (error) {
-      console.error('Error:', error);
-      alert('Error al guardar la canción');
+    } catch (error: any) {
+      console.error('Error saving song:', error);
+      setError(error.message || 'Error al guardar la canción');
     } finally {
       setLoading(false);
     }
@@ -247,6 +223,12 @@ export function SongForm({ song, onClose }: SongFormProps) {
                 currentImage={formData.cover_image_url}
               />
             </div>
+
+            {error && (
+              <div className="bg-red-900/20 border border-red-500 text-red-200 px-4 py-3 rounded">
+                {error}
+              </div>
+            )}
 
             <div className="flex justify-end gap-2 pt-4">
               <Button type="button" variant="outline" onClick={onClose}>

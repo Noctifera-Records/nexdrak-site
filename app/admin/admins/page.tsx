@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -9,11 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-
-interface AdminProfile {
-  id: string;
-  email: string;
-}
+import { AdminService, AdminProfile } from "@/lib/supabase/admin-operations";
 
 export default function AdminAdminsPage() {
   const [admins, setAdmins] = useState<AdminProfile[]>([]);
@@ -21,27 +16,22 @@ export default function AdminAdminsPage() {
   const [newAdminEmail, setNewAdminEmail] = useState("");
   const [newAdminPassword, setNewAdminPassword] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const supabase = createClientComponentClient();
+  const [error, setError] = useState<string>('');
+  const adminService = new AdminService();
 
   const fetchAdmins = async () => {
     setLoading(true);
-    const { data, error } = await supabase.from('profiles').select('id, email').eq('role', 'admin');
-    if (error) {
-      toast.error("Error fetching admins: " + error.message);
-    } else {
-      // Fetch emails from auth.users table
-      const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
-      if (authError) {
-        toast.error("Error fetching auth users: " + authError.message);
-      } else {
-        const adminsWithEmails = data.map(profile => {
-          const authUser = authUsers.users.find(au => au.id === profile.id);
-          return { id: profile.id, email: authUser?.email || 'N/A' };
-        });
-        setAdmins(adminsWithEmails);
-      }
+    setError('');
+    try {
+      const adminsList = await adminService.getAdmins();
+      setAdmins(adminsList);
+    } catch (error: any) {
+      console.error('Error fetching admins:', error);
+      setError(error.message || 'Error al cargar administradores');
+      toast.error(error.message || 'Error al cargar administradores');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -49,47 +39,34 @@ export default function AdminAdminsPage() {
   }, []);
 
   const handleAddAdmin = async () => {
-    if (!newAdminEmail || !newAdminPassword) {
-      toast.error("Email and password are required.");
-      return;
-    }
-
-    const { data, error } = await supabase.auth.admin.createUser({
-      email: newAdminEmail,
-      password: newAdminPassword,
-      email_confirm: true, // Automatically confirm email for admin
-      user_metadata: { role: 'admin' }, // Set role in user_metadata for trigger
-    });
-
-    if (error) {
-      toast.error("Error adding admin: " + error.message);
-    } else {
-      // The trigger in Supabase will handle adding to the profiles table with the 'admin' role
-      toast.success("Admin added successfully.");
+    setError('');
+    try {
+      await adminService.createAdmin(newAdminEmail, newAdminPassword);
+      toast.success("Administrador agregado exitosamente.");
       setNewAdminEmail("");
       setNewAdminPassword("");
       setIsDialogOpen(false);
       fetchAdmins();
+    } catch (error: any) {
+      console.error('Error adding admin:', error);
+      const errorMessage = error.message || 'Error al agregar administrador';
+      setError(errorMessage);
+      toast.error(errorMessage);
     }
   };
 
   const handleDeleteAdmin = async (adminId: string) => {
-    // First, delete from profiles table
-    const { error: profileError } = await supabase.from('profiles').delete().eq('id', adminId);
-    if (profileError) {
-      toast.error("Error deleting admin profile: " + profileError.message);
-      return;
+    setError('');
+    try {
+      await adminService.deleteAdmin(adminId);
+      toast.success("Administrador eliminado exitosamente.");
+      fetchAdmins();
+    } catch (error: any) {
+      console.error('Error deleting admin:', error);
+      const errorMessage = error.message || 'Error al eliminar administrador';
+      setError(errorMessage);
+      toast.error(errorMessage);
     }
-
-    // Then, delete from auth.users table
-    const { error: authError } = await supabase.auth.admin.deleteUser(adminId);
-    if (authError) {
-      toast.error("Error deleting auth admin: " + authError.message);
-      return;
-    }
-
-    toast.success("Admin deleted successfully.");
-    fetchAdmins();
   };
 
   if (loading) {
@@ -99,6 +76,12 @@ export default function AdminAdminsPage() {
   return (
     <div>
       <h1 className="text-3xl font-bold mb-6">Manage Admins</h1>
+      
+      {error && (
+        <div className="bg-red-900/20 border border-red-500 text-red-200 px-4 py-3 rounded mb-4">
+          {error}
+        </div>
+      )}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogTrigger asChild>
           <Button className="mb-4">Add New Admin</Button>

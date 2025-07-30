@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Save, RefreshCw } from 'lucide-react';
+import { Save, RefreshCw, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { createClient } from '@/lib/supabase/client';
+import { AdminService } from '@/lib/supabase/admin-operations';
 import { AdminImageUpload } from '@/components/image-upload';
 
 interface Setting {
@@ -25,37 +25,78 @@ export default function AdminSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<Record<string, string>>({});
-  const supabase = createClient();
+  const [error, setError] = useState<string>('');
+  const [success, setSuccess] = useState<string>('');
+  const adminService = new AdminService();
 
   useEffect(() => {
     fetchSettings();
   }, []);
 
   const fetchSettings = async () => {
+    setLoading(true);
+    setError('');
     try {
-      const { data, error } = await supabase
-        .from('site_settings')
-        .select('*')
-        .order('key');
-
-      if (error) {
-        console.error('Error fetching settings:', error);
-        return;
-      }
-
-      setSettings(data || []);
+      const data = await adminService.getSiteSettings();
+      
+      // Convert to the expected format
+      const settingsData = data.map((item, index) => ({
+        id: index + 1,
+        key: item.key,
+        value: item.value,
+        description: getSettingDescription(item.key),
+        type: getSettingType(item.key),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }));
+      
+      setSettings(settingsData);
       
       // Inicializar formData con los valores actuales
       const initialData: Record<string, string> = {};
-      data?.forEach(setting => {
+      data.forEach(setting => {
         initialData[setting.key] = setting.value || '';
       });
       setFormData(initialData);
-    } catch (error) {
-      console.error('Error:', error);
+    } catch (error: any) {
+      console.error('Error fetching settings:', error);
+      setError(error.message || 'Error al cargar las configuraciones');
     } finally {
       setLoading(false);
     }
+  };
+
+  // Helper functions to get setting metadata
+  const getSettingDescription = (key: string): string => {
+    const descriptions: Record<string, string> = {
+      'hero_album_link': 'Enlace del álbum principal en la página de inicio',
+      'hero_background_image': 'Imagen de fondo de la sección hero',
+      'hero_release_image': 'Imagen pequeña que aparece junto al texto del lanzamiento',
+      'hero_release_text': 'Texto que aparece en la sección hero junto a la imagen',
+      'site_logo': 'Logo principal del sitio',
+      'site_logo_mobile': 'Logo para dispositivos móviles',
+      'navbar_logo': 'Logo que aparece en la barra de navegación',
+      'site_title': 'Título del sitio',
+      'site_description': 'Descripción del sitio',
+      'contact_email': 'Email de contacto',
+      'booking_email': 'Email para bookings'
+    };
+    return descriptions[key] || key;
+  };
+
+  const getSettingType = (key: string): string => {
+    const types: Record<string, string> = {
+      'hero_album_link': 'url',
+      'hero_background_image': 'image',
+      'hero_release_image': 'image',
+      'site_logo': 'image',
+      'site_logo_mobile': 'image',
+      'navbar_logo': 'image',
+      'contact_email': 'email',
+      'booking_email': 'email',
+      'site_description': 'textarea'
+    };
+    return types[key] || 'text';
   };
 
   const handleInputChange = (key: string, value: string) => {
@@ -74,31 +115,17 @@ export default function AdminSettingsPage() {
 
   const handleSave = async () => {
     setSaving(true);
+    setError('');
+    setSuccess('');
     
     try {
-      // Actualizar cada setting
-      const updates = Object.entries(formData).map(([key, value]) => 
-        supabase
-          .from('site_settings')
-          .update({ value })
-          .eq('key', key)
-      );
-
-      const results = await Promise.all(updates);
-      
-      // Verificar si hubo errores
-      const errors = results.filter(result => result.error);
-      if (errors.length > 0) {
-        console.error('Errors updating settings:', errors);
-        alert('Error al guardar algunas configuraciones');
-        return;
-      }
-
-      alert('Configuraciones guardadas exitosamente');
+      await adminService.updateSiteSettings(formData);
+      setSuccess('Configuraciones guardadas exitosamente');
       fetchSettings(); // Refrescar los datos
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving settings:', error);
-      alert('Error al guardar las configuraciones');
+      const errorMessage = error.message || 'Error al guardar las configuraciones';
+      setError(errorMessage);
     } finally {
       setSaving(false);
     }
@@ -202,6 +229,20 @@ export default function AdminSettingsPage() {
           </Button>
         </div>
       </div>
+
+      {/* Mensajes de error y éxito */}
+      {error && (
+        <div className="bg-red-900/20 border border-red-500 text-red-200 px-4 py-3 rounded mb-4 flex items-center">
+          <AlertCircle className="h-5 w-5 mr-2" />
+          {error}
+        </div>
+      )}
+      
+      {success && (
+        <div className="bg-green-900/20 border border-green-500 text-green-200 px-4 py-3 rounded mb-4">
+          {success}
+        </div>
+      )}
 
       <div className="space-y-6">
         {/* Configuraciones de la página principal */}
