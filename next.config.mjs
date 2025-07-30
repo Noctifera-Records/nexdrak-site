@@ -12,33 +12,53 @@ const nextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
-  compress: true,
+  compress: false, // Disable compression to reduce server load
   poweredByHeader: false,
   generateEtags: false, // Disable ETags to reduce requests
   trailingSlash: false,
   reactStrictMode: false, // Disable strict mode to prevent double renders
 
+  // Minimal experimental features to prevent chunk generation
   experimental: {
-    optimizeCss: true,
-    optimizePackageImports: ["lucide-react", "@radix-ui/react-icons"],
+    optimizeCss: false,
+    optimizePackageImports: [],
     serverComponentsExternalPackages: [],
-    webpackBuildWorker: true,
+    webpackBuildWorker: false,
+    turbo: false,
+    appDir: true,
   },
   
-  // Completely disable code splitting to prevent 429 errors
-  webpack: (config, { isServer }) => {
+  // Extreme optimization to prevent 429 errors - works in both dev and production
+  webpack: (config, { isServer, dev }) => {
     if (!isServer) {
-      // Disable all code splitting
-      config.optimization.splitChunks = false;
-      
-      // Reduce the number of entry points
-      config.optimization.runtimeChunk = false;
-      
-      // Minimize the number of requests
-      config.resolve.alias = {
-        ...config.resolve.alias,
-        // Ensure single bundle
+      // Apply optimizations in both dev and production
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: false,
+        runtimeChunk: false,
+        minimize: !dev, // Only minimize in production
+        concatenateModules: !dev,
       };
+      
+      // Reduce the number of chunks even in development
+      if (dev) {
+        // In development, limit the number of chunks
+        config.optimization.splitChunks = {
+          chunks: 'all',
+          maxAsyncRequests: 1,
+          maxInitialRequests: 1,
+          cacheGroups: {
+            default: false,
+            vendors: false,
+            // Single bundle for everything
+            bundle: {
+              name: 'bundle',
+              chunks: 'all',
+              enforce: true,
+            },
+          },
+        };
+      }
     }
     return config;
   },
