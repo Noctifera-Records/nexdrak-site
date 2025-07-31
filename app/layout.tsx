@@ -12,6 +12,7 @@ import ErrorBoundary from "@/components/error-boundary"
 import SafeAppWrapper from "@/components/safe-app-wrapper"
 
 import Smart429Handler from "@/components/smart-429-handler"
+import MimeTypeFixer from "@/components/mime-type-fixer"
 import StructuredData from "./structured-data"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -129,8 +130,72 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <StructuredData />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Immediate MIME type error prevention
+              (function() {
+                // Override createElement immediately
+                const originalCreateElement = document.createElement;
+                document.createElement = function(tagName, options) {
+                  const element = originalCreateElement.call(this, tagName, options);
+                  
+                  if (tagName.toLowerCase() === 'script') {
+                    const script = element;
+                    const originalSrcDescriptor = Object.getOwnPropertyDescriptor(HTMLScriptElement.prototype, 'src');
+                    
+                    Object.defineProperty(script, 'src', {
+                      get: function() {
+                        return originalSrcDescriptor?.get?.call(this) || '';
+                      },
+                      set: function(value) {
+                        if (value && value.includes('.css')) {
+                          console.warn('Prevented CSS file from being loaded as script:', value);
+                          const link = document.createElement('link');
+                          link.rel = 'stylesheet';
+                          link.type = 'text/css';
+                          link.href = value;
+                          document.head.appendChild(link);
+                          return;
+                        }
+                        originalSrcDescriptor?.set?.call(this, value);
+                      },
+                      configurable: true,
+                      enumerable: true
+                    });
+                    
+                    script.onerror = function(event) {
+                      if (script.src && script.src.includes('.css')) {
+                        console.warn('CSS MIME type error prevented:', script.src);
+                        event.preventDefault();
+                        event.stopPropagation();
+                        return false;
+                      }
+                      return true;
+                    };
+                  }
+                  
+                  return element;
+                };
+                
+                // Handle global MIME type errors
+                window.addEventListener('error', function(event) {
+                  if (event.message && event.message.includes('MIME type') && 
+                      event.message.includes('text/css') && 
+                      event.message.includes('not executable')) {
+                    console.warn('Global CSS MIME type error handled:', event.message);
+                    event.preventDefault();
+                    event.stopPropagation();
+                    return true;
+                  }
+                }, true);
+              })();
+            `,
+          }}
+        />
       </head>
       <body className={`${inter.className} bg-black text-white min-h-screen flex flex-col`}>
+        <MimeTypeFixer />
         <Smart429Handler />
         <SafeAppWrapper>
           <ResourcePreloader />

@@ -92,11 +92,52 @@ export default function Smart429Handler() {
       return false;
     };
 
+    // Override document.createElement to fix CSS loading issues
+    const originalCreateElement = document.createElement;
+    document.createElement = function(tagName: string, options?: ElementCreationOptions) {
+      const element = originalCreateElement.call(this, tagName, options);
+      
+      // Fix script tags that might be loading CSS
+      if (tagName.toLowerCase() === 'script') {
+        const script = element as HTMLScriptElement;
+        const originalOnError = script.onerror;
+        
+        script.onerror = function(event) {
+          // Check if this script is actually trying to load CSS
+          if (script.src && script.src.includes('.css')) {
+            console.warn('Script trying to load CSS file, converting to link:', script.src);
+            
+            // Create a proper link element for CSS
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = script.src;
+            link.type = 'text/css';
+            
+            // Replace the script with the link
+            if (script.parentNode) {
+              script.parentNode.replaceChild(link, script);
+            }
+            
+            event.preventDefault();
+            return false;
+          }
+          
+          if (originalOnError) {
+            return originalOnError.call(this, event);
+          }
+          return false;
+        };
+      }
+      
+      return element;
+    };
+
     document.addEventListener('error', handleResourceError, true);
     window.addEventListener('error', handleMimeError, true);
 
     return () => {
       window.fetch = originalFetch;
+      document.createElement = originalCreateElement;
       document.removeEventListener('error', handleResourceError, true);
       window.removeEventListener('error', handleMimeError, true);
       clearTimeout(notificationTimeout);
