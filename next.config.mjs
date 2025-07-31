@@ -28,35 +28,27 @@ const nextConfig = {
     appDir: true,
   },
   
-  // Balanced optimization to reduce 429 errors while allowing navigation
+  // Extreme optimization to prevent all chunking issues
   webpack: (config, { isServer, dev }) => {
     if (!isServer) {
-      // Less aggressive optimization that allows navigation
+      // Completely disable code splitting to prevent MIME type errors
       config.optimization = {
         ...config.optimization,
-        // Allow some chunking but limit it
-        splitChunks: {
-          chunks: 'all',
-          maxAsyncRequests: 3, // Reduced from default
-          maxInitialRequests: 2, // Reduced from default
-          cacheGroups: {
-            vendor: {
-              test: /[\\/]node_modules[\\/]/,
-              name: 'vendors',
-              chunks: 'all',
-              priority: 10,
-              enforce: true,
-            },
-            default: {
-              minChunks: 2,
-              priority: -10,
-              reuseExistingChunk: true,
-            },
-          },
-        },
-        runtimeChunk: false, // Keep this disabled
+        splitChunks: false,
+        runtimeChunk: false,
         minimize: !dev,
-        concatenateModules: !dev,
+        concatenateModules: false, // Disable to prevent issues
+      };
+      
+      // Ensure all modules are bundled together
+      config.resolve = {
+        ...config.resolve,
+        fallback: {
+          ...config.resolve.fallback,
+          fs: false,
+          net: false,
+          tls: false,
+        },
       };
     }
     return config;
