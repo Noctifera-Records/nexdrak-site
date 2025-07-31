@@ -28,37 +28,36 @@ const nextConfig = {
     appDir: true,
   },
   
-  // Extreme optimization to prevent 429 errors - works in both dev and production
+  // Balanced optimization to reduce 429 errors while allowing navigation
   webpack: (config, { isServer, dev }) => {
     if (!isServer) {
-      // Apply optimizations in both dev and production
+      // Less aggressive optimization that allows navigation
       config.optimization = {
         ...config.optimization,
-        splitChunks: false,
-        runtimeChunk: false,
-        minimize: !dev, // Only minimize in production
-        concatenateModules: !dev,
-      };
-      
-      // Reduce the number of chunks even in development
-      if (dev) {
-        // In development, limit the number of chunks
-        config.optimization.splitChunks = {
+        // Allow some chunking but limit it
+        splitChunks: {
           chunks: 'all',
-          maxAsyncRequests: 1,
-          maxInitialRequests: 1,
+          maxAsyncRequests: 3, // Reduced from default
+          maxInitialRequests: 2, // Reduced from default
           cacheGroups: {
-            default: false,
-            vendors: false,
-            // Single bundle for everything
-            bundle: {
-              name: 'bundle',
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
               chunks: 'all',
+              priority: 10,
               enforce: true,
             },
+            default: {
+              minChunks: 2,
+              priority: -10,
+              reuseExistingChunk: true,
+            },
           },
-        };
-      }
+        },
+        runtimeChunk: false, // Keep this disabled
+        minimize: !dev,
+        concatenateModules: !dev,
+      };
     }
     return config;
   },
