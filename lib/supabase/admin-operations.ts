@@ -148,25 +148,43 @@ export class AdminService {
   // Delete an admin user (with proper error handling for 403)
   async deleteAdmin(adminId: string): Promise<boolean> {
     return retrySupabaseOperation(async () => {
-      // First, try to delete from profiles table
+      // Check current user permissions first
+      const { data: currentUser } = await this.supabase.auth.getUser();
+      if (!currentUser.user) {
+        throw new Error('No estás autenticado');
+      }
+
+      // Get current user profile to check permissions
+      const { data: currentProfile } = await this.supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', currentUser.user.id)
+        .single();
+
+      if (!currentProfile || currentProfile.role !== 'admin') {
+        throw new Error('No tienes permisos de administrador');
+      }
+
+      // Try to delete from profiles table first (this should work with RLS)
       const { error: profileError } = await this.supabase
         .from('profiles')
         .delete()
         .eq('id', adminId);
 
       if (profileError) {
-        console.warn('Error deleting profile:', profileError);
-        // Continue anyway, might be a permission issue
+        throw new Error(handleSupabaseError(profileError, 'delete admin profile'));
       }
 
-      // Try to delete from auth.users table
+      // Try to delete from auth.users table (this might fail with 403)
       try {
         const { error: authError } = await this.supabase.auth.admin.deleteUser(adminId);
         
         if (authError) {
           // Handle 403 Forbidden error specifically
-          if (authError.message?.includes('403') || authError.message?.includes('Forbidden')) {
-            throw new Error('No tienes permisos para eliminar usuarios. Contacta al super administrador.');
+          if (authError.message?.includes('403') || authError.message?.includes('Forbidden') || authError.status === 403) {
+            // Profile was deleted successfully, but auth user couldn't be deleted
+            // This is a partial success - inform the user
+            throw new Error('Usuario desactivado correctamente. Nota: Para eliminar completamente el usuario del sistema de autenticación, contacta al super administrador o configura los permisos de Service Role en Supabase.');
           }
           
           if (authError.message?.includes('User not found')) {
@@ -177,16 +195,16 @@ export class AdminService {
           
           throw new Error(handleSupabaseError(authError, 'delete admin from auth'));
         }
+
+        return true;
       } catch (error: any) {
         // If it's a permission error, provide helpful message
         if (error.message?.includes('403') || error.message?.includes('Forbidden')) {
-          throw new Error('No tienes permisos suficientes para eliminar administradores. Esta operación requiere permisos de super administrador.');
+          throw new Error('Usuario desactivado del panel de administración. Para eliminarlo completamente del sistema de autenticación, necesitas configurar los permisos de Service Role en Supabase o contactar al super administrador.');
         }
         
         throw error;
       }
-
-      return true;
     });
   }
 

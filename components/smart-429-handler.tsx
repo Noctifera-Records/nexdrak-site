@@ -39,6 +39,14 @@ export default function Smart429Handler() {
               });
             }
             
+            // For CSS files, return empty CSS
+            if (url.includes('/_next/static/css/')) {
+              return new Response('', {
+                status: 200,
+                headers: { 'Content-Type': 'text/css' }
+              });
+            }
+            
             // For other resources, wait a bit and retry once
             await new Promise(resolve => setTimeout(resolve, 1000));
             return originalFetch.call(this, input, init);
@@ -52,23 +60,45 @@ export default function Smart429Handler() {
       }
     };
 
-    // Handle script loading errors for chunks only
-    const handleScriptError = (event: Event) => {
-      const target = event.target as HTMLScriptElement;
-      if (target?.src && target.src.includes('/_next/static/chunks/')) {
+    // Handle script and CSS loading errors
+    const handleResourceError = (event: Event) => {
+      const target = event.target as HTMLScriptElement | HTMLLinkElement;
+      
+      if (target?.tagName === 'SCRIPT' && target.src?.includes('/_next/static/chunks/')) {
         console.warn('Chunk loading failed, but continuing:', target.src);
         // Remove the failed script but don't reload the page
         target.remove();
         event.preventDefault();
         event.stopPropagation();
       }
+      
+      if (target?.tagName === 'LINK' && target.href?.includes('/_next/static/css/')) {
+        console.warn('CSS loading failed, but continuing:', target.href);
+        // Remove the failed CSS link but don't reload the page
+        target.remove();
+        event.preventDefault();
+        event.stopPropagation();
+      }
     };
 
-    document.addEventListener('error', handleScriptError, true);
+    // Handle MIME type errors specifically
+    const handleMimeError = (event: ErrorEvent) => {
+      if (event.message?.includes('MIME type') && event.message?.includes('text/css')) {
+        console.warn('CSS MIME type error handled:', event.message);
+        event.preventDefault();
+        event.stopPropagation();
+        return true;
+      }
+      return false;
+    };
+
+    document.addEventListener('error', handleResourceError, true);
+    window.addEventListener('error', handleMimeError, true);
 
     return () => {
       window.fetch = originalFetch;
-      document.removeEventListener('error', handleScriptError, true);
+      document.removeEventListener('error', handleResourceError, true);
+      window.removeEventListener('error', handleMimeError, true);
       clearTimeout(notificationTimeout);
     };
   }, []);
