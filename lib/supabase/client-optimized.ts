@@ -50,8 +50,17 @@ export function handleSupabaseError(error: any, operation: string) {
     return 'Ya existe un registro con estos datos';
   }
   
+  if (error?.code === '23514') {
+    return 'Los datos no cumplen con las reglas de validación de la base de datos';
+  }
+  
   if (error?.code === '42501') {
-    return 'No tienes permisos para realizar esta acción';
+    return 'Error de permisos: verifica que estés autenticado correctamente. Si el problema persiste, contacta al administrador.';
+  }
+  
+  // Check for RLS policy violations
+  if (error?.message?.includes('row-level security policy')) {
+    return 'Error de permisos de seguridad: verifica que estés autenticado correctamente. Si el problema persiste, contacta al administrador.';
   }
   
   if (error?.message?.includes('JWT')) {

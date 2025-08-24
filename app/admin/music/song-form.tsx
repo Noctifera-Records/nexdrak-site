@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SongsService } from '@/lib/supabase/songs-operations';
 import { AdminImageUpload } from '@/components/image-upload';
+import { RLSErrorHelp } from '@/components/rls-error-help';
 
 interface Song {
   id: number;
@@ -225,8 +226,14 @@ export function SongForm({ song, onClose }: SongFormProps) {
             </div>
 
             {error && (
-              <div className="bg-red-900/20 border border-red-500 text-red-200 px-4 py-3 rounded">
-                {error}
+              <div className="space-y-3">
+                <div className="bg-red-900/20 border border-red-500 text-red-200 px-4 py-3 rounded">
+                  {error}
+                </div>
+                <RLSErrorHelp 
+                  error={error} 
+                  operation={song ? 'actualizar canción' : 'crear canción'} 
+                />
               </div>
             )}
 

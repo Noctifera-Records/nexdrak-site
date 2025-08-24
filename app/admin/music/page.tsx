@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { createClient } from '@/lib/supabase/client';
+import { SongsService } from '@/lib/supabase/songs-operations';
 import { SongsTable } from './songs-table';
 import { SongForm } from './song-form';
 
@@ -25,7 +25,7 @@ export default function AdminMusicPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingSong, setEditingSong] = useState<Song | null>(null);
-  const supabase = createClient();
+  const songsService = new SongsService();
 
   useEffect(() => {
     fetchSongs();
@@ -33,17 +33,8 @@ export default function AdminMusicPage() {
 
   const fetchSongs = async () => {
     try {
-      const { data, error } = await supabase
-        .from('songs')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching songs:', error);
-        return;
-      }
-
-      setSongs(data || []);
+      const data = await songsService.getAllSongs();
+      setSongs(data);
     } catch (error) {
       console.error('Error:', error);
     } finally {
@@ -62,17 +53,7 @@ export default function AdminMusicPage() {
     }
 
     try {
-      const { error } = await supabase
-        .from('songs')
-        .delete()
-        .eq('id', id);
-
-      if (error) {
-        console.error('Error deleting song:', error);
-        alert('Error al eliminar la canción');
-        return;
-      }
-
+      await songsService.deleteSong(id);
       setSongs(prev => prev.filter(song => song.id !== id));
     } catch (error) {
       console.error('Error:', error);
