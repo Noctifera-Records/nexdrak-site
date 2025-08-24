@@ -51,6 +51,17 @@ interface SongsTableProps {
   songs: Song[];
 }
 
+// Helper function to validate and normalize song type
+const validateSongType = (type: any): 'album' | 'single' => {
+  if (typeof type === 'string') {
+    const normalizedType = type.trim().toLowerCase();
+    if (normalizedType === 'album') return 'album';
+    if (normalizedType === 'single') return 'single';
+  }
+  console.warn('Invalid song type:', type, 'defaulting to single');
+  return 'single';
+};
+
 export default function SongsTable({ songs: initialSongs }: SongsTableProps) {
   const [songs, setSongs] = useState(initialSongs);
   const [searchTerm, setSearchTerm] = useState("");
@@ -73,11 +84,15 @@ export default function SongsTable({ songs: initialSongs }: SongsTableProps) {
     try {
       console.log("Adding song with data:", songData);
 
-      // Asegurar que el tipo esté definido
+      // Validar y normalizar el tipo
+      const validatedType = validateSongType(songData.type);
+      
       const completeData = {
         ...songData,
-        type: songData.type || "single",
+        type: validatedType,
       };
+      
+      console.log('Datos completos para insertar:', completeData);
 
       const { data, error } = await supabase
         .from("songs")
@@ -114,18 +129,29 @@ export default function SongsTable({ songs: initialSongs }: SongsTableProps) {
         throw new Error("Canción no encontrada");
       }
 
-      // Asegurar que el tipo se preserve si no se está actualizando
+      // Validar y normalizar el tipo
+      const typeToUse = updates.type || currentSong.type;
+      const validatedType = validateSongType(typeToUse);
+      
       const updateData = {
         ...updates,
-        type: updates.type || currentSong.type,
+        type: validatedType,
       };
+
+      console.log('Canción actual:', currentSong);
+      console.log('Updates recibidos:', updates);
+      console.log('Datos finales para actualizar:', updateData);
+      console.log('Tipo final:', updateData.type, typeof updateData.type);
 
       const { error } = await supabase
         .from("songs")
         .update(updateData)
         .eq("id", songId);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error de Supabase:', error);
+        throw error;
+      }
 
       setSongs(
         songs.map((song) =>
@@ -377,7 +403,8 @@ function SongForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({
+    
+    const songData = {
       title,
       artist: artist || null,
       stream_url: streamUrl,
@@ -387,7 +414,12 @@ function SongForm({
       track_number:
         type === "album" && trackNumber ? parseInt(trackNumber) : null,
       release_date: releaseDate || null,
-    });
+    };
+    
+    console.log('Datos de canción a enviar:', songData);
+    console.log('Tipo de campo type:', typeof songData.type, songData.type);
+    
+    onSave(songData);
   };
 
   return (
@@ -447,7 +479,10 @@ function SongForm({
         </Label>
         <Select
           value={type}
-          onValueChange={(value: "album" | "single") => setType(value)}
+          onValueChange={(value: "album" | "single") => {
+            console.log('Cambiando tipo a:', value, typeof value);
+            setType(value);
+          }}
         >
           <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
             <SelectValue placeholder="Selecciona el tipo" />
@@ -457,6 +492,9 @@ function SongForm({
             <SelectItem value="album">Álbum</SelectItem>
           </SelectContent>
         </Select>
+        <p className="text-xs text-gray-400 mt-1">
+          Valor actual: {type} (tipo: {typeof type})
+        </p>
       </div>
 
       {type === "album" && (
