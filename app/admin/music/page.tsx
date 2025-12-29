@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { SongsService } from '@/lib/supabase/songs-operations';
 import { SongsTable } from './songs-table';
 import { SongForm } from './song-form';
+import { StreamingLinksManager } from './streaming-links-manager';
 
 interface Song {
   id: number;
@@ -18,13 +19,26 @@ interface Song {
   track_number?: number;
   release_date?: string;
   created_at: string;
+  youtube_embed_id?: string;
+}
+
+interface StreamingLink {
+  id: number;
+  song_id: number;
+  platform: string;
+  url: string;
+  is_primary: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 export default function AdminMusicPage() {
   const [songs, setSongs] = useState<Song[]>([]);
+  const [streamingLinks, setStreamingLinks] = useState<StreamingLink[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingSong, setEditingSong] = useState<Song | null>(null);
+  const [managingLinks, setManagingLinks] = useState<Song | null>(null);
   const songsService = new SongsService();
 
   useEffect(() => {
@@ -35,10 +49,32 @@ export default function AdminMusicPage() {
     try {
       const data = await songsService.getAllSongs();
       setSongs(data);
+      
+      // Fetch streaming links
+      await fetchStreamingLinks();
     } catch (error) {
       console.error('Error:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchStreamingLinks = async () => {
+    try {
+      const { createClient } = await import('@/lib/supabase/client');
+      const supabase = createClient();
+      
+      const { data, error } = await supabase
+        .from('streaming_links')
+        .select('*')
+        .order('song_id')
+        .order('is_primary', { ascending: false });
+
+      if (data && !error) {
+        setStreamingLinks(data);
+      }
+    } catch (error) {
+      console.error('Error fetching streaming links:', error);
     }
   };
 
@@ -67,6 +103,15 @@ export default function AdminMusicPage() {
     fetchSongs(); // Refresh the list
   };
 
+  const handleManageLinks = (song: Song) => {
+    setManagingLinks(song);
+  };
+
+  const handleLinksClose = () => {
+    setManagingLinks(null);
+    fetchStreamingLinks(); // Refresh streaming links
+  };
+
   if (loading) {
     return (
       <div className="p-6">
@@ -74,7 +119,7 @@ export default function AdminMusicPage() {
           <h1 className="text-2xl font-bold">Música</h1>
         </div>
         <div className="text-center py-8">
-          <p>Cargando canciones...</p>
+          <p>Loading songs...</p>
         </div>
       </div>
     );
@@ -92,14 +137,24 @@ export default function AdminMusicPage() {
 
       <SongsTable 
         songs={songs}
+        streamingLinks={streamingLinks}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onManageLinks={handleManageLinks}
       />
 
       {showForm && (
         <SongForm
           song={editingSong}
           onClose={handleFormClose}
+        />
+      )}
+
+      {managingLinks && (
+        <StreamingLinksManager
+          song={managingLinks}
+          streamingLinks={streamingLinks.filter(link => link.song_id === managingLinks.id)}
+          onClose={handleLinksClose}
         />
       )}
     </div>

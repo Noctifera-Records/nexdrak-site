@@ -20,7 +20,7 @@ Allow: /img/
 Allow: /favicon.ico
 Allow: /sitemap.xml
 
-# Crawl delay (optional)
+# Crawl delay
 Crawl-delay: 1
 
 # Sitemaps

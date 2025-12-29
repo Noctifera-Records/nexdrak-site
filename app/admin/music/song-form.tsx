@@ -22,6 +22,7 @@ interface Song {
   track_number?: number;
   release_date?: string;
   created_at: string;
+  youtube_embed_id?: string;
 }
 
 interface SongFormProps {
@@ -38,7 +39,8 @@ export function SongForm({ song, onClose }: SongFormProps) {
     type: 'single' as 'album' | 'single',
     album_name: '',
     track_number: '',
-    release_date: ''
+    release_date: '',
+    youtube_embed_id: ''
   });
   const [loading, setLoading] = useState(false);
   const [existingAlbums, setExistingAlbums] = useState<string[]>([]);
@@ -57,7 +59,8 @@ export function SongForm({ song, onClose }: SongFormProps) {
         type: song.type,
         album_name: song.album_name || '',
         track_number: song.track_number?.toString() || '',
-        release_date: song.release_date || ''
+        release_date: song.release_date || '',
+        youtube_embed_id: song.youtube_embed_id || ''
       });
     }
   }, [song]);
@@ -85,7 +88,8 @@ export function SongForm({ song, onClose }: SongFormProps) {
         type: formData.type,
         album_name: formData.album_name || null,
         track_number: formData.track_number ? parseInt(formData.track_number) : null,
-        release_date: formData.release_date || null
+        release_date: formData.release_date || null,
+        youtube_embed_id: formData.youtube_embed_id || null
       };
 
       if (song) {
@@ -215,6 +219,20 @@ export function SongForm({ song, onClose }: SongFormProps) {
                 value={formData.release_date}
                 onChange={(e) => setFormData(prev => ({ ...prev, release_date: e.target.value }))}
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="youtube_embed_id">YouTube Video ID</Label>
+              <Input
+                id="youtube_embed_id"
+                value={formData.youtube_embed_id}
+                onChange={(e) => setFormData(prev => ({ ...prev, youtube_embed_id: e.target.value }))}
+                placeholder="dQw4w9WgXcQ (solo el ID del video)"
+              />
+              <p className="text-xs text-gray-500">
+                Opcional: ID del video de YouTube para mostrar el reproductor embebido. 
+                Ejemplo: para https://www.youtube.com/watch?v=dQw4w9WgXcQ usar solo "dQw4w9WgXcQ"
+              </p>
             </div>
 
             <div className="space-y-2">

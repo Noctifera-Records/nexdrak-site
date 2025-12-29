@@ -2,19 +2,10 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { ExternalLink, Share2, Music, Calendar, Disc, PlayCircle } from "lucide-react";
+import { ExternalLink, Share2, Music, Calendar, Disc, PlayCircle, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/client";
-
-interface Release {
-  id: number;
-  title: string;
-  release_date: string;
-  cover_image_url: string | null;
-  stream_url: string | null;
-  created_at: string;
-}
 
 interface Song {
   id: number;
@@ -29,6 +20,14 @@ interface Song {
   created_at: string;
 }
 
+interface StreamingLink {
+  id: number;
+  song_id: number;
+  platform: string;
+  url: string;
+  is_primary: boolean;
+}
+
 interface Album {
   name: string;
   songs: Song[];
@@ -38,11 +37,14 @@ interface Album {
 }
 
 export default function MusicPage() {
-  const [songs, setSongs] = useState<Song[]>([]);
   const [albums, setAlbums] = useState<Album[]>([]);
   const [singles, setSingles] = useState<Song[]>([]);
   const [activeTab, setActiveTab] = useState<'albums' | 'singles'>('albums');
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredAlbums, setFilteredAlbums] = useState<Album[]>([]);
+  const [filteredSingles, setFilteredSingles] = useState<Song[]>([]);
+  const [streamingLinks, setStreamingLinks] = useState<StreamingLink[]>([]);
   const supabase = createClient();
 
   useEffect(() => {
@@ -59,13 +61,11 @@ export default function MusicPage() {
         }
 
         if (songsData) {
-          setSongs(songsData);
-          
-          // Separar singles
+          // Separate singles
           const singlesData = songsData.filter(song => song.type === 'single');
           setSingles(singlesData);
           
-          // Agrupar álbumes
+          // Group albums
           const albumsMap = new Map<string, Album>();
           songsData
             .filter(song => song.type === 'album' && song.album_name)
@@ -83,12 +83,22 @@ export default function MusicPage() {
               albumsMap.get(albumName)!.songs.push(song);
             });
           
-          // Ordenar canciones de cada álbum por track_number
+          // Sort songs in each album by track_number
           albumsMap.forEach(album => {
             album.songs.sort((a, b) => (a.track_number || 0) - (b.track_number || 0));
           });
           
           setAlbums(Array.from(albumsMap.values()));
+
+          // Fetch streaming links for all songs
+          const { data: linksData, error: linksError } = await supabase
+            .from('streaming_links')
+            .select('*')
+            .order('is_primary', { ascending: false });
+
+          if (linksData && !linksError) {
+            setStreamingLinks(linksData);
+          }
         }
       } catch (error) {
         console.error('Error:', error);
@@ -100,12 +110,69 @@ export default function MusicPage() {
     fetchMusic();
   }, [supabase]);
 
+  // Initialize filtered data when albums/singles are loaded
+  useEffect(() => {
+    setFilteredAlbums(albums);
+    setFilteredSingles(singles);
+  }, [albums, singles]);
+
+  // Filter function for search
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredAlbums(albums);
+      setFilteredSingles(singles);
+      return;
+    }
+
+    const query = searchQuery.toLowerCase();
+    
+    // Filter albums and their songs
+    const filteredAlbumsData = albums.map(album => ({
+      ...album,
+      songs: album.songs.filter(song => 
+        song.title.toLowerCase().includes(query) ||
+        song.artist.toLowerCase().includes(query)
+      )
+    })).filter(album => 
+      album.name.toLowerCase().includes(query) ||
+      album.artist?.toLowerCase().includes(query) ||
+      album.songs.length > 0
+    );
+
+    // Filter singles
+    const filteredSinglesData = singles.filter(song =>
+      song.title.toLowerCase().includes(query) ||
+      song.artist.toLowerCase().includes(query)
+    );
+
+    setFilteredAlbums(filteredAlbumsData);
+    setFilteredSingles(filteredSinglesData);
+
+    // Auto-switch to tab with results when searching
+    if (searchQuery.trim()) {
+      if (filteredSinglesData.length > 0 && filteredAlbumsData.length === 0) {
+        setActiveTab('singles');
+      } else if (filteredAlbumsData.length > 0 && filteredSinglesData.length === 0) {
+        setActiveTab('albums');
+      } else if (filteredSinglesData.length > filteredAlbumsData.length) {
+        setActiveTab('singles');
+      } else if (filteredAlbumsData.length > 0) {
+        setActiveTab('albums');
+      }
+    }
+  }, [searchQuery, albums, singles]);
+
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-ES', {
+    return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     });
+  };
+
+  const getPrimaryLinkForSong = (songId: number) => {
+    const songLinks = streamingLinks.filter(link => link.song_id === songId);
+    return songLinks.find(link => link.is_primary) || songLinks[0];
   };
 
   const handleShare = async (item: Song | Album) => {
@@ -115,20 +182,20 @@ export default function MusicPage() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `¡Escucha ${title} de NexDrak!`,
-          text: `Descubre ${title}.`,
+          title: `Listen to ${title} by NexDrak!`,
+          text: `Discover ${title}.`,
           url: url || window.location.href,
         });
-        console.log("¡Compartido exitosamente!");
+        console.log("Shared successfully!");
       } catch (error) {
-        console.log("Error al compartir", error);
+        console.log("Error sharing", error);
       }
     } else {
       try {
         await navigator.clipboard.writeText(url || window.location.href);
-        alert("Enlace copiado al portapapeles");
+        alert("Link copied to clipboard");
       } catch (error) {
-        alert("No se pudo compartir el enlace");
+        alert("Could not share the link");
       }
     }
   };
@@ -138,7 +205,7 @@ export default function MusicPage() {
       <div className="container mx-auto px-4 py-24 mt-10">
         <div className="max-w-4xl mx-auto mb-12 text-center">
           <h1 className="text-4xl font-bold mb-4">MUSIC</h1>
-          <p className="text-gray-300">Cargando discografía...</p>
+          <p className="text-gray-300">Loading discography...</p>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -160,12 +227,98 @@ export default function MusicPage() {
     <div className="container mx-auto px-4 py-24 mt-10">
       <div className="max-w-4xl mx-auto mb-12 text-center">
         <h1 className="text-4xl font-bold mb-4">MUSIC</h1>
-        <p className="text-gray-300">Explora la discografía completa de NexDrak, desde álbumes hasta sencillos.</p>
+        <p className="text-gray-300 mb-8">Explore NexDrak's complete discography, from albums to singles.</p>
+        
+        {/* Search Bar */}
+        <div style={{ 
+          width: '100%', 
+          maxWidth: '400px', 
+          margin: '0 auto 32px auto'
+        }}>
+          <div style={{ position: 'relative' }}>
+            <input
+              type="text"
+              placeholder="Search songs, albums, or artists..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '12px 40px 12px 40px',
+                backgroundColor: 'rgba(31, 41, 55, 0.8)',
+                border: '1px solid rgba(75, 85, 99, 0.6)',
+                borderRadius: '8px',
+                color: 'white',
+                fontSize: '16px',
+                outline: 'none',
+                backdropFilter: 'blur(8px)',
+                transition: 'all 0.2s ease'
+              }}
+              onFocus={(e) => {
+                const target = e.target as HTMLInputElement;
+                target.style.borderColor = 'rgba(156, 163, 175, 0.8)';
+                target.style.backgroundColor = 'rgba(31, 41, 55, 0.9)';
+              }}
+              onBlur={(e) => {
+                const target = e.target as HTMLInputElement;
+                target.style.borderColor = 'rgba(75, 85, 99, 0.6)';
+                target.style.backgroundColor = 'rgba(31, 41, 55, 0.8)';
+              }}
+            />
+            <div style={{
+              position: 'absolute',
+              left: '12px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              color: '#9ca3af',
+              pointerEvents: 'none'
+            }}>
+              <Search className="h-5 w-5" />
+            </div>
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                style={{
+                  position: 'absolute',
+                  right: '12px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: '#9ca3af',
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  borderRadius: '4px',
+                  transition: 'color 0.2s ease'
+                }}
+                onMouseEnter={(e) => (e.target as HTMLButtonElement).style.color = 'white'}
+                onMouseLeave={(e) => (e.target as HTMLButtonElement).style.color = '#9ca3af'}
+                type="button"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            )}
+          </div>
+          {searchQuery && (
+            <div style={{ 
+              fontSize: '14px', 
+              color: '#9ca3af', 
+              marginTop: '8px', 
+              textAlign: 'center' 
+            }}>
+              Searching for "{searchQuery}"
+              {filteredAlbums.length > 0 && filteredSingles.length > 0 && (
+                <span style={{ display: 'block', marginTop: '4px', fontSize: '12px' }}>
+                  Found in both Albums ({filteredAlbums.length}) and Singles ({filteredSingles.length})
+                </span>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Tabs */}
       <div className="flex justify-center mb-8">
-        <div className="bg-black/50 backdrop-blur-sm rounded-lg p-1 border border-white/20">
+        <div className="bg-black/50 backdrop-blur-sm rounded-lg p-1 border border-white/20 flex">
           <button
             onClick={() => setActiveTab('albums')}
             className={`px-6 py-2 rounded-md transition-colors flex items-center gap-2 ${
@@ -175,7 +328,20 @@ export default function MusicPage() {
             }`}
           >
             <Disc className="h-4 w-4" />
-            Álbumes
+            Albums
+            {searchQuery && filteredAlbums.length > 0 && (
+              <span style={{
+                backgroundColor: activeTab === 'albums' ? '#000' : '#fff',
+                color: activeTab === 'albums' ? '#fff' : '#000',
+                borderRadius: '12px',
+                padding: '2px 8px',
+                fontSize: '12px',
+                fontWeight: 'bold',
+                marginLeft: '4px'
+              }}>
+                {filteredAlbums.length}
+              </span>
+            )}
           </button>
           <button
             onClick={() => setActiveTab('singles')}
@@ -187,6 +353,19 @@ export default function MusicPage() {
           >
             <PlayCircle className="h-4 w-4" />
             Singles
+            {searchQuery && filteredSingles.length > 0 && (
+              <span style={{
+                backgroundColor: activeTab === 'singles' ? '#000' : '#fff',
+                color: activeTab === 'singles' ? '#fff' : '#000',
+                borderRadius: '12px',
+                padding: '2px 8px',
+                fontSize: '12px',
+                fontWeight: 'bold',
+                marginLeft: '4px'
+              }}>
+                {filteredSingles.length}
+              </span>
+            )}
           </button>
         </div>
       </div>
@@ -194,9 +373,9 @@ export default function MusicPage() {
       {/* Albums Tab */}
       {activeTab === 'albums' && (
         <div className="mb-16">
-          {albums.length > 0 ? (
+          {filteredAlbums.length > 0 ? (
             <div className="space-y-8">
-              {albums.map((album, index) => (
+              {filteredAlbums.map((album, index) => (
                 <Card key={index} className="bg-black/50 backdrop-blur-sm border-white/20 overflow-hidden">
                   <CardContent className="p-6">
                     <div className="flex flex-col lg:flex-row gap-6">
@@ -244,12 +423,12 @@ export default function MusicPage() {
                                   asChild
                                 >
                                   <a 
-                                    href={song.stream_url}
+                                    href={getPrimaryLinkForSong(song.id)?.url || song.stream_url}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                   >
                                     <ExternalLink className="h-4 w-4 mr-2" />
-                                    Escuchar
+                                    Listen
                                   </a>
                                 </Button>
                               </div>
@@ -265,8 +444,17 @@ export default function MusicPage() {
           ) : (
             <div className="text-center py-12">
               <Disc className="h-16 w-16 text-gray-600 mx-auto mb-4" />
-              <p className="text-gray-400 text-lg">No hay álbumes disponibles</p>
-              <p className="text-gray-500 text-sm">Los álbumes aparecerán aquí cuando se agreguen</p>
+              {searchQuery ? (
+                <>
+                  <p className="text-gray-400 text-lg">No albums found for "{searchQuery}"</p>
+                  <p className="text-gray-500 text-sm">Try searching with different keywords</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-gray-400 text-lg">No albums available</p>
+                  <p className="text-gray-500 text-sm">Albums will appear here when added</p>
+                </>
+              )}
             </div>
           )}
         </div>
@@ -275,9 +463,9 @@ export default function MusicPage() {
       {/* Singles Tab */}
       {activeTab === 'singles' && (
         <div className="mb-16">
-          {singles.length > 0 ? (
+          {filteredSingles.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {singles.map((song) => (
+              {filteredSingles.map((song) => (
                 <Card key={song.id} className="bg-black/50 backdrop-blur-sm border-white/20 overflow-hidden group hover:border-white/40 transition-all">
                   <div className="relative aspect-square bg-gray-800">
                     {song.cover_image_url ? (
@@ -301,12 +489,12 @@ export default function MusicPage() {
                         asChild
                       >
                         <a 
-                          href={song.stream_url} 
+                          href={getPrimaryLinkForSong(song.id)?.url || song.stream_url} 
                           target="_blank" 
                           rel="noopener noreferrer"
                         >
                           <ExternalLink className="h-5 w-5 mr-2" />
-                          ESCUCHAR
+                          LISTEN
                         </a>
                       </Button>
                     </div>
@@ -337,7 +525,7 @@ export default function MusicPage() {
                           asChild
                         >
                           <a 
-                            href={song.stream_url} 
+                            href={getPrimaryLinkForSong(song.id)?.url || song.stream_url} 
                             target="_blank" 
                             rel="noopener noreferrer"
                           >
@@ -363,22 +551,31 @@ export default function MusicPage() {
           ) : (
             <div className="text-center py-12">
               <PlayCircle className="h-16 w-16 text-gray-600 mx-auto mb-4" />
-              <p className="text-gray-400 text-lg">No hay singles disponibles</p>
-              <p className="text-gray-500 text-sm">Los singles aparecerán aquí cuando se agreguen</p>
+              {searchQuery ? (
+                <>
+                  <p className="text-gray-400 text-lg">No singles found for "{searchQuery}"</p>
+                  <p className="text-gray-500 text-sm">Try searching with different keywords</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-gray-400 text-lg">No singles available</p>
+                  <p className="text-gray-500 text-sm">Singles will appear here when added</p>
+                </>
+              )}
             </div>
           )}
         </div>
       )}
 
-      {/* Sección de licenciamiento */}
+      {/* Licensing section */}
       <div className="max-w-2xl mx-auto p-8 bg-black/50 backdrop-blur-sm border border-white/20 rounded-xl text-center">
-        <h2 className="text-2xl font-bold mb-4">LICENCIAMIENTO</h2>
+        <h2 className="text-2xl font-bold mb-4">LICENSING</h2>
         <p className="text-gray-300 mb-6">
-          ¿Interesado en licenciar la música de NexDrak para tu proyecto, película o comercial? 
-          Ponte en contacto con nuestro equipo de licenciamiento.
+          Interested in licensing NexDrak's music for your project, film, or commercial? 
+          Get in touch with our licensing team.
         </p>
         <Button className="bg-white hover:bg-gray-200 text-black">
-          CONTACTAR PARA LICENCIAS
+          CONTACT FOR LICENSING
         </Button>
       </div>
     </div>

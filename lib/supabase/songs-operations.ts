@@ -14,6 +14,7 @@ export interface Song {
   album_name?: string | null;
   track_number?: number | null;
   release_date?: string | null;
+  youtube_embed_id?: string | null;
   created_at?: string;
 }
 
@@ -83,6 +84,7 @@ export class SongsService {
             ? Number(songData.track_number)
             : null,
         release_date: songData.release_date || null,
+        youtube_embed_id: songData.youtube_embed_id?.trim() || null,
       };
 
       const { data, error } = await this.supabase
@@ -174,6 +176,8 @@ export class SongsService {
           : null;
       if (updates.release_date !== undefined)
         cleanUpdates.release_date = updates.release_date || null;
+      if (updates.youtube_embed_id !== undefined)
+        cleanUpdates.youtube_embed_id = updates.youtube_embed_id?.trim() || null;
 
       // Final validation before sending
       if (

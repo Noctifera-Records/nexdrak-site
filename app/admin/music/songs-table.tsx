@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { Edit, Trash2, ExternalLink, Music, Disc, PlayCircle } from 'lucide-react';
+import { Edit, Trash2, ExternalLink, Music, Disc, PlayCircle, Link, Volume2, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -17,15 +17,28 @@ interface Song {
   track_number?: number;
   release_date?: string;
   created_at: string;
+  youtube_embed_id?: string;
+}
+
+interface StreamingLink {
+  id: number;
+  song_id: number;
+  platform: string;
+  url: string;
+  is_primary: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 interface SongsTableProps {
   songs: Song[];
+  streamingLinks: StreamingLink[];
   onEdit: (song: Song) => void;
   onDelete: (id: number) => void;
+  onManageLinks: (song: Song) => void;
 }
 
-export function SongsTable({ songs, onEdit, onDelete }: SongsTableProps) {
+export function SongsTable({ songs, streamingLinks, onEdit, onDelete, onManageLinks }: SongsTableProps) {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('es-ES', {
       year: 'numeric',
@@ -40,6 +53,29 @@ export function SongsTable({ songs, onEdit, onDelete }: SongsTableProps) {
 
   const getTypeColor = (type: 'album' | 'single') => {
     return type === 'album' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800';
+  };
+
+  const getSongStreamingLinks = (songId: number) => {
+    return streamingLinks.filter(link => link.song_id === songId);
+  };
+
+  const getPrimaryLink = (songId: number) => {
+    const links = getSongStreamingLinks(songId);
+    return links.find(link => link.is_primary) || links[0];
+  };
+
+  const getPlatformIcon = (platform: string) => {
+    const icons = {
+      spotify: Volume2,
+      youtube: Play,
+      apple_music: Music,
+      soundcloud: Volume2,
+      bandcamp: Music,
+      deezer: Volume2,
+      tidal: Volume2,
+      amazon_music: Music
+    };
+    return icons[platform as keyof typeof icons] || ExternalLink;
   };
 
   if (songs.length === 0) {
@@ -71,6 +107,7 @@ export function SongsTable({ songs, onEdit, onDelete }: SongsTableProps) {
                     <th className="text-left p-2">Artista</th>
                     <th className="text-left p-2">Tipo</th>
                     <th className="text-left p-2">Álbum/Track</th>
+                    <th className="text-left p-2">Enlaces</th>
                     <th className="text-left p-2">Fecha</th>
                     <th className="text-left p-2">Acciones</th>
                   </tr>
@@ -120,24 +157,79 @@ export function SongsTable({ songs, onEdit, onDelete }: SongsTableProps) {
                           <span className="text-gray-400">-</span>
                         )}
                       </td>
+                      <td className="p-2">
+                        {(() => {
+                          const links = getSongStreamingLinks(song.id);
+                          const primaryLink = getPrimaryLink(song.id);
+                          
+                          if (links.length === 0) {
+                            return (
+                              <div className="flex items-center gap-1 text-gray-400">
+                                <ExternalLink className="h-3 w-3" />
+                                <span className="text-xs">Legacy URL</span>
+                              </div>
+                            );
+                          }
+                          
+                          return (
+                            <div className="flex items-center gap-1">
+                              <div className="flex -space-x-1">
+                                {links.slice(0, 3).map((link) => {
+                                  const IconComponent = getPlatformIcon(link.platform);
+                                  return (
+                                    <div
+                                      key={link.id}
+                                      className={`w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-xs ${
+                                        link.is_primary ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'
+                                      }`}
+                                      title={`${link.platform}${link.is_primary ? ' (Primary)' : ''}`}
+                                    >
+                                      <IconComponent className="h-3 w-3" />
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                              {links.length > 3 && (
+                                <span className="text-xs text-gray-500">+{links.length - 3}</span>
+                              )}
+                              <span className="text-xs text-gray-500">({links.length})</span>
+                            </div>
+                          );
+                        })()}
+                      </td>
                       <td className="p-2 text-sm text-gray-500">
                         {song.release_date ? formatDate(song.release_date) : formatDate(song.created_at)}
                       </td>
                       <td className="p-2">
                         <div className="flex items-center gap-2">
+                          {(() => {
+                            const primaryLink = getPrimaryLink(song.id);
+                            const linkUrl = primaryLink?.url || song.stream_url;
+                            
+                            return (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                asChild
+                              >
+                                <a 
+                                  href={linkUrl} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  title="Escuchar canción"
+                                >
+                                  <ExternalLink className="h-4 w-4" />
+                                </a>
+                              </Button>
+                            );
+                          })()}
                           <Button
                             variant="ghost"
                             size="sm"
-                            asChild
+                            onClick={() => onManageLinks(song)}
+                            title="Gestionar enlaces de streaming"
                           >
-                            <a 
-                              href={song.stream_url} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              title="Escuchar canción"
-                            >
-                              <ExternalLink className="h-4 w-4" />
-                            </a>
+                            <Link className="h-4 w-4" />
                           </Button>
                           <Button
                             variant="ghost"
@@ -209,32 +301,85 @@ export function SongsTable({ songs, onEdit, onDelete }: SongsTableProps) {
                     </div>
                   )}
                   
-                  <p className="text-xs text-gray-500 mb-3">
+                  <p className="text-xs text-gray-500 mb-2">
                     {song.release_date ? formatDate(song.release_date) : formatDate(song.created_at)}
                   </p>
                   
-                  <div className="flex items-center gap-2">
+                  {/* Streaming Links Info */}
+                  <div className="mb-3">
+                    {(() => {
+                      const links = getSongStreamingLinks(song.id);
+                      
+                      if (links.length === 0) {
+                        return (
+                          <div className="flex items-center gap-1 text-gray-400">
+                            <ExternalLink className="h-3 w-3" />
+                            <span className="text-xs">Using legacy URL</span>
+                          </div>
+                        );
+                      }
+                      
+                      return (
+                        <div className="flex items-center gap-2">
+                          <div className="flex -space-x-1">
+                            {links.slice(0, 4).map((link) => {
+                              const IconComponent = getPlatformIcon(link.platform);
+                              return (
+                                <div
+                                  key={link.id}
+                                  className={`w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-xs ${
+                                    link.is_primary ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'
+                                  }`}
+                                  title={`${link.platform}${link.is_primary ? ' (Primary)' : ''}`}
+                                >
+                                  <IconComponent className="h-3 w-3" />
+                                </div>
+                              );
+                            })}
+                          </div>
+                          <span className="text-xs text-gray-500">{links.length} platform{links.length !== 1 ? 's' : ''}</span>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-2">
+                    {(() => {
+                      const primaryLink = getPrimaryLink(song.id);
+                      const linkUrl = primaryLink?.url || song.stream_url;
+                      
+                      return (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          asChild
+                        >
+                          <a 
+                            href={linkUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                          >
+                            <ExternalLink className="h-4 w-4 mr-2" />
+                            Listen
+                          </a>
+                        </Button>
+                      );
+                    })()}
                     <Button
                       variant="outline"
                       size="sm"
-                      asChild
-                      className="flex-1"
+                      onClick={() => onManageLinks(song)}
                     >
-                      <a 
-                        href={song.stream_url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                      >
-                        <ExternalLink className="h-4 w-4 mr-2" />
-                        Escuchar
-                      </a>
+                      <Link className="h-4 w-4 mr-2" />
+                      Links
                     </Button>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => onEdit(song)}
                     >
-                      <Edit className="h-4 w-4" />
+                      <Edit className="h-4 w-4 mr-2" />
+                      Edit
                     </Button>
                     <Button
                       variant="outline"
@@ -242,7 +387,8 @@ export function SongsTable({ songs, onEdit, onDelete }: SongsTableProps) {
                       onClick={() => onDelete(song.id)}
                       className="text-red-600 hover:text-red-700"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete
                     </Button>
                   </div>
                 </div>
