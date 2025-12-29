@@ -145,14 +145,14 @@ export default function SongPage({ params }: SongPageProps) {
 
   const getPlatformInfo = (platform: string) => {
     const platforms = {
-      spotify: { name: 'Spotify', color: '#1db954', icon: Volume2 },
+      spotify: { name: 'Spotify', color: '#1ed35eff', icon: Volume2 },
       youtube: { name: 'YouTube Music', color: '#ff0000', icon: Play },
-      apple_music: { name: 'Apple Music', color: '#fa57c1', icon: Music },
+      apple_music: { name: 'Apple Music', color: '#fd118fff', icon: Music },
       soundcloud: { name: 'SoundCloud', color: '#ff5500', icon: Volume2 },
       bandcamp: { name: 'Bandcamp', color: '#629aa0', icon: Music },
-      deezer: { name: 'Deezer', color: '#ff0092', icon: Volume2 },
-      tidal: { name: 'Tidal', color: '#000000', icon: Volume2 },
-      amazon_music: { name: 'Amazon Music', color: '#ff9900', icon: Music }
+      deezer: { name: 'Deezer', color: '#f6ff00ff', icon: Volume2 },
+      tidal: { name: 'Tidal', color: '#f2f2f2ff', icon: Volume2 },
+      amazon_music: { name: 'Amazon Music', color: '#00b7ffff', icon: Music }
     };
     
     return platforms[platform as keyof typeof platforms] || { 

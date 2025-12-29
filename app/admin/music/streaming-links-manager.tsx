@@ -40,14 +40,14 @@ interface StreamingLinksManagerProps {
 }
 
 const PLATFORMS = [
-  { value: 'spotify', label: 'Spotify', color: '#1db954' },
+  { value: 'spotify', label: 'Spotify', color: '#17d359ff' },
   { value: 'youtube', label: 'YouTube Music', color: '#ff0000' },
   { value: 'apple_music', label: 'Apple Music', color: '#fa57c1' },
   { value: 'soundcloud', label: 'SoundCloud', color: '#ff5500' },
   { value: 'bandcamp', label: 'Bandcamp', color: '#629aa0' },
-  { value: 'deezer', label: 'Deezer', color: '#ff0092' },
-  { value: 'tidal', label: 'Tidal', color: '#000000' },
-  { value: 'amazon_music', label: 'Amazon Music', color: '#ff9900' }
+  { value: 'deezer', label: 'Deezer', color: '#eeff00ff' },
+  { value: 'tidal', label: 'Tidal', color: '#e4e4e4ff' },
+  { value: 'amazon_music', label: 'Amazon Music', color: '#00d9ffff' }
 ];
 
 export function StreamingLinksManager({ song, streamingLinks, onClose }: StreamingLinksManagerProps) {
