@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import OptimizedImage from "@/components/optimized-image";
 import { Button } from "@/components/ui/button";
@@ -11,7 +9,7 @@ import {
   ArrowDown,
 } from "lucide-react";
 import dynamic from "next/dynamic";
-import { useSiteSettings } from "@/hooks/use-site-settings";
+import { createClient } from "@/lib/supabase/server";
 
 const LatestReleases = dynamic(() => import("@/components/latest-releases"));
 const UpcomingEvents = dynamic(() => import("@/components/upcoming-events"));
@@ -19,15 +17,55 @@ const Newsletter = dynamic(() => import("@/components/newsletter"));
 const SocialLinks = dynamic(() => import("@/components/social-links"));
 const CookieBanner = dynamic(() => import("@/components/cookie-banner"), { ssr: false });
 
-export default function Home() {
-  const { settings, loading } = useSiteSettings();
+interface SiteSettings {
+  hero_album_link: string;
+  hero_background_image: string;
+  hero_release_image: string;
+  hero_release_text: string;
+  site_logo: string;
+  site_logo_mobile: string;
+  navbar_logo: string;
+  site_title: string;
+  site_description: string;
+  contact_email: string;
+  booking_email: string;
+}
 
-  if (loading) {
-    return (
-      <div className="relative min-h-screen flex flex-col items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
-      </div>
-    );
+const defaultSettings: SiteSettings = {
+  hero_album_link: "https://album.link/thequietone",
+  hero_background_image: "/placeholder.png",
+  hero_release_image: "/red.png",
+  hero_release_text: "NEW RELEASE",
+  site_logo: "/placeholder.png",
+  site_logo_mobile: "/placeholder.png",
+  navbar_logo: "/nav-logo.webp",
+  site_title: "NexDrak",
+  site_description: "Official website of NexDrak - Electronic Music Artist",
+  contact_email: "contact@nexdrak.com",
+  booking_email: "mgmt@nexdrak.com",
+};
+
+export default async function Home() {
+  const supabase = await createClient();
+  let settings = { ...defaultSettings };
+
+  try {
+    const { data, error } = await supabase
+      .from("site_settings")
+      .select("key, value");
+
+    if (!error && data) {
+      const settingsMap: Partial<SiteSettings> = {};
+      data.forEach((item) => {
+        if (item.key in defaultSettings) {
+          (settingsMap as any)[item.key] =
+            item.value || (defaultSettings as any)[item.key];
+        }
+      });
+      settings = { ...defaultSettings, ...settingsMap };
+    }
+  } catch (error) {
+    console.error("Error fetching settings:", error);
   }
 
   return (

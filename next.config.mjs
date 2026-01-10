@@ -22,7 +22,7 @@ const nextConfig = {
   reactStrictMode: true, // Enable strict mode for better performance
 
   experimental: {
-    optimizeCss: true,
+    optimizeCss: false,
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
     serverComponentsExternalPackages: [],
     webpackBuildWorker: false,
