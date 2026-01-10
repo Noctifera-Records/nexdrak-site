@@ -15,7 +15,7 @@ const LatestReleases = dynamic(() => import("@/components/latest-releases"));
 const UpcomingEvents = dynamic(() => import("@/components/upcoming-events"));
 const Newsletter = dynamic(() => import("@/components/newsletter"));
 const SocialLinks = dynamic(() => import("@/components/social-links"));
-const CookieBanner = dynamic(() => import("@/components/cookie-banner"), { ssr: false });
+import CookieBanner from "@/components/cookie-banner";
 
 interface SiteSettings {
   hero_album_link: string;

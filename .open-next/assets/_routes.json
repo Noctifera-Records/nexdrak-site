@@ -1,11 +1,19 @@
 {
   "version": 1,
-  "include": ["/*"],
+  "include": [
+    "/*"
+  ],
   "exclude": [
     "/_next/static/*",
     "/img/*",
     "/favicon.ico",
     "/robots.txt",
-    "/site.webmanifest"
+    "/site.webmanifest",
+    "/*.png",
+    "/*.jpg",
+    "/*.svg",
+    "/*.css",
+    "/*.js",
+    "/*.txt"
   ]
 }

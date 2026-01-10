@@ -21,17 +21,17 @@ const nextConfig = {
   trailingSlash: false,
   reactStrictMode: true, // Enable strict mode for better performance
 
+  serverExternalPackages: [],
   experimental: {
     optimizeCss: false,
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
-    serverComponentsExternalPackages: [],
     webpackBuildWorker: false,
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
+  },
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
       },
     },
   },
