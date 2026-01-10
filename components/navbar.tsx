@@ -89,7 +89,7 @@ export default function Navbar() {
   return (
     <header className="fixed top-0 w-full z-50 bg-black/70 backdrop-blur-md">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <Link href="/">
+        <Link href="/" aria-label="Go to homepage">
           <img
             src={settings.navbar_logo}
             alt={`${settings.site_title} logo`}

@@ -10,12 +10,14 @@ import {
   Play,
   ArrowDown,
 } from "lucide-react";
-import LatestReleases from "@/components/latest-releases";
-import UpcomingEvents from "@/components/upcoming-events";
-import Newsletter from "@/components/newsletter";
-import SocialLinks from "@/components/social-links";
-import CookieBanner from "@/components/cookie-banner";
+import dynamic from "next/dynamic";
 import { useSiteSettings } from "@/hooks/use-site-settings";
+
+const LatestReleases = dynamic(() => import("@/components/latest-releases"));
+const UpcomingEvents = dynamic(() => import("@/components/upcoming-events"));
+const Newsletter = dynamic(() => import("@/components/newsletter"));
+const SocialLinks = dynamic(() => import("@/components/social-links"));
+const CookieBanner = dynamic(() => import("@/components/cookie-banner"), { ssr: false });
 
 export default function Home() {
   const { settings, loading } = useSiteSettings();
