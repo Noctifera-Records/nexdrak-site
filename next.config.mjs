@@ -7,56 +7,76 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    unoptimized: true,
+    unoptimized: false, // Enable optimization
     formats: ["image/webp", "image/avif"],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    minimumCacheTTL: 31536000, // 1 year cache
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
-  compress: false, // Disable compression to reduce server load
+  compress: true, // Enable compression
   poweredByHeader: false,
-  generateEtags: false, // Disable ETags to reduce requests
+  generateEtags: true, // Enable ETags for better caching
   trailingSlash: false,
-  reactStrictMode: false, // Disable strict mode to prevent double renders
+  reactStrictMode: true, // Enable strict mode for better performance
 
-  // Minimal experimental features to prevent chunk generation
   experimental: {
-    optimizeCss: false,
-    optimizePackageImports: [],
+    optimizeCss: true,
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
     serverComponentsExternalPackages: [],
-    webpackBuildWorker: false,
-    turbo: false,
-    appDir: true,
+    webpackBuildWorker: true,
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      },
+    },
   },
   
-  // Extreme optimization to prevent all chunking issues
   webpack: (config, { isServer, dev }) => {
-    if (!isServer) {
-      // Completely disable code splitting to prevent MIME type errors
+    // Optimize bundle splitting
+    if (!isServer && !dev) {
       config.optimization = {
         ...config.optimization,
-        splitChunks: false,
-        runtimeChunk: false,
-        minimize: !dev,
-        concatenateModules: false, // Disable to prevent issues
-      };
-      
-      // Ensure all modules are bundled together
-      config.resolve = {
-        ...config.resolve,
-        fallback: {
-          ...config.resolve.fallback,
-          fs: false,
-          net: false,
-          tls: false,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              chunks: 'all',
+              priority: 10,
+            },
+            common: {
+              name: 'common',
+              minChunks: 2,
+              chunks: 'all',
+              priority: 5,
+              reuseExistingChunk: true,
+            },
+          },
         },
+        usedExports: true,
+        sideEffects: false,
       };
     }
+
+    // Tree shaking optimization
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': require('path').resolve(__dirname),
+    };
+
     return config;
   },
 
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
+
   async headers() {
     return [
       {
@@ -78,14 +98,6 @@ const nextConfig = {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=()",
           },
-          {
-            key: "Cache-Control",
-            value: "public, max-age=3600, s-maxage=3600",
-          },
-          {
-            key: "Connection",
-            value: "keep-alive",
-          },
         ],
       },
       {
@@ -94,6 +106,24 @@ const nextConfig = {
           {
             key: "Cache-Control",
             value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/_next/image(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/api/(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=300, s-maxage=300",
           },
         ],
       },

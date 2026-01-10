@@ -6,16 +6,18 @@ import { ThemeProvider } from "@/components/theme-provider"
 import Navbar from "@/components/navbar"
 import BackgroundAnimation from "@/components/background-animation"
 import { NotificationProvider } from "@/components/notification-system"
-import OptimizedLoader from "@/components/optimized-loader"
-import ResourcePreloader from "@/components/resource-preloader"
 import ErrorBoundary from "@/components/error-boundary"
-import SafeAppWrapper from "@/components/safe-app-wrapper"
-
-import Smart429Handler from "@/components/smart-429-handler"
 import HydrationFix from "@/components/hydration-fix"
 import StructuredData from "./structured-data"
+import ResourcePreloader from "@/components/resource-preloader"
+import WebVitals from "@/components/web-vitals"
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ 
+  subsets: ["latin"],
+  display: 'swap',
+  preload: true,
+  variable: '--font-inter'
+})
 
 export const metadata: Metadata = {
   title: {
@@ -118,7 +120,12 @@ export const metadata: Metadata = {
 export const viewport = {
   width: 'device-width',
   initialScale: 1.0,
-  themeColor: '#000000', // Agregando themeColor
+  maximumScale: 5.0,
+  userScalable: true,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#000000' }
+  ],
 };
 
 export default function RootLayout({
@@ -132,11 +139,13 @@ export default function RootLayout({
         <StructuredData />
 
       </head>
-      <body className={`${inter.className} bg-black text-white min-h-screen flex flex-col`}>
+      <body className={`${inter.variable} font-sans bg-black text-white min-h-screen flex flex-col antialiased`}>
         <HydrationFix>
           <ErrorBoundary>
             <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
               <NotificationProvider>
+                <ResourcePreloader />
+                <WebVitals />
                 <BackgroundAnimation />
                 <Navbar />
                 <main className="flex-1 relative pt-20">{children}</main>

@@ -2,7 +2,7 @@
 
 export const runtime = 'edge';
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, use, Suspense, lazy } from "react";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -19,6 +19,9 @@ import {
   Volume2
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+
+// Lazy load YouTube player component
+const YouTubePlayer = lazy(() => import('@/components/youtube-player'));
 
 interface Song {
   id: number;
@@ -466,10 +469,12 @@ export default function SongPage({ params }: SongPageProps) {
                 {song.cover_image_url ? (
                   <Image
                     src={song.cover_image_url}
-                    alt={song.title}
+                    alt={`${song.title} album cover by ${song.artist}`}
                     fill
                     style={{ objectFit: 'cover' }}
                     priority
+                    sizes="(max-width: 768px) 100vw, 400px"
+                    quality={85}
                   />
                 ) : (
                   <div style={{
@@ -480,7 +485,7 @@ export default function SongPage({ params }: SongPageProps) {
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}>
-                    <Music style={{ width: '64px', height: '64px', color: '#6b7280' }} />
+                    <Music style={{ width: '64px', height: '64px', color: '#6b7280' }} aria-hidden="true" />
                   </div>
                 )}
               </div>
@@ -536,8 +541,13 @@ export default function SongPage({ params }: SongPageProps) {
                     }}
                     asChild
                   >
-                    <a href={getPrimaryLink()?.url || song.stream_url} target="_blank" rel="noopener noreferrer">
-                      <Play className="h-5 w-5" />
+                    <a 
+                      href={getPrimaryLink()?.url || song.stream_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      aria-label={`Listen to ${song.title} by ${song.artist}`}
+                    >
+                      <Play className="h-5 w-5" aria-hidden="true" />
                       LISTEN NOW
                     </a>
                   </Button>
@@ -553,8 +563,9 @@ export default function SongPage({ params }: SongPageProps) {
                     alignItems: 'center',
                     gap: '8px'
                   }}
+                  aria-label={`Share ${song.title} by ${song.artist}`}
                 >
-                  <Share2 className="h-4 w-4" />
+                  <Share2 className="h-4 w-4" aria-hidden="true" />
                   Share
                 </Button>
               </div>
@@ -583,8 +594,13 @@ export default function SongPage({ params }: SongPageProps) {
                             }}
                             asChild
                           >
-                            <a href={link.url} target="_blank" rel="noopener noreferrer">
-                              <IconComponent className="h-4 w-4 mr-3" />
+                            <a 
+                              href={link.url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              aria-label={`Listen to ${song.title} on ${platformInfo.name}`}
+                            >
+                              <IconComponent className="h-4 w-4 mr-3" aria-hidden="true" />
                               {platformInfo.name}
                               {link.is_primary && (
                                 <span style={{ 
@@ -595,7 +611,7 @@ export default function SongPage({ params }: SongPageProps) {
                                   ⭐
                                 </span>
                               )}
-                              <ExternalLink className="h-4 w-4 ml-auto" />
+                              <ExternalLink className="h-4 w-4 ml-auto" aria-hidden="true" />
                             </a>
                           </Button>
                         );
@@ -613,10 +629,15 @@ export default function SongPage({ params }: SongPageProps) {
                           }}
                           asChild
                         >
-                          <a href={song.stream_url} target="_blank" rel="noopener noreferrer">
-                            <ExternalLink className="h-4 w-4 mr-3" />
+                          <a 
+                            href={song.stream_url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            aria-label={`Listen to ${song.title} on other platforms`}
+                          >
+                            <ExternalLink className="h-4 w-4 mr-3" aria-hidden="true" />
                             Others
-                            <ExternalLink className="h-4 w-4 ml-auto" />
+                            <ExternalLink className="h-4 w-4 ml-auto" aria-hidden="true" />
                           </a>
                         </Button>
                       )}
@@ -634,10 +655,15 @@ export default function SongPage({ params }: SongPageProps) {
                         }}
                         asChild
                       >
-                        <a href={song.stream_url} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="h-4 w-4 mr-3" />
+                        <a 
+                          href={song.stream_url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          aria-label={`Listen to ${song.title}`}
+                        >
+                          <ExternalLink className="h-4 w-4 mr-3" aria-hidden="true" />
                           Listen
-                          <ExternalLink className="h-4 w-4 ml-auto" />
+                          <ExternalLink className="h-4 w-4 ml-auto" aria-hidden="true" />
                         </a>
                       </Button>
                     )
@@ -692,32 +718,29 @@ export default function SongPage({ params }: SongPageProps) {
                   Watch on YouTube
                 </h3>
                 
-                <div style={{ 
-                  position: 'relative', 
-                  width: '100%', 
-                  paddingBottom: '56.25%', // 16:9 aspect ratio
-                  height: 0,
-                  borderRadius: '12px',
-                  overflow: 'hidden',
-                  backgroundColor: '#000',
-                  border: `2px solid ${dominantColor}30`
-                }}>
-                  <iframe
-                    src={`https://www.youtube.com/embed/${getYouTubeEmbedId()}?rel=0&modestbranding=1&color=white`}
+                <Suspense fallback={
+                  <div style={{ 
+                    position: 'relative', 
+                    width: '100%', 
+                    paddingBottom: '56.25%',
+                    height: 0,
+                    borderRadius: '12px',
+                    overflow: 'hidden',
+                    backgroundColor: '#000',
+                    border: `2px solid ${dominantColor}30`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <div style={{ position: 'absolute', color: 'white' }}>Loading video...</div>
+                  </div>
+                }>
+                  <YouTubePlayer 
+                    videoId={getYouTubeEmbedId()!}
                     title={`${song.title} - ${song.artist}`}
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowFullScreen
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      width: '100%',
-                      height: '100%',
-                      borderRadius: '8px'
-                    }}
+                    dominantColor={dominantColor}
                   />
-                </div>
+                </Suspense>
                 
                 <div style={{ 
                   marginTop: '12px', 
@@ -737,7 +760,7 @@ export default function SongPage({ params }: SongPageProps) {
                       alignItems: 'center',
                       justifyContent: 'center'
                     }}>
-                      <Play style={{ width: '12px', height: '12px', color: 'white' }} />
+                      <Play style={{ width: '12px', height: '12px', color: 'white' }} aria-hidden="true" />
                     </div>
                     <span style={{ fontSize: '14px', color: '#9ca3af' }}>
                       Official video on YouTube
@@ -761,8 +784,9 @@ export default function SongPage({ params }: SongPageProps) {
                       href={`https://www.youtube.com/watch?v=${getYouTubeEmbedId()}`}
                       target="_blank" 
                       rel="noopener noreferrer"
+                      aria-label={`Watch ${song.title} on YouTube`}
                     >
-                      <ExternalLink className="h-3 w-3" />
+                      <ExternalLink className="h-3 w-3" aria-hidden="true" />
                       Watch on YouTube
                     </a>
                   </Button>

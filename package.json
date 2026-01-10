@@ -10,7 +10,11 @@
     "vercel-build": "next build",
     "pages:build": "next build && npx @cloudflare/next-on-pages",
     "pages:dev": "npx @cloudflare/next-on-pages --watch",
-    "pages:deploy": "npm run pages:build"
+    "pages:deploy": "npm run pages:build",
+    "analyze": "ANALYZE=true npm run build",
+    "optimize-images": "node scripts/optimize-images.js",
+    "lighthouse": "lighthouse http://localhost:3000 --output html --output-path ./lighthouse-report.html",
+    "perf": "npm run build && npm run lighthouse"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
