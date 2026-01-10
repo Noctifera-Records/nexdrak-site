@@ -3241,6 +3241,11 @@
       "imports": [],
       "format": "cjs"
     },
+    ".open-next/server-functions/default/.next/server/app/playground/page_client-reference-manifest.js": {
+      "bytes": 17024,
+      "imports": [],
+      "format": "cjs"
+    },
     ".open-next/server-functions/default/.next/server/app/[song]/page_client-reference-manifest.js": {
       "bytes": 17016,
       "imports": [],
@@ -3248,11 +3253,6 @@
     },
     ".open-next/server-functions/default/.next/server/app/register/page_client-reference-manifest.js": {
       "bytes": 17018,
-      "imports": [],
-      "format": "cjs"
-    },
-    ".open-next/server-functions/default/.next/server/app/playground/page_client-reference-manifest.js": {
-      "bytes": 17024,
       "imports": [],
       "format": "cjs"
     },
@@ -3301,6 +3301,21 @@
       "imports": [],
       "format": "cjs"
     },
+    ".open-next/server-functions/default/.next/server/app/auth/reset-password/page_client-reference-manifest.js": {
+      "bytes": 17051,
+      "imports": [],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/auth/callback/route_client-reference-manifest.js": {
+      "bytes": 16972,
+      "imports": [],
+      "format": "cjs"
+    },
+    ".open-next/server-functions/default/.next/server/app/auth/auth-error/page_client-reference-manifest.js": {
+      "bytes": 17039,
+      "imports": [],
+      "format": "cjs"
+    },
     ".open-next/server-functions/default/.next/server/app/admin/users/page_client-reference-manifest.js": {
       "bytes": 17284,
       "imports": [],
@@ -3341,33 +3356,18 @@
       "imports": [],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/app/admin/account/page_client-reference-manifest.js": {
-      "bytes": 17290,
-      "imports": [],
-      "format": "cjs"
-    },
     ".open-next/server-functions/default/.next/server/app/admin/admins/page_client-reference-manifest.js": {
       "bytes": 17287,
       "imports": [],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/app/auth/callback/route_client-reference-manifest.js": {
-      "bytes": 16972,
-      "imports": [],
-      "format": "cjs"
-    },
-    ".open-next/server-functions/default/.next/server/app/auth/reset-password/page_client-reference-manifest.js": {
-      "bytes": 17051,
-      "imports": [],
-      "format": "cjs"
-    },
-    ".open-next/server-functions/default/.next/server/app/auth/auth-error/page_client-reference-manifest.js": {
-      "bytes": 17039,
+    ".open-next/server-functions/default/.next/server/app/admin/account/page_client-reference-manifest.js": {
+      "bytes": 17290,
       "imports": [],
       "format": "cjs"
     },
     ".open-next/server-functions/default/node_modules/next/dist/server/load-manifest.external.js": {
-      "bytes": 56602,
+      "bytes": 57510,
       "imports": [
         {
           "path": "path",
@@ -3400,6 +3400,11 @@
           "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\_not-found\\page_client-reference-manifest.js"
         },
         {
+          "path": ".open-next/server-functions/default/.next/server/app/playground/page_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\playground\\page_client-reference-manifest.js"
+        },
+        {
           "path": ".open-next/server-functions/default/.next/server/app/[song]/page_client-reference-manifest.js",
           "kind": "require-call",
           "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\[song]\\page_client-reference-manifest.js"
@@ -3408,11 +3413,6 @@
           "path": ".open-next/server-functions/default/.next/server/app/register/page_client-reference-manifest.js",
           "kind": "require-call",
           "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\register\\page_client-reference-manifest.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/.next/server/app/playground/page_client-reference-manifest.js",
-          "kind": "require-call",
-          "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\playground\\page_client-reference-manifest.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/app/music/page_client-reference-manifest.js",
@@ -3460,6 +3460,21 @@
           "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\about\\page_client-reference-manifest.js"
         },
         {
+          "path": ".open-next/server-functions/default/.next/server/app/auth/reset-password/page_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\auth\\reset-password\\page_client-reference-manifest.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/auth/callback/route_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\auth\\callback\\route_client-reference-manifest.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/auth/auth-error/page_client-reference-manifest.js",
+          "kind": "require-call",
+          "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\auth\\auth-error\\page_client-reference-manifest.js"
+        },
+        {
           "path": ".open-next/server-functions/default/.next/server/app/admin/users/page_client-reference-manifest.js",
           "kind": "require-call",
           "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\admin\\users\\page_client-reference-manifest.js"
@@ -3500,29 +3515,14 @@
           "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\admin\\downloads\\page_client-reference-manifest.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/app/admin/account/page_client-reference-manifest.js",
-          "kind": "require-call",
-          "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\admin\\account\\page_client-reference-manifest.js"
-        },
-        {
           "path": ".open-next/server-functions/default/.next/server/app/admin/admins/page_client-reference-manifest.js",
           "kind": "require-call",
           "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\admin\\admins\\page_client-reference-manifest.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/app/auth/callback/route_client-reference-manifest.js",
+          "path": ".open-next/server-functions/default/.next/server/app/admin/account/page_client-reference-manifest.js",
           "kind": "require-call",
-          "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\auth\\callback\\route_client-reference-manifest.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/.next/server/app/auth/reset-password/page_client-reference-manifest.js",
-          "kind": "require-call",
-          "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\auth\\reset-password\\page_client-reference-manifest.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/.next/server/app/auth/auth-error/page_client-reference-manifest.js",
-          "kind": "require-call",
-          "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\auth\\auth-error\\page_client-reference-manifest.js"
+          "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\admin\\account\\page_client-reference-manifest.js"
         }
       ],
       "format": "cjs"
@@ -3550,11 +3550,6 @@
     },
     ".open-next/server-functions/default/.next/server/chunks/2.js": {
       "bytes": 823050,
-      "imports": [],
-      "format": "cjs"
-    },
-    ".open-next/server-functions/default/.next/server/chunks/451.js": {
-      "bytes": 484849,
       "imports": [],
       "format": "cjs"
     },
@@ -3609,6 +3604,11 @@
       "imports": [],
       "format": "cjs"
     },
+    ".open-next/server-functions/default/.next/server/chunks/991.js": {
+      "bytes": 484875,
+      "imports": [],
+      "format": "cjs"
+    },
     ".open-next/server-functions/default/.next/server/webpack-runtime.js": {
       "bytes": 2232,
       "imports": [
@@ -3621,11 +3621,6 @@
           "path": ".open-next/server-functions/default/.next/server/chunks/2.js",
           "kind": "require-call",
           "original": "./chunks/2.js"
-        },
-        {
-          "path": ".open-next/server-functions/default/.next/server/chunks/451.js",
-          "kind": "require-call",
-          "original": "./chunks/451.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/chunks/53.js",
@@ -3671,6 +3666,11 @@
           "path": ".open-next/server-functions/default/.next/server/chunks/94.js",
           "kind": "require-call",
           "original": "./chunks/94.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/chunks/991.js",
+          "kind": "require-call",
+          "original": "./chunks/991.js"
         }
       ],
       "format": "cjs"
@@ -6221,7 +6221,7 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/.next/server/app/auth/callback/route.js": {
-      "bytes": 39656,
+      "bytes": 39957,
       "imports": [
         {
           "path": ".open-next/server-functions/default/node_modules/next/dist/shared/lib/router/utils/app-paths.js",
@@ -6326,8 +6326,8 @@
       ],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/app/[song]/page.js": {
-      "bytes": 39120,
+    ".open-next/server-functions/default/.next/server/app/account/page.js": {
+      "bytes": 24659,
       "imports": [
         {
           "path": ".open-next/server-functions/default/node_modules/next/dist/shared/lib/router/utils/app-paths.js",
@@ -6447,8 +6447,8 @@
       ],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/app/account/page.js": {
-      "bytes": 24659,
+    ".open-next/server-functions/default/.next/server/app/[song]/page.js": {
+      "bytes": 39120,
       "imports": [
         {
           "path": ".open-next/server-functions/default/node_modules/next/dist/shared/lib/router/utils/app-paths.js",
@@ -7052,8 +7052,8 @@
       ],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/app/login/page.js": {
-      "bytes": 78049,
+    ".open-next/server-functions/default/.next/server/app/downloads/page.js": {
+      "bytes": 39822,
       "imports": [
         {
           "path": ".open-next/server-functions/default/node_modules/next/dist/shared/lib/router/utils/app-paths.js",
@@ -7173,8 +7173,8 @@
       ],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/app/downloads/page.js": {
-      "bytes": 39521,
+    ".open-next/server-functions/default/.next/server/app/login/page.js": {
+      "bytes": 78049,
       "imports": [
         {
           "path": ".open-next/server-functions/default/node_modules/next/dist/shared/lib/router/utils/app-paths.js",
@@ -7657,8 +7657,8 @@
       ],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/app/page.js": {
-      "bytes": 44419,
+    ".open-next/server-functions/default/.next/server/app/register/page.js": {
+      "bytes": 21401,
       "imports": [
         {
           "path": ".open-next/server-functions/default/node_modules/next/dist/shared/lib/router/utils/app-paths.js",
@@ -7773,7 +7773,7 @@
         {
           "path": ".open-next/server-functions/default/.next/server/webpack-runtime.js",
           "kind": "require-call",
-          "original": "../webpack-runtime.js"
+          "original": "../../webpack-runtime.js"
         }
       ],
       "format": "cjs"
@@ -7899,8 +7899,8 @@
       ],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/app/register/page.js": {
-      "bytes": 21401,
+    ".open-next/server-functions/default/.next/server/app/page.js": {
+      "bytes": 44736,
       "imports": [
         {
           "path": ".open-next/server-functions/default/node_modules/next/dist/shared/lib/router/utils/app-paths.js",
@@ -8015,7 +8015,7 @@
         {
           "path": ".open-next/server-functions/default/.next/server/webpack-runtime.js",
           "kind": "require-call",
-          "original": "../../webpack-runtime.js"
+          "original": "../webpack-runtime.js"
         }
       ],
       "format": "cjs"
@@ -8141,8 +8141,8 @@
       ],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/app/admin/admins/page.js": {
-      "bytes": 63454,
+    ".open-next/server-functions/default/.next/server/app/admin/downloads/page.js": {
+      "bytes": 46098,
       "imports": [
         {
           "path": ".open-next/server-functions/default/node_modules/next/dist/shared/lib/router/utils/app-paths.js",
@@ -8262,8 +8262,8 @@
       ],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/app/admin/downloads/page.js": {
-      "bytes": 45797,
+    ".open-next/server-functions/default/.next/server/app/admin/admins/page.js": {
+      "bytes": 63454,
       "imports": [
         {
           "path": ".open-next/server-functions/default/node_modules/next/dist/shared/lib/router/utils/app-paths.js",
@@ -8868,7 +8868,7 @@
       "format": "cjs"
     },
     ".open-next/server-functions/default/.next/server/app/admin/releases/page.js": {
-      "bytes": 33910,
+      "bytes": 34211,
       "imports": [
         {
           "path": ".open-next/server-functions/default/node_modules/next/dist/shared/lib/router/utils/app-paths.js",
@@ -9109,8 +9109,8 @@
       ],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/app/admin/users/page.js": {
-      "bytes": 44993,
+    ".open-next/server-functions/default/.next/server/app/admin/songs/page.js": {
+      "bytes": 39997,
       "imports": [
         {
           "path": ".open-next/server-functions/default/node_modules/next/dist/shared/lib/router/utils/app-paths.js",
@@ -9230,8 +9230,8 @@
       ],
       "format": "cjs"
     },
-    ".open-next/server-functions/default/.next/server/app/admin/songs/page.js": {
-      "bytes": 39696,
+    ".open-next/server-functions/default/.next/server/app/admin/users/page.js": {
+      "bytes": 45294,
       "imports": [
         {
           "path": ".open-next/server-functions/default/node_modules/next/dist/shared/lib/router/utils/app-paths.js",
@@ -9425,14 +9425,14 @@
           "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\auth\\callback\\route.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/app/[song]/page.js",
-          "kind": "require-call",
-          "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\[song]\\page.js"
-        },
-        {
           "path": ".open-next/server-functions/default/.next/server/app/account/page.js",
           "kind": "require-call",
           "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\account\\page.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/[song]/page.js",
+          "kind": "require-call",
+          "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\[song]\\page.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/app/about/page.js",
@@ -9455,14 +9455,14 @@
           "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\contact\\page.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/app/login/page.js",
-          "kind": "require-call",
-          "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\login\\page.js"
-        },
-        {
           "path": ".open-next/server-functions/default/.next/server/app/downloads/page.js",
           "kind": "require-call",
           "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\downloads\\page.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/login/page.js",
+          "kind": "require-call",
+          "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\login\\page.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/app/merch/page.js",
@@ -9480,9 +9480,9 @@
           "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\music\\page.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/app/page.js",
+          "path": ".open-next/server-functions/default/.next/server/app/register/page.js",
           "kind": "require-call",
-          "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\page.js"
+          "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\register\\page.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/app/playground/page.js",
@@ -9490,9 +9490,9 @@
           "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\playground\\page.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/app/register/page.js",
+          "path": ".open-next/server-functions/default/.next/server/app/page.js",
           "kind": "require-call",
-          "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\register\\page.js"
+          "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\page.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/app/admin/account/page.js",
@@ -9500,14 +9500,14 @@
           "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\admin\\account\\page.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/app/admin/admins/page.js",
-          "kind": "require-call",
-          "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\admin\\admins\\page.js"
-        },
-        {
           "path": ".open-next/server-functions/default/.next/server/app/admin/downloads/page.js",
           "kind": "require-call",
           "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\admin\\downloads\\page.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/admin/admins/page.js",
+          "kind": "require-call",
+          "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\admin\\admins\\page.js"
         },
         {
           "path": ".open-next/server-functions/default/.next/server/app/admin/events/page.js",
@@ -9540,14 +9540,14 @@
           "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\admin\\settings\\page.js"
         },
         {
-          "path": ".open-next/server-functions/default/.next/server/app/admin/users/page.js",
-          "kind": "require-call",
-          "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\admin\\users\\page.js"
-        },
-        {
           "path": ".open-next/server-functions/default/.next/server/app/admin/songs/page.js",
           "kind": "require-call",
           "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\admin\\songs\\page.js"
+        },
+        {
+          "path": ".open-next/server-functions/default/.next/server/app/admin/users/page.js",
+          "kind": "require-call",
+          "original": "D:\\Users\\alexa\\Documentos\\VSC\\nex-website\\.open-next\\server-functions\\default\\.next\\server\\app\\admin\\users\\page.js"
         }
       ],
       "format": "cjs"
@@ -11528,7 +11528,7 @@
       "format": "esm"
     },
     ".open-next/server-functions/default/index.mjs": {
-      "bytes": 90177,
+      "bytes": 90612,
       "imports": [
         {
           "path": "node:module",
@@ -14565,14 +14565,14 @@
         ".open-next/server-functions/default/.next/server/app/_not-found/page_client-reference-manifest.js": {
           "bytesInOutput": 15178
         },
+        ".open-next/server-functions/default/.next/server/app/playground/page_client-reference-manifest.js": {
+          "bytesInOutput": 15239
+        },
         ".open-next/server-functions/default/.next/server/app/[song]/page_client-reference-manifest.js": {
           "bytesInOutput": 15227
         },
         ".open-next/server-functions/default/.next/server/app/register/page_client-reference-manifest.js": {
           "bytesInOutput": 15231
-        },
-        ".open-next/server-functions/default/.next/server/app/playground/page_client-reference-manifest.js": {
-          "bytesInOutput": 15239
         },
         ".open-next/server-functions/default/.next/server/app/music/page_client-reference-manifest.js": {
           "bytesInOutput": 15219
@@ -14601,6 +14601,15 @@
         ".open-next/server-functions/default/.next/server/app/about/page_client-reference-manifest.js": {
           "bytesInOutput": 15276
         },
+        ".open-next/server-functions/default/.next/server/app/auth/reset-password/page_client-reference-manifest.js": {
+          "bytesInOutput": 15276
+        },
+        ".open-next/server-functions/default/.next/server/app/auth/callback/route_client-reference-manifest.js": {
+          "bytesInOutput": 15191
+        },
+        ".open-next/server-functions/default/.next/server/app/auth/auth-error/page_client-reference-manifest.js": {
+          "bytesInOutput": 15260
+        },
         ".open-next/server-functions/default/.next/server/app/admin/users/page_client-reference-manifest.js": {
           "bytesInOutput": 15501
         },
@@ -14625,23 +14634,14 @@
         ".open-next/server-functions/default/.next/server/app/admin/downloads/page_client-reference-manifest.js": {
           "bytesInOutput": 15517
         },
-        ".open-next/server-functions/default/.next/server/app/admin/account/page_client-reference-manifest.js": {
-          "bytesInOutput": 15509
-        },
         ".open-next/server-functions/default/.next/server/app/admin/admins/page_client-reference-manifest.js": {
           "bytesInOutput": 15505
         },
-        ".open-next/server-functions/default/.next/server/app/auth/callback/route_client-reference-manifest.js": {
-          "bytesInOutput": 15191
-        },
-        ".open-next/server-functions/default/.next/server/app/auth/reset-password/page_client-reference-manifest.js": {
-          "bytesInOutput": 15276
-        },
-        ".open-next/server-functions/default/.next/server/app/auth/auth-error/page_client-reference-manifest.js": {
-          "bytesInOutput": 15260
+        ".open-next/server-functions/default/.next/server/app/admin/account/page_client-reference-manifest.js": {
+          "bytesInOutput": 15509
         },
         ".open-next/server-functions/default/node_modules/next/dist/server/load-manifest.external.js": {
-          "bytesInOutput": 39049
+          "bytesInOutput": 39618
         },
         ".open-next/server-functions/default/node_modules/react/cjs/react-jsx-runtime.production.js": {
           "bytesInOutput": 740
@@ -14654,9 +14654,6 @@
         },
         ".open-next/server-functions/default/.next/server/chunks/2.js": {
           "bytesInOutput": 846157
-        },
-        ".open-next/server-functions/default/.next/server/chunks/451.js": {
-          "bytesInOutput": 494200
         },
         ".open-next/server-functions/default/.next/server/chunks/53.js": {
           "bytesInOutput": 2071
@@ -14677,13 +14674,16 @@
           "bytesInOutput": 24340
         },
         ".open-next/server-functions/default/.next/server/chunks/932.js": {
-          "bytesInOutput": 31863
+          "bytesInOutput": 31862
         },
         ".open-next/server-functions/default/.next/server/chunks/937.js": {
           "bytesInOutput": 3449
         },
         ".open-next/server-functions/default/.next/server/chunks/94.js": {
           "bytesInOutput": 49782
+        },
+        ".open-next/server-functions/default/.next/server/chunks/991.js": {
+          "bytesInOutput": 494075
         },
         ".open-next/server-functions/default/.next/server/webpack-runtime.js": {
           "bytesInOutput": 2110
@@ -15091,13 +15091,13 @@
           "bytesInOutput": 167797
         },
         ".open-next/server-functions/default/.next/server/app/auth/callback/route.js": {
-          "bytesInOutput": 40478
-        },
-        ".open-next/server-functions/default/.next/server/app/[song]/page.js": {
-          "bytesInOutput": 39588
+          "bytesInOutput": 40780
         },
         ".open-next/server-functions/default/.next/server/app/account/page.js": {
           "bytesInOutput": 25026
+        },
+        ".open-next/server-functions/default/.next/server/app/[song]/page.js": {
+          "bytesInOutput": 39588
         },
         ".open-next/server-functions/default/.next/server/app/about/page.js": {
           "bytesInOutput": 36643
@@ -15111,11 +15111,11 @@
         ".open-next/server-functions/default/.next/server/app/contact/page.js": {
           "bytesInOutput": 21542
         },
+        ".open-next/server-functions/default/.next/server/app/downloads/page.js": {
+          "bytesInOutput": 40566
+        },
         ".open-next/server-functions/default/.next/server/app/login/page.js": {
           "bytesInOutput": 79307
-        },
-        ".open-next/server-functions/default/.next/server/app/downloads/page.js": {
-          "bytesInOutput": 40264
         },
         ".open-next/server-functions/default/.next/server/app/merch/page.js": {
           "bytesInOutput": 26971
@@ -15126,23 +15126,23 @@
         ".open-next/server-functions/default/.next/server/app/music/page.js": {
           "bytesInOutput": 30937
         },
-        ".open-next/server-functions/default/.next/server/app/page.js": {
-          "bytesInOutput": 45164
+        ".open-next/server-functions/default/.next/server/app/register/page.js": {
+          "bytesInOutput": 21733
         },
         ".open-next/server-functions/default/.next/server/app/playground/page.js": {
           "bytesInOutput": 31465
         },
-        ".open-next/server-functions/default/.next/server/app/register/page.js": {
-          "bytesInOutput": 21733
+        ".open-next/server-functions/default/.next/server/app/page.js": {
+          "bytesInOutput": 45483
         },
         ".open-next/server-functions/default/.next/server/app/admin/account/page.js": {
           "bytesInOutput": 30231
         },
+        ".open-next/server-functions/default/.next/server/app/admin/downloads/page.js": {
+          "bytesInOutput": 47097
+        },
         ".open-next/server-functions/default/.next/server/app/admin/admins/page.js": {
           "bytesInOutput": 64705
-        },
-        ".open-next/server-functions/default/.next/server/app/admin/downloads/page.js": {
-          "bytesInOutput": 46795
         },
         ".open-next/server-functions/default/.next/server/app/admin/events/page.js": {
           "bytesInOutput": 38826
@@ -15157,16 +15157,16 @@
           "bytesInOutput": 29203
         },
         ".open-next/server-functions/default/.next/server/app/admin/releases/page.js": {
-          "bytesInOutput": 34607
+          "bytesInOutput": 34909
         },
         ".open-next/server-functions/default/.next/server/app/admin/settings/page.js": {
           "bytesInOutput": 30419
         },
-        ".open-next/server-functions/default/.next/server/app/admin/users/page.js": {
-          "bytesInOutput": 45880
-        },
         ".open-next/server-functions/default/.next/server/app/admin/songs/page.js": {
-          "bytesInOutput": 40511
+          "bytesInOutput": 40813
+        },
+        ".open-next/server-functions/default/.next/server/app/admin/users/page.js": {
+          "bytesInOutput": 46182
         },
         ".open-next/server-functions/default/node_modules/next/dist/server/require.js": {
           "bytesInOutput": 25880
@@ -15457,10 +15457,10 @@
           "bytesInOutput": 4971
         },
         ".open-next/server-functions/default/index.mjs": {
-          "bytesInOutput": 64510
+          "bytesInOutput": 64890
         }
       },
-      "bytes": 6166032
+      "bytes": 6168986
     }
   }
 }

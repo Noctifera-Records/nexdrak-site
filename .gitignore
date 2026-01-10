@@ -25,6 +25,7 @@ Docs
 1Docs
 *.local
 /docs
+/.open-next
 
 # debug
 npm-debug.log*
@@ -60,6 +61,7 @@ lerna-debug.log*
 !.vscode/extensions.json
 .idea
 .next
+.open-next
 .bolt
 .gemini
 .DS_Store

@@ -24,7 +24,7 @@ export default function OptimizedImage({
   priority = false,
   draggable = false,
 }: OptimizedImageProps) {
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(!priority)
   const [hasError, setHasError] = useState(false)
 
   return (

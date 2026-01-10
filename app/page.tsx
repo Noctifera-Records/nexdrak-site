@@ -9,7 +9,7 @@ import {
   ArrowDown,
 } from "lucide-react";
 import dynamic from "next/dynamic";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/server";
 
 import LatestReleases from "@/components/latest-releases";
 import UpcomingEvents from "@/components/upcoming-events";
@@ -45,8 +45,10 @@ const defaultSettings: SiteSettings = {
   booking_email: "mgmt@nexdrak.com",
 };
 
+export const revalidate = 60; // Revalidate every 60 seconds
+
 export default async function Home() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   let settings = { ...defaultSettings };
   let latestSongs: any[] = [];
   let upcomingEvents: any[] = [];
