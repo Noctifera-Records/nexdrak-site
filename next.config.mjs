@@ -64,11 +64,6 @@ const nextConfig = {
       };
     }
 
-    // Tree shaking optimization
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      '@': require('path').resolve(__dirname),
-    };
 
     return config;
   },
