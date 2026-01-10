@@ -2,8 +2,10 @@ const fs = require('fs');
 const path = require('path');
 
 // Define source and destination directories
-const sourceDir = path.join(__dirname, '.open-next');
-const destDir = path.join(__dirname, '.open-next/assets');
+// We are in 'scripts', so we go up one level to root
+const projectRoot = path.join(__dirname, '..');
+const sourceDir = path.join(projectRoot, '.open-next');
+const destDir = path.join(projectRoot, '.open-next/assets');
 
 // Helper function to copy a file if it exists
 function copyFile(src, dest) {
@@ -58,5 +60,25 @@ copyDirectory(path.join(sourceDir, '.build'), path.join(destDir, '.build'));
 
 // 5. Copy the 'server-functions' directory (contains default/handler.mjs)
 copyDirectory(path.join(sourceDir, 'server-functions'), path.join(destDir, 'server-functions'));
+
+// 6. Create _routes.json
+const routesConfig = {
+  version: 1,
+  include: ["/*"],
+  exclude: [
+    "/_next/static/*",
+    "/img/*",
+    "/favicon.ico",
+    "/robots.txt",
+    "/site.webmanifest",
+    "/*.png",
+    "/*.jpg",
+    "/*.svg",
+    "/*.css",
+    "/*.js",
+    "/*.txt"
+  ]
+};
+fs.writeFileSync(path.join(destDir, '_routes.json'), JSON.stringify(routesConfig, null, 2));
 
 console.log('Successfully prepared assets for Cloudflare Pages deployment.');
