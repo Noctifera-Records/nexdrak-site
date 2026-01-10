@@ -88,26 +88,50 @@ export default async function Home() {
 
         <div className="max-w-4xl mx-auto space-y-8 z-10">
           <div className="hidden md:block select-none pointer-events-none">
-            <OptimizedImage
-              src={settings.site_logo}
-              alt={`${settings.site_title} Logo - Electronic Music Artist`}
-              width={800}
-              height={400}
-              className="w-full h-auto max-w-3xl mx-auto"
-              priority={true}
-              draggable={false}
-            />
+            {settings.site_logo.startsWith('data:') ? (
+              <img
+                src={settings.site_logo}
+                alt={`${settings.site_title} Logo - Electronic Music Artist`}
+                width={800}
+                height={400}
+                className="w-full h-auto max-w-3xl mx-auto"
+                draggable={false}
+                decoding="async"
+              />
+            ) : (
+              <OptimizedImage
+                src={settings.site_logo}
+                alt={`${settings.site_title} Logo - Electronic Music Artist`}
+                width={800}
+                height={400}
+                className="w-full h-auto max-w-3xl mx-auto"
+                priority={true}
+                draggable={false}
+              />
+            )}
           </div>
           <div className="md:hidden select-none pointer-events-none">
-            <OptimizedImage
-              src={settings.site_logo_mobile}
-              alt={`${settings.site_title} Logo Mobile - Electronic Music Artist`}
-              width={400}
-              height={200}
-              className="w-full h-auto max-w-md mx-auto"
-              priority={true}
-              draggable={false}
-            />
+            {settings.site_logo_mobile.startsWith('data:') ? (
+              <img
+                src={settings.site_logo_mobile}
+                alt={`${settings.site_title} Logo Mobile - Electronic Music Artist`}
+                width={400}
+                height={200}
+                className="w-full h-auto max-w-md mx-auto"
+                draggable={false}
+                decoding="async"
+              />
+            ) : (
+              <OptimizedImage
+                src={settings.site_logo_mobile}
+                alt={`${settings.site_title} Logo Mobile - Electronic Music Artist`}
+                width={400}
+                height={200}
+                className="w-full h-auto max-w-md mx-auto"
+                priority={true}
+                draggable={false}
+              />
+            )}
           </div>
           <div className="flex items-center justify-center select-none pointer-events-none">
             <OptimizedImage
