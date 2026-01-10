@@ -1,132 +1,80 @@
 import type React from "react"
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
+// import { ThemeProvider } from "@/components/theme-provider"
 import Navbar from "@/components/navbar"
-import BackgroundAnimation from "@/components/background-animation"
+// import BackgroundAnimation from "@/components/background-animation"
 import { NotificationProvider } from "@/components/notification-system"
 import ErrorBoundary from "@/components/error-boundary"
-import HydrationFix from "@/components/hydration-fix"
+// import HydrationFix from "@/components/hydration-fix"
 import StructuredData from "./structured-data"
-import ResourcePreloader from "@/components/resource-preloader"
-import WebVitals from "@/components/web-vitals"
+// import ResourcePreloader from "@/components/resource-preloader"
+// import WebVitals from "@/components/web-vitals"
+import { Toaster } from "@/components/ui/toaster"
 
-const inter = Inter({ 
-  subsets: ["latin"],
-  display: 'swap',
-  preload: true,
-  variable: '--font-inter'
-})
+const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://nexdrak.com'),
   title: {
-    default: "NexDrak — Official Music Artist Website",
-    template: "%s | NexDrak"
+    default: 'NexDrak | Electronic Music Artist',
+    template: '%s | NexDrak'
   },
-  description: "Official website of NexDrak - Electronic Music Artist. Listen to the latest releases including Red Eye Flight, discover tour dates, and explore the complete discography of dubstep, darkwave, and synth music.",
-  generator: "Next.js",
-  applicationName: "NexDrak Official Website",
-  referrer: "origin-when-cross-origin",
-  keywords: [
-    "NexDrak", 
-    "Electronic Music", 
-    "Music Artist", 
-    "Dubstep", 
-    "Darkwave", 
-    "Synth", 
-    "Red Eye Flight",
-    "Venus",
-    "Call Me Back",
-    "Your Smile",
-    "Electronic Dance Music",
-    "EDM",
-    "Music Producer",
-    "DJ",
-    "Live Music",
-    "Concert Tours",
-    "Music Streaming"
-  ],
-  authors: [{ name: "NexDrak", url: "https://nexdrak.com" }],
-  creator: "NexDrak",
-  publisher: "NexDrak",
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
-  },
-  metadataBase: new URL("https://nexdrak.com"),
-  alternates: {
-    canonical: "/",
-    languages: {
-      "en-US": "/en-US",
-      "es-ES": "/es-ES",
-    },
-  },
-  icons: {
-    icon: [
-      { url: "/favicon.ico" },
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },
-      { url: "/android-chrome-512x512.png", sizes: "512x512", type: "image/png" },
-    ],
-    apple: "/apple-touch-icon.png",
-  },
-  manifest: "/site.webmanifest",
+  description: 'Official website of NexDrak. Listen to the latest electronic music releases, check upcoming events, and get exclusive merchandise.',
+  keywords: ['Electronic Music', 'NexDrak', 'DJ', 'Producer', 'Techno', 'House', 'Music Events'],
+  authors: [{ name: 'NexDrak' }],
+  creator: 'NexDrak',
   openGraph: {
-    title: "NexDrak — Official Electronic Music Artist",
-    description: "Discover NexDrak's latest electronic music releases, tour dates, and exclusive content. Stream Red Eye Flight and explore the complete discography.",
-    url: "https://nexdrak.com",
-    siteName: "NexDrak Official",
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://nexdrak.com',
+    siteName: 'NexDrak',
+    title: 'NexDrak | Electronic Music Artist',
+    description: 'Official website of NexDrak. Listen to the latest electronic music releases, check upcoming events, and get exclusive merchandise.',
     images: [
       {
-        url: "/og-image.png",
+        url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: "NexDrak - Electronic Music Artist",
+        alt: 'NexDrak Official Website',
       },
     ],
-    locale: "en_US",
-    type: "website",
   },
   twitter: {
-    card: "summary_large_image",
-    title: "NexDrak — Electronic Music Artist",
-    description: "Stream the latest electronic music from NexDrak. New single Red Eye Flight out now!",
-    creator: "@NexDrak",
-    images: ["/og-image.png"],
+    card: 'summary_large_image',
+    title: 'NexDrak | Electronic Music Artist',
+    description: 'Official website of NexDrak. Listen to the latest electronic music releases, check upcoming events, and get exclusive merchandise.',
+    images: ['/og-image.png'],
+    creator: '@nexdrak',
   },
   robots: {
     index: true,
     follow: true,
-    nocache: true,
     googleBot: {
       index: true,
       follow: true,
-      noimageindex: false,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
     },
   },
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+  },
+  manifest: '/site.webmanifest',
   verification: {
-    google: "google-site-verification-code-here",
-    yandex: "yandex-verification-code-here",
-    yahoo: "yahoo-site-verification-code-here",
+    google: 'verification_token', // Add your Google verification token
   },
 }
 
-export const viewport = {
+export const viewport: Viewport = {
+  themeColor: '#000000',
   width: 'device-width',
-  initialScale: 1.0,
-  maximumScale: 5.0,
-  userScalable: true,
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#000000' }
-  ],
-};
+  initialScale: 1,
+  maximumScale: 5,
+}
 
 export default function RootLayout({
   children,
@@ -134,25 +82,27 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="dark scroll-smooth">
       <head>
         <StructuredData />
-
       </head>
-      <body className={`${inter.variable} font-sans bg-black text-white min-h-screen flex flex-col antialiased`}>
-        <HydrationFix>
-          <ErrorBoundary>
-            <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-              <NotificationProvider>
-                <ResourcePreloader />
-                <WebVitals />
-                <BackgroundAnimation />
+      <body className={`${inter.className} min-h-screen bg-black text-white antialiased overflow-x-hidden selection:bg-purple-500/30 selection:text-purple-200`}>
+        <ErrorBoundary>
+            <NotificationProvider>
+              {/* <ResourcePreloader /> */}
+              {/* <WebVitals /> */}
+              {/* <BackgroundAnimation /> */}
+              <div className="fixed inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-900 via-black to-black opacity-40 pointer-events-none" aria-hidden="true" />
+              
+              {/* <HydrationFix> */}
                 <Navbar />
-                <main className="flex-1 relative pt-20">{children}</main>
-              </NotificationProvider>
-            </ThemeProvider>
-          </ErrorBoundary>
-        </HydrationFix>
+                <main className="flex-grow flex flex-col relative z-0">
+                  {children}
+                </main>
+                <Toaster />
+              {/* </HydrationFix> */}
+            </NotificationProvider>
+        </ErrorBoundary>
       </body>
     </html>
   )

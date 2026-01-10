@@ -11,8 +11,8 @@ import {
 import dynamic from "next/dynamic";
 import { createClient } from "@/lib/supabase/server";
 
-const LatestReleases = dynamic(() => import("@/components/latest-releases"));
-const UpcomingEvents = dynamic(() => import("@/components/upcoming-events"));
+import LatestReleases from "@/components/latest-releases";
+import UpcomingEvents from "@/components/upcoming-events";
 const Newsletter = dynamic(() => import("@/components/newsletter"));
 const SocialLinks = dynamic(() => import("@/components/social-links"));
 import CookieBanner from "@/components/cookie-banner";
@@ -48,6 +48,8 @@ const defaultSettings: SiteSettings = {
 export default async function Home() {
   const supabase = await createClient();
   let settings = { ...defaultSettings };
+  let latestSongs: any[] = [];
+  let upcomingEvents: any[] = [];
 
   try {
     const { data, error } = await supabase
@@ -64,8 +66,27 @@ export default async function Home() {
       });
       settings = { ...defaultSettings, ...settingsMap };
     }
+    
+    // Fetch initial data for components
+    const { data: songsData } = await supabase
+      .from('songs')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(4);
+      
+    if (songsData) latestSongs = songsData;
+
+    const { data: eventsData } = await supabase
+      .from("events")
+      .select("*")
+      .gte("date", new Date().toISOString().split("T")[0])
+      .order("date", { ascending: true })
+      .limit(3);
+
+    if (eventsData) upcomingEvents = eventsData;
+
   } catch (error) {
-    console.error("Error fetching settings:", error);
+    console.error("Error fetching data:", error);
   }
 
   return (
@@ -178,7 +199,7 @@ export default async function Home() {
             <h2 className="text-4xl font-bold mb-12 text-center">
               LATEST RELEASES
             </h2>
-            <LatestReleases />
+            <LatestReleases initialSongs={latestSongs} />
           </div>
         </section>
 
@@ -188,7 +209,7 @@ export default async function Home() {
             <h2 className="text-4xl font-bold mb-12 text-center">
               UPCOMING EVENTS
             </h2>
-            <UpcomingEvents limit={3} />
+            <UpcomingEvents limit={3} initialEvents={upcomingEvents} />
             <div className="flex justify-center mt-12">
               <Button
                 asChild

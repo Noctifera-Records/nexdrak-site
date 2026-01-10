@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { createClient } from "@/lib/supabase/client"
 
-interface Song {
+export interface Song {
   id: number
   title: string
   artist: string
@@ -20,12 +20,18 @@ interface Song {
   created_at: string
 }
 
-export default function LatestReleases() {
-  const [songs, setSongs] = useState<Song[]>([])
-  const [loading, setLoading] = useState(true)
+interface LatestReleasesProps {
+  initialSongs?: Song[]
+}
+
+export default function LatestReleases({ initialSongs = [] }: LatestReleasesProps) {
+  const [songs, setSongs] = useState<Song[]>(initialSongs)
+  const [loading, setLoading] = useState(initialSongs.length === 0)
   const supabase = createClient()
 
   useEffect(() => {
+    if (initialSongs.length > 0) return
+
     const fetchLatestSongs = async () => {
       try {
         const { data, error } = await supabase

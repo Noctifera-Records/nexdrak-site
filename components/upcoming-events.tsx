@@ -7,7 +7,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { createClient } from "@/lib/supabase/client";
 
-interface Event {
+export interface Event {
   id: number;
   title: string;
   date: string;
@@ -18,14 +18,17 @@ interface Event {
 
 interface UpcomingEventsProps {
   limit?: number;
+  initialEvents?: Event[];
 }
 
-export default function UpcomingEvents({ limit }: UpcomingEventsProps) {
-  const [events, setEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function UpcomingEvents({ limit, initialEvents = [] }: UpcomingEventsProps) {
+  const [events, setEvents] = useState<Event[]>(initialEvents);
+  const [loading, setLoading] = useState(initialEvents.length === 0);
   const supabase = createClient();
 
   useEffect(() => {
+    if (initialEvents.length > 0) return;
+
     const fetchEvents = async () => {
       try {
         const { data, error } = await supabase
