@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import DownloadsGrid from './downloads-grid'
 
-export const runtime = 'edge'
+
 
 export default async function DownloadsPage() {
   const supabase = await createClient()

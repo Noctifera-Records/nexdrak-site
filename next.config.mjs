@@ -25,7 +25,7 @@ const nextConfig = {
     optimizeCss: true,
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
     serverComponentsExternalPackages: [],
-    webpackBuildWorker: true,
+    webpackBuildWorker: false,
     turbo: {
       rules: {
         '*.svg': {

@@ -8,9 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "vercel-build": "next build",
-    "pages:build": "next build && npx @cloudflare/next-on-pages",
-    "pages:dev": "npx @cloudflare/next-on-pages --watch",
-    "pages:deploy": "npm run pages:build",
+    "build:cf": "opennextjs-cloudflare build",
+    "dev:cf": "wrangler dev .open-next/worker.js --assets .open-next/assets --compatibility-flag nodejs_compat --port 8788",
+    "deploy:cf": "npm run build:cf && node -e \"require('fs').copyFileSync('.open-next/worker.js', '.open-next/assets/_worker.js')\" && wrangler pages deploy .open-next/assets",
     "analyze": "ANALYZE=true npm run build",
     "optimize-images": "node scripts/optimize-images.js",
     "lighthouse": "lighthouse http://localhost:3000 --output html --output-path ./lighthouse-report.html",
@@ -75,7 +75,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@cloudflare/next-on-pages": "^1.13.12",
+    "@opennextjs/cloudflare": "^1.14.8",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^22",
     "@types/react": "^19",
@@ -87,7 +87,8 @@
     "postcss": "^8",
     "tailwindcss": "^3.4.17",
     "typescript": "^5",
-    "vercel": "^41.7.0"
+    "vercel": "^41.7.0",
+    "wrangler": "^4.58.0"
   },
   "overrides": {
     "esbuild": "0.25.3",
