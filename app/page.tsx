@@ -49,51 +49,45 @@ export const revalidate = 60; // Revalidate every 60 seconds
 
 export default async function Home() {
   const supabase = createPublicClient();
-  let settings = { ...defaultSettings };
-  let latestSongs: any[] = [];
-  let upcomingEvents: any[] = [];
-
-  try {
-    const { data, error } = await supabase
+  
+  // Parallel fetch for better performance
+  const [settingsResult, songsResult, eventsResult] = await Promise.all([
+    supabase
       .from("site_settings")
-      .select("key, value");
-
-    if (!error && data) {
-      const settingsMap: Partial<SiteSettings> = {};
-      data.forEach((item) => {
-        if (item.key in defaultSettings) {
-          (settingsMap as any)[item.key] =
-            item.value || (defaultSettings as any)[item.key];
-        }
-      });
-      settings = { ...defaultSettings, ...settingsMap };
-    }
-    
-    // Fetch initial data for components
-    const { data: songsData } = await supabase
+      .select("key, value"),
+    supabase
       .from('songs')
-      .select('*')
+      .select('id, title, artist, stream_url, cover_image_url, type, album_name, track_number, release_date, created_at')
       .order('created_at', { ascending: false })
-      .limit(4);
-      
-    if (songsData) latestSongs = songsData;
-
-    const { data: eventsData } = await supabase
+      .limit(4),
+    supabase
       .from("events")
-      .select("*")
+      .select("id, title, date, location, ticket_url, created_at")
       .gte("date", new Date().toISOString().split("T")[0])
       .order("date", { ascending: true })
-      .limit(3);
+      .limit(3)
+  ]);
 
-    if (eventsData) upcomingEvents = eventsData;
-
-  } catch (error) {
-    console.error("Error fetching data:", error);
+  // Process settings
+  let settings = { ...defaultSettings };
+  if (!settingsResult.error && settingsResult.data) {
+    const settingsMap: Partial<SiteSettings> = {};
+    settingsResult.data.forEach((item) => {
+      if (item.key in defaultSettings) {
+        (settingsMap as any)[item.key] =
+          item.value || (defaultSettings as any)[item.key];
+      }
+    });
+    settings = { ...defaultSettings, ...settingsMap };
   }
+
+  // Process data
+  const latestSongs = songsResult.data || [];
+  const upcomingEvents = eventsResult.data || [];
 
   return (
     <div className="relative min-h-screen flex flex-col">
-      {/* Banner de Cookies */}
+      {/* Hero section with logo fix */}
       <CookieBanner />
 
       {/* Hero Section with New Single */}
