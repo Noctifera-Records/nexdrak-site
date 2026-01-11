@@ -186,12 +186,11 @@ export default function Navbar() {
         {isMainMenuOpen && (
           <div className="fixed inset-0 z-[60] md:hidden">
             <div
-              className="fixed inset-0 bg-black/70 backdrop-blur-sm"
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm"
               onClick={() => setIsMainMenuOpen(false)}
             />
-            <div className="fixed right-0 top-0 h-full w-[300px] bg-gray-900 border-l border-white/30 p-6 shadow-2xl z-[70]">
-              <div className="flex justify-between items-center mb-8">
-                <h2 className="text-lg font-bold">Navigation</h2>
+            <div className="fixed right-0 top-0 h-full w-[300px] bg-black border-l border-white/10 p-6 shadow-2xl z-[70]">
+              <div className="flex justify-end items-center mb-8">
                 <Button
                   variant="ghost"
                   size="icon"
