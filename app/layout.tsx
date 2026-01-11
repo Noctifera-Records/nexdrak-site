@@ -18,7 +18,7 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   metadataBase: new URL('https://nexdrak.com'),
   title: {
-    default: 'NexDrak | Electronic Music Artist',
+    default: 'NexDrak - Official Artist',
     template: '%s | NexDrak'
   },
   description: 'Official website of NexDrak. Listen to the latest electronic music releases, check upcoming events, and get exclusive merchandise.',
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://nexdrak.com',
     siteName: 'NexDrak',
-    title: 'NexDrak | Electronic Music Artist',
+    title: 'NexDrak | Official Artist',
     description: 'Official website of NexDrak. Listen to the latest electronic music releases, check upcoming events, and get exclusive merchandise.',
     images: [
       {
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'NexDrak | Electronic Music Artist',
+    title: 'NexDrak | Official Artist',
     description: 'Official website of NexDrak. Listen to the latest electronic music releases, check upcoming events, and get exclusive merchandise.',
     images: ['/og-image.png'],
     creator: '@nexdrak',
