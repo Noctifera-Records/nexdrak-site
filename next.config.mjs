@@ -7,7 +7,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    unoptimized: false, // Enable optimization
+    unoptimized: true, // Disable optimization to save Worker CPU
     formats: ["image/webp", "image/avif"],
     remotePatterns: [
       {

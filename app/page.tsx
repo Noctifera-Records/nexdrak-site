@@ -45,7 +45,7 @@ const defaultSettings: SiteSettings = {
   booking_email: "mgmt@nexdrak.com",
 };
 
-export const revalidate = 60; // Revalidate every 60 seconds
+export const revalidate = 3600; // Revalidate every hour
 
 export default async function Home() {
   const supabase = createPublicClient();
