@@ -20,7 +20,7 @@ interface SiteSettings {
 const defaultSettings: SiteSettings = {
   hero_album_link: "https://album.link/thequietone",
   hero_background_image: "/placeholder.png",
-  hero_release_image: "/red.png",
+  hero_release_image: "/img/red.png",
   hero_release_text: "NEW RELEASE",
   site_logo: "/placeholder.png",
   site_logo_mobile: "/placeholder.png",
