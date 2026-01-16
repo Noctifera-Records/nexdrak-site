@@ -60,7 +60,8 @@ export function SongForm({ song, onClose }: SongFormProps) {
         album_name: song.album_name || '',
         track_number: song.track_number?.toString() || '',
         release_date: song.release_date || '',
-        youtube_embed_id: song.youtube_embed_id || ''
+        youtube_embed_id: song.youtube_embed_id || '',
+        slug: song.slug || ''
       });
     }
   }, [song]);
@@ -232,6 +233,19 @@ export function SongForm({ song, onClose }: SongFormProps) {
               <p className="text-xs text-gray-500">
                 Opcional: ID del video de YouTube para mostrar el reproductor embebido. 
                 Ejemplo: para https://www.youtube.com/watch?v=dQw4w9WgXcQ usar solo "dQw4w9WgXcQ"
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="slug">Slug (URL)</Label>
+              <Input
+                id="slug"
+                value={formData.slug}
+                onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/--+/g, "-") }))}
+                placeholder="ej: the-cathedral, x-z-am0u-r"
+              />
+              <p className="text-xs text-gray-500">
+                Opcional: Identificador único para la URL. Solo letras minúsculas, números y guiones.
               </p>
             </div>
 

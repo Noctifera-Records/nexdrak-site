@@ -35,6 +35,7 @@ interface Song {
   release_date?: string;
   created_at: string;
   youtube_embed_id?: string;
+  slug?: string;
 }
 
 interface StreamingLink {
@@ -67,36 +68,58 @@ export default function SongPage({ params }: SongPageProps) {
   useEffect(() => {
     const fetchSong = async () => {
       try {
-        // Convert URL slug back to readable format
-        const searchTerm = resolvedParams.song
-          .replace(/([a-z])([A-Z])/g, '$1 $2') // Add space before capital letters
-          .replace(/-/g, ' ') // Replace hyphens with spaces
-          .toLowerCase()
-          .split(' ')
-          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(' ');
+        const slugParam = resolvedParams.song.toLowerCase();
 
-        // First, try to find by song title
-        let { data: songData, error } = await supabase
-          .from('songs')
-          .select('*')
-          .ilike('title', searchTerm)
-          .single();
+        let songData: Song | null = null;
+        let error: any = null;
 
-        // If not found by title, try to find by album name
-        if (error || !songData) {
-          const { data: albumSongs, error: albumError } = await supabase
+        try {
+          const { data, error: slugError } = await supabase
             .from('songs')
             .select('*')
-            .ilike('album_name', searchTerm)
-            .order('track_number', { ascending: true });
+            .eq('slug', slugParam)
+            .single();
 
-          if (albumSongs && albumSongs.length > 0 && !albumError) {
-            // If found by album name, use the first track of the album
-            songData = albumSongs[0];
-            error = null;
-            setIsAlbumView(true);
-            setAlbumSongs(albumSongs);
+          if (!slugError && data) {
+            songData = data as Song;
+          }
+        } catch {
+        }
+
+        if (!songData) {
+          const searchTerm = resolvedParams.song
+            .replace(/([a-z])([A-Z])/g, '$1 $2')
+            .replace(/-/g, ' ')
+            .toLowerCase()
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+
+          const { data, error: titleError } = await supabase
+            .from('songs')
+            .select('*')
+            .ilike('title', searchTerm)
+            .single();
+
+          songData = (data as Song) || null;
+          error = titleError;
+
+          if (error || !songData) {
+            const { data: albumSongsData, error: albumError } = await supabase
+              .from('songs')
+              .select('*')
+              .ilike('album_name', searchTerm)
+              .order('track_number', { ascending: true });
+
+            if (albumSongsData && albumSongsData.length > 0 && !albumError) {
+              songData = albumSongsData[0] as Song;
+              error = null;
+              setIsAlbumView(true);
+              setAlbumSongs(albumSongsData as Song[]);
+            }
+          } else {
+            setIsAlbumView(false);
+            setAlbumSongs([]);
           }
         } else {
           setIsAlbumView(false);
@@ -104,7 +127,6 @@ export default function SongPage({ params }: SongPageProps) {
         }
 
         if (error || !songData) {
-          // Neither song nor album found - redirect to 404 silently
           notFound();
           return;
         }

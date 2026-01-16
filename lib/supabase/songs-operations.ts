@@ -16,6 +16,7 @@ export interface Song {
   release_date?: string | null;
   youtube_embed_id?: string | null;
   created_at?: string;
+  slug?: string | null;
 }
 
 export class SongsService {
@@ -85,6 +86,7 @@ export class SongsService {
             : null,
         release_date: songData.release_date || null,
         youtube_embed_id: songData.youtube_embed_id?.trim() || null,
+        slug: songData.slug?.trim() || null,
       };
 
       const { data, error } = await this.supabase
