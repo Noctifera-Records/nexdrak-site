@@ -106,11 +106,6 @@ export class SongsService {
   // Update a song with proper validation
   async updateSong(songId: number, updates: Partial<Song>) {
     return retrySupabaseOperation(async () => {
-      console.log("🔄 SongsService.updateSong called with:", {
-        songId,
-        updates,
-      });
-
       // Validate required fields if they're being updated
       if (updates.title !== undefined && !updates.title?.trim()) {
         throw new Error("El título es requerido");
@@ -141,21 +136,6 @@ export class SongsService {
         }
       }
 
-      // Validate and normalize type field
-      if (updates.type !== undefined) {
-        const validTypes: ("album" | "single")[] = ["album", "single"];
-        if (!validTypes.includes(updates.type)) {
-          console.warn(
-            "⚠️ Invalid type detected:",
-            updates.type,
-            "defaulting to single"
-          );
-          updates.type = "single";
-        }
-        // Ensure it's a clean string
-        updates.type = String(updates.type).trim() as "album" | "single";
-      }
-
       // Prepare clean data
       const cleanUpdates: any = {};
 
@@ -167,9 +147,18 @@ export class SongsService {
         cleanUpdates.stream_url = updates.stream_url.trim();
       if (updates.cover_image_url !== undefined)
         cleanUpdates.cover_image_url = updates.cover_image_url?.trim() || null;
-      // Temporarily skip type field to test if it's causing the issue
-      // if (updates.type !== undefined) cleanUpdates.type = updates.type;
-      console.log("⚠️ TEMPORARILY SKIPPING TYPE FIELD FOR TESTING");
+      
+      if (updates.type !== undefined) {
+        const validTypes = ["album", "single"];
+        if (validTypes.includes(updates.type)) {
+          cleanUpdates.type = updates.type;
+        } else {
+           // Fallback to single if invalid, or ignore? 
+           // Better to be safe and default to single if somehow invalid data comes in
+           cleanUpdates.type = "single";
+        }
+      }
+
       if (updates.album_name !== undefined)
         cleanUpdates.album_name = updates.album_name?.trim() || null;
       if (updates.track_number !== undefined)
@@ -180,30 +169,8 @@ export class SongsService {
         cleanUpdates.release_date = updates.release_date || null;
       if (updates.youtube_embed_id !== undefined)
         cleanUpdates.youtube_embed_id = updates.youtube_embed_id?.trim() || null;
-
-      // Final validation before sending
-      if (
-        cleanUpdates.type &&
-        !["album", "single"].includes(cleanUpdates.type)
-      ) {
-        console.error(
-          "🚨 CRITICAL: Invalid type about to be sent:",
-          cleanUpdates.type
-        );
-        cleanUpdates.type = "single"; // Force fallback
-      }
-
-      console.log("📤 Final data to send to Supabase:", cleanUpdates);
-      console.log("🔍 Type field details:", {
-        type: cleanUpdates.type,
-        typeOf: typeof cleanUpdates.type,
-        length: cleanUpdates.type?.length,
-        isAlbum: cleanUpdates.type === "album",
-        isSingle: cleanUpdates.type === "single",
-        charCodes: cleanUpdates.type
-          ? cleanUpdates.type.split("").map((c: string) => c.charCodeAt(0))
-          : null,
-      });
+      if (updates.slug !== undefined)
+        cleanUpdates.slug = updates.slug?.trim() || null;
 
       const { data, error } = await this.supabase
         .from("songs")
@@ -213,11 +180,10 @@ export class SongsService {
         .single();
 
       if (error) {
-        console.error("❌ Supabase update error:", error);
+        console.error("Supabase update error:", error);
         throw new Error(handleSupabaseError(error, "update song"));
       }
 
-      console.log("✅ Update successful:", data);
       return data;
     });
   }
