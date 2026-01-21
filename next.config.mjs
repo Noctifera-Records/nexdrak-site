@@ -111,6 +111,10 @@ const nextConfig = {
             key: "X-XSS-Protection",
             value: "1; mode=block",
           },
+          {
+            key: "Content-Security-Policy",
+            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://api.supabase.io wss://*.supabase.co;",
+          },
         ],
       },
       {
