@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { 
@@ -93,6 +93,39 @@ export default function PlaygroundPage() {
     sunset: ['#ff6b35', '#f7931e', '#ffd23f', '#06ffa5'],
     ocean: ['#0077be', '#00a8cc', '#40e0d0', '#7fffd4']
   };
+
+  // Deterministic PRNG to avoid hydration mismatches in demo sections
+  const hashSeed = (str: string) => {
+    let h = 2166136261 >>> 0;
+    for (let i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  };
+  const mulberry32 = (a: number) => {
+    return () => {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      let t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  };
+  const visualizerBars = useMemo(() => {
+    const rnd = mulberry32(hashSeed("visualizer-seed"));
+    return Array.from({ length: 20 }, () => ({
+      height: rnd() * 150 + 20,
+      duration: rnd() * 0.5 + 0.5
+    }));
+  }, []);
+  const particleDotsDemo = useMemo(() => {
+    const rnd = mulberry32(hashSeed("particles-seed"));
+    return Array.from({ length: 30 }, () => ({
+      left: rnd() * 100,
+      top: rnd() * 100,
+      duration: rnd() * 3 + 2
+    }));
+  }, []);
 
   const resetParticles = () => {
     const newParticles: Particle[] = Array.from({ length: 50 }, (_, i) => ({
@@ -250,15 +283,15 @@ export default function PlaygroundPage() {
                     border: `1px solid ${colorSchemes[colorScheme][1]}`
                   }}>
                     <div style={{ display: 'flex', gap: '4px', alignItems: 'end' }}>
-                      {Array.from({ length: 20 }, (_, i) => (
+                    {visualizerBars.map((bar, i) => (
                         <div
                           key={i}
                           style={{
                             width: '8px',
-                            height: `${Math.random() * 150 + 20}px`,
+                          height: `${bar.height}px`,
                             backgroundColor: colorSchemes[colorScheme][i % 4],
                             borderRadius: '4px 4px 0 0',
-                            animation: isPlaying ? `pulse ${Math.random() * 0.5 + 0.5}s infinite alternate` : 'none'
+                          animation: isPlaying ? `pulse ${bar.duration}s infinite alternate` : 'none'
                           }}
                         />
                       ))}
@@ -284,18 +317,18 @@ export default function PlaygroundPage() {
                     marginBottom: '16px',
                     border: `1px solid ${colorSchemes[colorScheme][1]}`
                   }}>
-                    {Array.from({ length: 30 }, (_, i) => (
+                    {particleDotsDemo.map((dot, i) => (
                       <div
                         key={i}
                         style={{
                           position: 'absolute',
-                          left: `${Math.random() * 100}%`,
-                          top: `${Math.random() * 100}%`,
+                          left: `${dot.left}%`,
+                          top: `${dot.top}%`,
                           width: '4px',
                           height: '4px',
                           backgroundColor: colorSchemes[colorScheme][i % 4],
                           borderRadius: '50%',
-                          animation: isPlaying ? `float ${Math.random() * 3 + 2}s infinite linear` : 'none'
+                          animation: isPlaying ? `float ${dot.duration}s infinite linear` : 'none'
                         }}
                       />
                     ))}

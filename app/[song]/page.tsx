@@ -17,6 +17,7 @@ import {
   Volume2
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import ClientSongPage from "./ClientSongPage";
 
 // Lazy load YouTube player component
 const YouTubePlayer = lazy(() => import('@/components/youtube-player'));
@@ -53,8 +54,9 @@ interface SongPageProps {
 }
 
 export default function SongPage({ params }: SongPageProps) {
-  // Unwrap the params Promise using React.use()
-  const resolvedParams = use(params);
+  const p = use(params) as { song: string };
+  const routeSong = p?.song || '';
+  const [slugParam, setSlugParam] = useState<string>('');
   const [song, setSong] = useState<Song | null>(null);
   const [streamingLinks, setStreamingLinks] = useState<StreamingLink[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,11 +64,21 @@ export default function SongPage({ params }: SongPageProps) {
   const [isAlbumView, setIsAlbumView] = useState(false);
   const [albumSongs, setAlbumSongs] = useState<Song[]>([]);
   const supabase = createClient();
+  
+  if (routeSong) {
+    return <ClientSongPage slug={routeSong} />;
+  }
+
+  useEffect(() => {
+    if (routeSong) {
+      setSlugParam(routeSong.toLowerCase());
+    }
+  }, [routeSong]);
 
   useEffect(() => {
     const fetchSong = async () => {
       try {
-        const slugParam = resolvedParams.song.toLowerCase();
+        if (!slugParam) return;
 
         let songData: Song | null = null;
         let error: any = null;
@@ -85,7 +97,7 @@ export default function SongPage({ params }: SongPageProps) {
         }
 
         if (!songData) {
-          const searchTerm = resolvedParams.song
+          const searchTerm = slugParam
             .replace(/([a-z])([A-Z])/g, '$1 $2')
             .replace(/-/g, ' ')
             .toLowerCase()
@@ -152,7 +164,7 @@ export default function SongPage({ params }: SongPageProps) {
     };
 
     fetchSong();
-  }, [resolvedParams.song, supabase]);
+  }, [slugParam, supabase]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {

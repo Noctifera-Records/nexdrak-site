@@ -311,7 +311,7 @@ export default function MusicPage() {
                 byArtist: a.artist ? { "@type": "MusicGroup", name: a.artist } : undefined,
                 image: a.cover_image_url || undefined,
                 datePublished: a.release_date ? new Date(a.release_date).toISOString().slice(0,10) : undefined,
-                url: typeof window !== 'undefined' ? window.location.href : undefined
+                url: siteUrl + "/music"
               }))
             })
           }}
@@ -325,7 +325,7 @@ export default function MusicPage() {
             "@type": "MusicCollection",
             name: "Discografía de NexDrak",
             headline: activeTab === 'singles' ? "Singles de NexDrak" : "Álbumes de NexDrak",
-            url: typeof window !== 'undefined' ? window.location.href : undefined,
+            url: siteUrl + "/music",
             publisher: {
               "@type": "Organization",
               name: "NexDrak",
@@ -346,7 +346,7 @@ export default function MusicPage() {
                   byArtist: a.artist ? { "@type": "MusicGroup", name: a.artist } : undefined,
                   image: a.cover_image_url || undefined,
                   datePublished: a.release_date ? new Date(a.release_date).toISOString().slice(0,10) : undefined,
-                  url: typeof window !== 'undefined' ? window.location.href : undefined
+                  url: siteUrl + "/music"
                 }))
             )
           })

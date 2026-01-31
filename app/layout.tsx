@@ -2,6 +2,7 @@ import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
+// @ts-ignore - CSS module import has no type declarations
 // import { ThemeProvider } from "@/components/theme-provider"
 import Navbar from "@/components/navbar"
 // import BackgroundAnimation from "@/components/background-animation"
@@ -12,13 +13,14 @@ import StructuredData from "./structured-data"
 // import ResourcePreloader from "@/components/resource-preloader"
 // import WebVitals from "@/components/web-vitals"
 import { Toaster } from "@/components/ui/toaster"
+import FooterBar from "@/components/footer-bar"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://nexdrak.com'),
   title: {
-    default: 'NexDrak - Official Artist',
+    default: 'NexDrak - Official Artist Website',
     template: '%s | NexDrak'
   },
   description: 'Official website of NexDrak. Listen to the latest electronic music releases, check upcoming events, and get exclusive merchandise.',
@@ -30,7 +32,7 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://nexdrak.com',
     siteName: 'NexDrak',
-    title: 'NexDrak | Official Artist',
+    title: 'NexDrak | Official Artist Website',
     description: 'Official website of NexDrak. Listen to the latest electronic music releases, check upcoming events, and get exclusive merchandise.',
     images: [
       {
@@ -43,7 +45,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'NexDrak | Official Artist',
+    title: 'NexDrak | Official Artist Website',
     description: 'Official website of NexDrak. Listen to the latest electronic music releases, check upcoming events, and get exclusive merchandise.',
     images: ['/og-image.png'],
     creator: '@nexdrak',
@@ -84,6 +86,10 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark scroll-smooth">
       <head>
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+        />
         <StructuredData />
       </head>
       <body className={`${inter.className} min-h-screen bg-black text-white antialiased overflow-x-hidden selection:bg-purple-500/30 selection:text-purple-200`}>
@@ -99,6 +105,7 @@ export default function RootLayout({
                 <main className="flex-grow flex flex-col relative z-0">
                   {children}
                 </main>
+                <FooterBar />
                 <Toaster />
               {/* </HydrationFix> */}
             </NotificationProvider>

@@ -113,7 +113,7 @@ const nextConfig = {
           },
           {
             key: "Content-Security-Policy",
-            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://api.supabase.io wss://*.supabase.co;",
+            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.supabase.co; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' blob: data: https:; font-src 'self' data: https://cdnjs.cloudflare.com; connect-src 'self' https://*.supabase.co https://api.supabase.io wss://*.supabase.co; frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com;",
           },
         ],
       },
@@ -179,6 +179,23 @@ const nextConfig = {
             value: "public, max-age=31536000, immutable",
           },
         ],
+      },
+    ];
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/@vite/client",
+        destination: "/api/vite-client",
+      },
+    ];
+  },
+  async redirects() {
+    return [
+      {
+        source: "/playgroud",
+        destination: "/playground",
+        permanent: false,
       },
     ];
   },

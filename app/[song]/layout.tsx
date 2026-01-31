@@ -5,11 +5,15 @@ export default async function SongLayout({
   params,
 }: {
   children: React.ReactNode
-  params: { song: string }
+  params: Promise<{ song: string }>
 }) {
+  const resolvedParams = await params;
+  if (!resolvedParams?.song) {
+    return <>{children}</>;
+  }
   const { createClient } = await import('@/lib/supabase/server');
   const supabase = await createClient();
-  const slugParam = params.song.toLowerCase();
+  const slugParam = resolvedParams.song.toLowerCase();
 
   let song: any = null;
   try {
@@ -122,11 +126,12 @@ export default async function SongLayout({
 }
 
 export async function generateMetadata(
-  { params }: { params: { song: string } }
+  { params }: { params: Promise<{ song: string }> }
 ): Promise<Metadata> {
   const { createClient } = await import('@/lib/supabase/server');
   const supabase = await createClient();
-  const slugParam = params.song.toLowerCase();
+  const resolvedParams = await params;
+  const slugParam = resolvedParams.song.toLowerCase();
 
   let song: any = null;
   try {

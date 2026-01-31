@@ -89,13 +89,53 @@ export default function Navbar() {
   return (
     <header className="fixed top-0 w-full z-50 bg-black/70 backdrop-blur-md">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <Link href="/" aria-label="Go to homepage">
-          <img
-            src={settings.navbar_logo}
-            alt={`${settings.site_title} logo`}
-            className="h-8 w-auto"
-          />
-        </Link>
+        <div className="flex items-center gap-5">
+          <Link href="/" aria-label="Go to homepage">
+            <img
+              src={settings.navbar_logo}
+              alt={`${settings.site_title} logo`}
+              className="h-8 w-auto"
+            />
+          </Link>
+          <div className="flex items-center gap-3">
+            <a
+              href="https://www.instagram.com/nexdrak"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+              className="text-white/60 hover:text-white/80"
+            >
+              <i className="fa-brands fa-instagram text-[14px]" />
+            </a>
+            <a
+              href="https://x.com/nexdrak"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Twitter"
+              className="text-white/60 hover:text-white/80"
+            >
+              <i className="fa-brands fa-x-twitter text-[14px]" />
+            </a>
+            <a
+              href="https://www.youtube.com/@nexdrak"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="YouTube"
+              className="text-white/60 hover:text-white/80"
+            >
+              <i className="fa-brands fa-youtube text-[14px]" />
+            </a>
+            <a
+              href="https://open.spotify.com/artist/1DRRpAYf6HmdFkLLPXeMEx"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Spotify"
+              className="text-white/60 hover:text-white/80"
+            >
+              <i className="fa-brands fa-spotify text-[14px]" />
+            </a>
+          </div>
+        </div>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
