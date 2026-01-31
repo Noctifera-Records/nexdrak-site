@@ -1,11 +1,15 @@
+import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import UsersTable from './users-table'
 
-
+export const metadata: Metadata = {
+  title: 'Admin - Users',
+  robots: { index: false, follow: false },
+  alternates: { canonical: '/admin/users' }
+}
 
 export default async function UsersPage() {
   const supabase = await createClient()
-  
   // Obtener usuarios con sus perfiles
   const { data: profiles, error } = await supabase
     .from('profiles')
@@ -29,8 +33,8 @@ export default async function UsersPage() {
   const authUsers = authData?.users || []
 
   // Combinar datos de profiles con emails de auth
-  const usersWithEmails = profiles?.map(profile => {
-    const authUser = authUsers.find(au => au.id === profile.id)
+  const usersWithEmails = profiles?.map((profile: { id: string; username: string | null; role: string }) => {
+    const authUser = authUsers.find((au: any) => au.id === profile.id)
     return {
       ...profile,
       email: authUser?.email || 'N/A',

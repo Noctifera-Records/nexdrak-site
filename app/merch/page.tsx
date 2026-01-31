@@ -114,6 +114,30 @@ export default function MerchPage() {
 
   return (
     <div className="container mx-auto px-4 py-24 mt-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            itemListElement: (filteredItems.length > 0 ? filteredItems : merchItems).map((item, i) => ({
+              "@type": "Product",
+              position: i + 1,
+              name: item.name,
+              image: item.image_url || undefined,
+              description: item.description || undefined,
+              category: item.category,
+              offers: {
+                "@type": "Offer",
+                priceCurrency: "USD",
+                price: item.price,
+                availability: item.is_available ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+                url: item.purchase_url
+              }
+            }))
+          })
+        }}
+      />
       <div className="max-w-4xl mx-auto mb-12 text-center">
         <h1 className="text-4xl font-bold mb-4">OFFICIAL MERCH</h1>
         <p className="text-gray-300">Official NexDrak merchandise. Limited editions and exclusive designs.</p>

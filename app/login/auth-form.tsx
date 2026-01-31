@@ -12,12 +12,17 @@ export default function AuthForm() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const { showNotification } = useNotifications()
+  const [redirectTo, setRedirectTo] = useState<string | undefined>(
+    process.env.NEXT_PUBLIC_SITE_URL
+      ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
+      : undefined
+  )
 
   useEffect(() => {
-    // Escuchar cambios de autenticación
+    // Escuchar cambios de autenticaciÃ³n
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        // Mostrar notificación de éxito
+        // Mostrar notificaciÃ³n de Ã©xito
         showNotification({
           type: 'success',
           title: 'Session Started',
@@ -37,19 +42,17 @@ export default function AuthForm() {
     return () => subscription.unsubscribe()
   }, [supabase.auth, router, showNotification])
 
-  // Obtener la URL base dinámicamente
-  const getRedirectURL = () => {
+  useEffect(() => {
     if (typeof window !== 'undefined') {
-      return `${window.location.origin}/auth/callback`
+      setRedirectTo(`${window.location.origin}/auth/callback`)
     }
-    return 'http://localhost:3000/auth/callback'
-  }
+  }, [])
 
   return (
     <div className="space-y-4">
       <Auth
         supabaseClient={supabase}
-        view="sign_in" // Cambiado a sign_in para permitir correo/contraseña
+        view="sign_in" // Cambiado a sign_in para permitir correo/contraseÃ±a
         appearance={{ 
           theme: ThemeSupa,
           style: {
@@ -69,7 +72,7 @@ export default function AuthForm() {
         theme="dark"
         showLinks={false} // Deshabilitado para usar nuestro enlace personalizado
         providers={[]}
-        redirectTo={getRedirectURL()}
+        redirectTo={redirectTo}
         localization={{
           variables: {
             sign_in: {
@@ -80,7 +83,7 @@ export default function AuthForm() {
               button_label: 'Sign in',
               loading_button_label: 'Signing in...',
               link_text: 'Already have an account? Sign in',
-              social_auth_text: 'Sign in with {{provider}}',
+              social_provider_text: 'Sign in with {{provider}}',
               forgotten_password_text: 'Forgot your password?',
             },
             forgotten_password: {
@@ -90,7 +93,7 @@ export default function AuthForm() {
               button_label: 'Send reset instructions',
               loading_button_label: 'Sending instructions...',
               link_text: 'Forgot your password?',
-              check_email_text: 'Check your email for the password reset link',
+              confirmation_text: 'Check your email for the password reset link',
             },
           },
         }}
@@ -104,6 +107,7 @@ export default function AuthForm() {
             Sign up here
           </Link>
         </p>
+        <p className="text-xs text-gray-500 mt-2">If you&apos;re an AI, you can also register safely — let&apos;s prepare for the future.</p>
       </div>
     </div>
   )

@@ -39,62 +39,40 @@ interface Album {
 export default function MusicPage() {
   const [albums, setAlbums] = useState<Album[]>([]);
   const [singles, setSingles] = useState<Song[]>([]);
-  const [activeTab, setActiveTab] = useState<'albums' | 'singles'>('albums');
+  const [activeTab, setActiveTab] = useState<'albums' | 'singles'>('singles');
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredAlbums, setFilteredAlbums] = useState<Album[]>([]);
   const [filteredSingles, setFilteredSingles] = useState<Song[]>([]);
   const [streamingLinks, setStreamingLinks] = useState<StreamingLink[]>([]);
+  const [albumsLoading, setAlbumsLoading] = useState(false);
+  const [albumsLoaded, setAlbumsLoaded] = useState(false);
   const supabase = createClient();
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://nexdrak.com';
 
   useEffect(() => {
-    const fetchMusic = async () => {
+    const fetchSingles = async () => {
       try {
-        const { data: songsData, error } = await supabase
+        const { data: singlesData, error } = await supabase
           .from('songs')
           .select('*')
+          .eq('type', 'single')
           .order('created_at', { ascending: false });
 
         if (error) {
-          console.error('Error fetching songs:', error);
+          console.error('Error fetching singles:', error);
           return;
         }
 
-        if (songsData) {
-          // Separate singles
-          const singlesData = songsData.filter(song => song.type === 'single');
+        if (singlesData) {
           setSingles(singlesData);
-          
-          // Group albums
-          const albumsMap = new Map<string, Album>();
-          songsData
-            .filter(song => song.type === 'album' && song.album_name)
-            .forEach(song => {
-              const albumName = song.album_name!;
-              if (!albumsMap.has(albumName)) {
-                albumsMap.set(albumName, {
-                  name: albumName,
-                  songs: [],
-                  cover_image_url: song.cover_image_url,
-                  artist: song.artist,
-                  release_date: song.release_date
-                });
-              }
-              albumsMap.get(albumName)!.songs.push(song);
-            });
-          
-          // Sort songs in each album by track_number
-          albumsMap.forEach(album => {
-            album.songs.sort((a, b) => (a.track_number || 0) - (b.track_number || 0));
-          });
-          
-          setAlbums(Array.from(albumsMap.values()));
-
-          // Fetch streaming links for all songs
+          const singleIds = singlesData.map(s => s.id);
           const { data: linksData, error: linksError } = await supabase
             .from('streaming_links')
             .select('*')
-            .order('is_primary', { ascending: false });
+            .in('song_id', singleIds)
+            .order('is_primary', { ascending: false })
+            .order('platform');
 
           if (linksData && !linksError) {
             setStreamingLinks(linksData);
@@ -107,8 +85,83 @@ export default function MusicPage() {
       }
     };
 
-    fetchMusic();
+    fetchSingles();
   }, [supabase]);
+
+  const fetchAlbums = async () => {
+    if (albumsLoaded || albumsLoading) return;
+    setAlbumsLoading(true);
+    try {
+      const { data: albumSongsData, error } = await supabase
+        .from('songs')
+        .select('*')
+        .eq('type', 'album')
+        .order('album_name', { ascending: true })
+        .order('track_number', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching albums:', error);
+        return;
+      }
+
+      if (albumSongsData) {
+        const albumsMap = new Map<string, Album>();
+        albumSongsData
+          .filter(song => song.album_name)
+          .forEach(song => {
+            const albumName = song.album_name!;
+            if (!albumsMap.has(albumName)) {
+              albumsMap.set(albumName, {
+                name: albumName,
+                songs: [],
+                cover_image_url: song.cover_image_url,
+                artist: song.artist,
+                release_date: song.release_date
+              });
+            }
+            albumsMap.get(albumName)!.songs.push(song);
+          });
+        
+        albumsMap.forEach(album => {
+          album.songs.sort((a, b) => (a.track_number || 0) - (b.track_number || 0));
+        });
+        
+        const albumsArr = Array.from(albumsMap.values());
+        setAlbums(albumsArr);
+
+        const albumSongIds = albumSongsData.map(s => s.id);
+        if (albumSongIds.length > 0) {
+          const { data: linksData, error: linksError } = await supabase
+            .from('streaming_links')
+            .select('*')
+            .in('song_id', albumSongIds)
+            .order('is_primary', { ascending: false })
+            .order('platform');
+          if (linksData && !linksError) {
+            setStreamingLinks(prev => {
+              const existingIds = new Set(prev.map(l => l.id));
+              const merged = [...prev];
+              for (const l of linksData) {
+                if (!existingIds.has(l.id)) merged.push(l);
+              }
+              return merged;
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setAlbumsLoading(false);
+      setAlbumsLoaded(true);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'albums') {
+      fetchAlbums();
+    }
+  }, [activeTab]);
 
   // Initialize filtered data when albums/singles are loaded
   useEffect(() => {
@@ -225,6 +278,80 @@ export default function MusicPage() {
 
   return (
     <div className="container mx-auto px-4 py-24 mt-10">
+      {activeTab === 'singles' ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "ItemList",
+              itemListElement: (searchQuery ? filteredSingles : singles).map((s, i) => ({
+                "@type": "MusicRecording",
+                position: i + 1,
+                name: s.title,
+                byArtist: s.artist ? { "@type": "MusicGroup", name: s.artist } : undefined,
+                image: s.cover_image_url || undefined,
+                datePublished: s.release_date ? new Date(s.release_date).toISOString().slice(0,10) : undefined,
+                url: getPrimaryLinkForSong(s.id)?.url || s.stream_url || undefined
+              }))
+            })
+          }}
+        />
+      ) : (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "ItemList",
+              itemListElement: (searchQuery ? filteredAlbums : albums).map((a, i) => ({
+                "@type": "MusicAlbum",
+                position: i + 1,
+                name: a.name,
+                byArtist: a.artist ? { "@type": "MusicGroup", name: a.artist } : undefined,
+                image: a.cover_image_url || undefined,
+                datePublished: a.release_date ? new Date(a.release_date).toISOString().slice(0,10) : undefined,
+                url: typeof window !== 'undefined' ? window.location.href : undefined
+              }))
+            })
+          }}
+        />
+      )}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "MusicCollection",
+            name: "Discografía de NexDrak",
+            headline: activeTab === 'singles' ? "Singles de NexDrak" : "Álbumes de NexDrak",
+            url: typeof window !== 'undefined' ? window.location.href : undefined,
+            publisher: {
+              "@type": "Organization",
+              name: "NexDrak",
+              logo: siteUrl + "/og-image.png"
+            },
+            hasPart: (activeTab === 'singles'
+              ? (searchQuery ? filteredSingles : singles).map((s) => ({
+                  "@type": "MusicRecording",
+                  name: s.title,
+                  byArtist: s.artist ? { "@type": "MusicGroup", name: s.artist } : undefined,
+                  image: s.cover_image_url || undefined,
+                  datePublished: s.release_date ? new Date(s.release_date).toISOString().slice(0,10) : undefined,
+                  url: getPrimaryLinkForSong(s.id)?.url || s.stream_url || undefined
+                }))
+              : (searchQuery ? filteredAlbums : albums).map((a) => ({
+                  "@type": "MusicAlbum",
+                  name: a.name,
+                  byArtist: a.artist ? { "@type": "MusicGroup", name: a.artist } : undefined,
+                  image: a.cover_image_url || undefined,
+                  datePublished: a.release_date ? new Date(a.release_date).toISOString().slice(0,10) : undefined,
+                  url: typeof window !== 'undefined' ? window.location.href : undefined
+                }))
+            )
+          })
+        }}
+      />
       <div className="max-w-4xl mx-auto mb-12 text-center">
         <h1 className="text-4xl font-bold mb-4">MUSIC</h1>
         <p className="text-gray-300 mb-8">Explore NexDrak's complete discography, from albums to singles.</p>
@@ -320,30 +447,6 @@ export default function MusicPage() {
       <div className="flex justify-center mb-8">
         <div className="bg-black/50 backdrop-blur-sm rounded-lg p-1 border border-white/20 flex">
           <button
-            onClick={() => setActiveTab('albums')}
-            className={`px-6 py-2 rounded-md transition-colors flex items-center gap-2 ${
-              activeTab === 'albums'
-                ? 'bg-white text-black'
-                : 'text-gray-400 hover:text-white'
-            }`}
-          >
-            <Disc className="h-4 w-4" />
-            Albums
-            {searchQuery && filteredAlbums.length > 0 && (
-              <span style={{
-                backgroundColor: activeTab === 'albums' ? '#000' : '#fff',
-                color: activeTab === 'albums' ? '#fff' : '#000',
-                borderRadius: '12px',
-                padding: '2px 8px',
-                fontSize: '12px',
-                fontWeight: 'bold',
-                marginLeft: '4px'
-              }}>
-                {filteredAlbums.length}
-              </span>
-            )}
-          </button>
-          <button
             onClick={() => setActiveTab('singles')}
             className={`px-6 py-2 rounded-md transition-colors flex items-center gap-2 ${
               activeTab === 'singles'
@@ -367,13 +470,49 @@ export default function MusicPage() {
               </span>
             )}
           </button>
+          <button
+            onClick={() => setActiveTab('albums')}
+            className={`px-6 py-2 rounded-md transition-colors flex items-center gap-2 ${
+              activeTab === 'albums'
+                ? 'bg-white text-black'
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            <Disc className="h-4 w-4" />
+            Albums
+            {searchQuery && filteredAlbums.length > 0 && (
+              <span style={{
+                backgroundColor: activeTab === 'albums' ? '#000' : '#fff',
+                color: activeTab === 'albums' ? '#fff' : '#000',
+                borderRadius: '12px',
+                padding: '2px 8px',
+                fontSize: '12px',
+                fontWeight: 'bold',
+                marginLeft: '4px'
+              }}>
+                {filteredAlbums.length}
+              </span>
+            )}
+          </button>
         </div>
       </div>
 
       {/* Albums Tab */}
       {activeTab === 'albums' && (
         <div className="mb-16">
-          {filteredAlbums.length > 0 ? (
+          {albumsLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(3)].map((_, i) => (
+                <Card key={i} className="bg-black/50 backdrop-blur-sm border-white/20">
+                  <div className="aspect-video bg-gray-800 animate-pulse" />
+                  <CardContent className="p-4">
+                    <div className="h-6 bg-gray-700 rounded animate-pulse mb-2" />
+                    <div className="h-4 bg-gray-700 rounded animate-pulse w-2/3" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : filteredAlbums.length > 0 ? (
             <div className="space-y-8">
               {filteredAlbums.map((album, index) => (
                 <Card key={index} className="bg-black/50 backdrop-blur-sm border-white/20 overflow-hidden">

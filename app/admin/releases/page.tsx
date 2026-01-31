@@ -1,11 +1,15 @@
+import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import ReleasesTable from './releases-table'
 
-
+export const metadata: Metadata = {
+  title: 'Admin - Releases',
+  robots: { index: false, follow: false },
+  alternates: { canonical: '/admin/releases' }
+}
 
 export default async function ReleasesPage() {
   const supabase = await createClient()
-  
   // Obtener releases
   const { data: releases, error } = await supabase
     .from('releases')

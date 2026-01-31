@@ -1,11 +1,15 @@
+import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import SongsTable from './songs-table'
 
-
+export const metadata: Metadata = {
+  title: 'Admin - Songs',
+  robots: { index: false, follow: false },
+  alternates: { canonical: '/admin/songs' }
+}
 
 export default async function SongsPage() {
   const supabase = await createClient()
-  
   // Obtener canciones
   const { data: songs, error } = await supabase
     .from('songs')

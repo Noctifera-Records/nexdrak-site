@@ -1,11 +1,15 @@
+import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import DownloadsTable from './downloads-table'
 
-
+export const metadata: Metadata = {
+  title: 'Admin - Downloads',
+  robots: { index: false, follow: false },
+  alternates: { canonical: '/admin/downloads' }
+}
 
 export default async function AdminDownloadsPage() {
   const supabase = await createClient()
-  
   // Obtener todas las descargas (incluyendo inactivas para admin)
   const { data: downloads, error } = await supabase
     .from('downloads')

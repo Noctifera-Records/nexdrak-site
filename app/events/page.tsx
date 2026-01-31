@@ -1,12 +1,19 @@
-'use client';
+ 
 
-import { useState, useEffect } from 'react';
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import { CalendarDays, MapPin, Clock, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/server';
+
+export const revalidate = 3600;
+export const metadata: Metadata = {
+  title: 'Upcoming Events | NexDrak',
+  description: 'Catch NexDrak live at venues around the world.',
+  alternates: { canonical: '/events' }
+}
 
 interface Event {
   id: number;
@@ -23,39 +30,19 @@ interface Event {
   created_at: string;
 }
 
-export default function EventsPage() {
-  const [events, setEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
-  const supabase = createClient();
+export default async function EventsPage() {
+  const supabase = await createClient();
+  const { data: eventsData, error } = await supabase
+    .from('events')
+    .select('*')
+    .eq('is_published', true)
+    .gte('date', new Date().toISOString().split('T')[0])
+    .order('date', { ascending: true });
 
-  useEffect(() => {
-    fetchEvents();
-  }, []);
-
-  const fetchEvents = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('events')
-        .select('*')
-        .eq('is_published', true)
-        .gte('date', new Date().toISOString().split('T')[0]) // Solo eventos futuros
-        .order('date', { ascending: true });
-
-      if (error) {
-        console.error('Error fetching events:', error);
-        return;
-      }
-
-      setEvents(data || []);
-    } catch (error) {
-      console.error('Error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const events: Event[] = error ? [] : (eventsData || []);
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-ES', {
+    return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
@@ -64,37 +51,11 @@ export default function EventsPage() {
 
   const formatTime = (timeString?: string) => {
     if (!timeString) return '';
-    return new Date(`2000-01-01T${timeString}`).toLocaleTimeString('es-ES', {
+    return new Date(`2000-01-01T${timeString}`).toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit'
     });
   };
-
-  if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-24 mt-10">
-        <div className="max-w-4xl mx-auto mb-12 text-center">
-          <h1 className="text-4xl font-bold mb-4">UPCOMING EVENTS</h1>
-          <p className="text-gray-300">Cargando eventos...</p>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => (
-            <Card key={i} className="bg-black/50 backdrop-blur-sm border-white/20">
-              <CardContent className="p-6">
-                <div className="animate-pulse">
-                  <div className="h-6 bg-gray-700 rounded w-3/4 mb-4"></div>
-                  <div className="h-4 bg-gray-700 rounded w-1/2 mb-2"></div>
-                  <div className="h-4 bg-gray-700 rounded w-2/3 mb-2"></div>
-                  <div className="h-4 bg-gray-700 rounded w-1/2"></div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="container mx-auto px-4 py-24 mt-10">
@@ -104,6 +65,34 @@ export default function EventsPage() {
           Catch NexDrak live at venues around the world. Experience the immersive audio-visual journey in person.
         </p>
       </div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            itemListElement: events.map((e, i) => ({
+              "@type": "Event",
+              position: i + 1,
+              name: e.title,
+              startDate: e.date,
+              eventStatus: "https://schema.org/EventScheduled",
+              location: e.location
+                ? { "@type": "Place", name: e.location }
+                : undefined,
+              image: e.image_url || undefined,
+              offers: e.ticket_url
+                ? {
+                    "@type": "Offer",
+                    url: e.ticket_url,
+                    availability: "https://schema.org/InStock",
+                  }
+                : undefined,
+              description: e.description || undefined,
+            })),
+          }),
+        }}
+      />
 
       {events.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
