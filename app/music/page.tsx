@@ -126,7 +126,11 @@ export default function MusicPage() {
           album.songs.sort((a, b) => (a.track_number || 0) - (b.track_number || 0));
         });
         
-        const albumsArr = Array.from(albumsMap.values());
+        const albumsArr = Array.from(albumsMap.values()).sort((a, b) => {
+          const ad = a.release_date ? new Date(a.release_date).getTime() : 0;
+          const bd = b.release_date ? new Date(b.release_date).getTime() : 0;
+          return bd - ad;
+        });
         setAlbums(albumsArr);
 
         const albumSongIds = albumSongsData.map(s => s.id);
@@ -190,7 +194,11 @@ export default function MusicPage() {
       album.name.toLowerCase().includes(query) ||
       album.artist?.toLowerCase().includes(query) ||
       album.songs.length > 0
-    );
+    ).sort((a, b) => {
+      const ad = a.release_date ? new Date(a.release_date).getTime() : 0;
+      const bd = b.release_date ? new Date(b.release_date).getTime() : 0;
+      return bd - ad;
+    });
 
     // Filter singles
     const filteredSinglesData = singles.filter(song =>

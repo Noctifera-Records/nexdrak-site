@@ -97,6 +97,7 @@ export default function Navbar() {
               className="h-8 w-auto"
             />
           </Link>
+          <span className="h-6 w-px bg-white/20" aria-hidden="true" />
           <div className="flex items-center gap-3">
             <a
               href="https://www.instagram.com/nexdrak"
