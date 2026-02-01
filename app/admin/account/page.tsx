@@ -72,7 +72,6 @@ export default function AdminAccountPage() {
         .from("profiles")
         .update({
           username: formData.username,
-          email: formData.email,
         })
         .eq("id", user.id);
 

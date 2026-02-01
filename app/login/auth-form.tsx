@@ -87,7 +87,6 @@ export default function AuthForm() {
               loading_button_label: 'Signing in...',
               link_text: 'Already have an account? Sign in',
               social_provider_text: 'Sign in with {{provider}}',
-              forgotten_password_text: 'Forgot your password?',
             },
             forgotten_password: {
               email_label: 'Email',

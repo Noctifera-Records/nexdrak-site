@@ -126,7 +126,6 @@ export class AdminService {
           .from('profiles')
           .insert({
             id: authData.user.id,
-            email: email.trim(),
             role: 'admin',
             username: email.split('@')[0]
           });
@@ -242,7 +241,7 @@ export class AdminService {
       const results = await Promise.allSettled(promises);
       
       const errors = results
-        .filter((result): result is PromiseRejectedReason => result.status === 'rejected')
+        .filter((result): result is PromiseRejectedResult => result.status === 'rejected')
         .map(result => result.reason);
 
       if (errors.length > 0) {

@@ -96,7 +96,6 @@ export default function AccountForm() {
         .from("profiles")
         .update({
           username: formData.username,
-          email: formData.email,
         })
         .eq("id", user.id);
 

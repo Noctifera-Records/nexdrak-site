@@ -91,12 +91,10 @@ export default function RegisterForm() {
       showNotification({
         type: 'success',
         title: 'Account Created Successfully',
-        message: 'Check your email to confirm your account'
+        message: 'Your account has been created'
       });
 
-      setTimeout(() => {
-        router.push('/login');
-      }, 2000);
+      router.push('/');
     } catch (error) {
       showNotification({
         type: 'error',
