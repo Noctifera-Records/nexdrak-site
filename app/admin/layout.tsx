@@ -40,7 +40,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       } = await supabase.auth.getUser();
 
       if (!user) {
-        window.location.href = "/login";
         return;
       }
 
@@ -51,7 +50,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         .single();
 
       if (profile?.role !== "admin") {
-        window.location.href = "/";
         return;
       }
 

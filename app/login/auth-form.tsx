@@ -44,7 +44,10 @@ export default function AuthForm() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      setRedirectTo(`${window.location.origin}/auth/callback`)
+      const url = new URL(window.location.href)
+      const next = url.searchParams.get('next')
+      const base = `${window.location.origin}/auth/callback`
+      setRedirectTo(next ? `${base}?next=${encodeURIComponent(next)}` : base)
     }
   }, [])
 

@@ -1,9 +1,23 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+type CookieToSet = {
+  name: string
+  value: string
+  options?: {
+    path?: string
+    expires?: Date
+    maxAge?: number
+    secure?: boolean
+    sameSite?: 'lax' | 'strict' | 'none'
+    httpOnly?: boolean
+    domain?: string
+  }
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
-  
+  const origin = request.nextUrl.origin
   const response = NextResponse.next()
 
   // Only initialize Supabase for protected routes
@@ -16,8 +30,8 @@ export async function middleware(request: NextRequest) {
           getAll() {
             return request.cookies.getAll()
           },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value, options }) => {
+          setAll(cookiesToSet: CookieToSet[]) {
+            cookiesToSet.forEach(({ name, value, options }: CookieToSet) => {
               request.cookies.set(name, value)
               response.cookies.set(name, value, options)
             })
@@ -26,7 +40,27 @@ export async function middleware(request: NextRequest) {
       }
     )
 
-    await supabase.auth.getUser()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      const loginUrl = new URL('/login', origin)
+      loginUrl.searchParams.set('next', pathname)
+      return NextResponse.redirect(loginUrl)
+    }
+
+    if (pathname.startsWith('/admin')) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+
+      if (!profile || profile.role !== 'admin') {
+        return NextResponse.redirect(new URL('/', origin))
+      }
+    }
   }
 
   return response
