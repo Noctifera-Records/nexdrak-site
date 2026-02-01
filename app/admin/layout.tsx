@@ -122,6 +122,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               <Link
                 key={item.href}
                 href={item.href}
+                prefetch={false}
                 onClick={closeSidebar}
                 className={`
                   flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors
