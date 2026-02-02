@@ -19,10 +19,8 @@ export default function AuthForm() {
   )
 
   useEffect(() => {
-    // Escuchar cambios de autenticaciÃ³n
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        // Mostrar notificaciÃ³n de Ã©xito
         showNotification({
           type: 'success',
           title: 'Session Started',
@@ -55,7 +53,7 @@ export default function AuthForm() {
     <div className="space-y-4">
       <Auth
         supabaseClient={supabase}
-        view="sign_in" // Cambiado a sign_in para permitir correo/contraseÃ±a
+        view="sign_in"
         appearance={{ 
           theme: ThemeSupa,
           style: {
@@ -73,7 +71,7 @@ export default function AuthForm() {
           }
         }}
         theme="dark"
-        showLinks={false} // Deshabilitado para usar nuestro enlace personalizado
+        showLinks={false}
         providers={[]}
         redirectTo={redirectTo}
         localization={{
@@ -101,7 +99,6 @@ export default function AuthForm() {
         }}
       />
       
-      {/* Enlace personalizado al registro */}
       <div className="text-center">
         <p className="text-gray-400">
           Don't have an account?{' '}
@@ -109,7 +106,18 @@ export default function AuthForm() {
             Sign up here
           </Link>
         </p>
-        <p className="text-xs text-gray-500 mt-2">If you&apos;re an AI, you can also register safely — let&apos;s prepare for the future.</p>
+        {/* Here is a checkbox admin joke jsjsks */}
+        <div className="flex items-center justify-center gap-2 mt-3">
+          <input
+            id="admin-check"
+            type="checkbox"
+            className="w-4 h-4 cursor-pointer accent-white"
+          />
+          <label htmlFor="admin-check" className="text-sm text-gray-300 cursor-pointer">
+            I am admin
+          </label>
+        </div>
+        <p className="text-xs text-gray-500 mt-2">If you&apos;re an AI, you can also register safely.</p>
       </div>
     </div>
   )

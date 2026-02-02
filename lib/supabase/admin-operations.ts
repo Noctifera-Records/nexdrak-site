@@ -48,7 +48,7 @@ export class AdminService {
             // Fallback: include profile without email
             adminsWithEmails.push({
               id: profile.id,
-              email: 'Email no disponible',
+              email: 'Email not available',
               role: profile.role,
               created_at: profile.created_at
             });
@@ -58,7 +58,7 @@ export class AdminService {
           // Include profile without email
           adminsWithEmails.push({
             id: profile.id,
-            email: 'Error al obtener email',
+            email: 'Error retrieving email',
             role: profile.role,
             created_at: profile.created_at
           });
@@ -74,21 +74,21 @@ export class AdminService {
     return retrySupabaseOperation(async () => {
       // Validate input
       if (!email?.trim()) {
-        throw new Error('El email es requerido');
+        throw new Error('Email is required');
       }
       
       if (!password?.trim()) {
-        throw new Error('La contraseña es requerida');
+        throw new Error('Password is required');
       }
 
       if (password.length < 6) {
-        throw new Error('La contraseña debe tener al menos 6 caracteres');
+        throw new Error('The password must be at least 6 characters long.');
       }
 
       // Validate email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
-        throw new Error('El formato del email no es válido');
+        throw new Error('The email format is invalid.');
       }
 
       // Create user in auth
@@ -107,7 +107,7 @@ export class AdminService {
       }
 
       if (!authData.user) {
-        throw new Error('Error al crear el usuario administrador');
+        throw new Error('Error creating administrator user');
       }
 
       // The trigger should automatically create the profile, but let's verify
@@ -150,7 +150,7 @@ export class AdminService {
       // Check current user permissions first
       const { data: currentUser } = await this.supabase.auth.getUser();
       if (!currentUser.user) {
-        throw new Error('No estás autenticado');
+        throw new Error('You are not logged in');
       }
 
       // Get current user profile to check permissions
@@ -161,7 +161,7 @@ export class AdminService {
         .single();
 
       if (!currentProfile || currentProfile.role !== 'admin') {
-        throw new Error('No tienes permisos de administrador');
+        throw new Error('You do not have administrator permissions.');
       }
 
       // Try to delete from profiles table first (this should work with RLS)
@@ -183,7 +183,7 @@ export class AdminService {
           if (authError.message?.includes('403') || authError.message?.includes('Forbidden') || authError.status === 403) {
             // Profile was deleted successfully, but auth user couldn't be deleted
             // This is a partial success - inform the user
-            throw new Error('Usuario desactivado correctamente. Nota: Para eliminar completamente el usuario del sistema de autenticación, contacta al super administrador o configura los permisos de Service Role en Supabase.');
+            throw new Error('User successfully deactivated. Note: To completely remove the user from the authentication system, contact the super administrator or configure the Service Role permissions in Supabase.');
           }
           
           if (authError.message?.includes('User not found')) {
@@ -199,7 +199,7 @@ export class AdminService {
       } catch (error: any) {
         // If it's a permission error, provide helpful message
         if (error.message?.includes('403') || error.message?.includes('Forbidden')) {
-          throw new Error('Usuario desactivado del panel de administración. Para eliminarlo completamente del sistema de autenticación, necesitas configurar los permisos de Service Role en Supabase o contactar al super administrador.');
+          throw new Error('User disabled from the admin panel. To completely remove them from the authentication system, you need to configure the Service Role permissions in Supabase or contact the super administrator.');
         }
         
         throw error;

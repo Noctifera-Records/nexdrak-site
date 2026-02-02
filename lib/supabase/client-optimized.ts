@@ -43,35 +43,35 @@ export function handleSupabaseError(error: any, operation: string) {
   
   // Handle specific error types
   if (error?.code === 'PGRST116') {
-    return 'No se encontraron registros';
+    return 'No records found';
   }
   
   if (error?.code === '23505') {
-    return 'Ya existe un registro con estos datos';
+    return 'There is already a record with this data.';
   }
   
   if (error?.code === '23514') {
-    return 'Los datos no cumplen con las reglas de validación de la base de datos';
+    return 'The data does not comply with the database validation rules.';
   }
   
   if (error?.code === '42501') {
-    return 'Error de permisos: verifica que estés autenticado correctamente. Si el problema persiste, contacta al administrador.';
+    return 'Permission error: verify that you are properly authenticated. If the problem persists, contact the administrator.';
   }
   
   // Check for RLS policy violations
   if (error?.message?.includes('row-level security policy')) {
-    return 'Error de permisos de seguridad: verifica que estés autenticado correctamente. Si el problema persiste, contacta al administrador.';
+    return 'Security permissions error: verify that you are properly authenticated. If the problem persists, contact the administrator.';
   }
   
   if (error?.message?.includes('JWT')) {
-    return 'Sesión expirada. Por favor, inicia sesión nuevamente';
+    return 'Session expired. Please log in again.';
   }
   
   if (error?.message?.includes('QUIC') || error?.message?.includes('protocol')) {
-    return 'Error de conexión. Reintentando...';
+    return 'Connection error. Retrying...';
   }
   
-  return error?.message || 'Error desconocido';
+  return error?.message || 'Unknown error';
 }
 
 // Retry mechanism for failed requests

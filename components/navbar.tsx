@@ -152,7 +152,6 @@ export default function Navbar() {
 
           {user ? (
             <div className="flex items-center space-x-4">
-              {/* Solo mostrar ACCOUNT si NO es admin */}
               {!isAdmin && (
                 <Link
                   href="/account"
@@ -161,8 +160,7 @@ export default function Navbar() {
                   ACCOUNT
                 </Link>
               )}
-              
-              {/* Solo mostrar ADMIN si ES admin */}
+            
               {isAdmin && (
                 <Link
                   href="/admin"
@@ -191,7 +189,6 @@ export default function Navbar() {
 
         {/* Mobile Navigation */}
         <div className="md:hidden flex items-center gap-2">
-          {/* Admin Menu Button (solo si está logueado Y es admin) */}
           {user && isAdmin && (
             <Button
               variant="ghost"

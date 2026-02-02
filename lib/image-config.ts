@@ -1,4 +1,4 @@
-// Configuración de imágenes para evitar errores 404
+// Default image config.
 export const imageConfig = {
   logo: "/img/logo.png",
   redEyeFlight: "/img/red.png",
@@ -13,7 +13,7 @@ export const imageConfig = {
   }
 };
 
-// Lista de imágenes que deben existir en el proyecto
+// List of images.
 export const requiredImages = [
   "/img/logo.png",
   "/img/red.png", 

@@ -22,7 +22,6 @@ export default function ResetPassword() {
   const supabase = createClient();
 
   useEffect(() => {
-    // Verificar si hay una sesión válida para cambio de contraseña
     const checkSession = async () => {
       const {
         data: { session },
@@ -30,9 +29,8 @@ export default function ResetPassword() {
       if (session) {
         setIsValidSession(true);
       } else {
-        // Si no hay sesión, redirigir a login
         router.push(
-          "/login?message=Sesión expirada. Solicita un nuevo enlace de restablecimiento."
+          "/login?message=SessionExpired"
         );
       }
     };
@@ -42,16 +40,16 @@ export default function ResetPassword() {
 
   const validatePassword = (pwd: string) => {
     if (pwd.length < 8) {
-      return "La contraseña debe tener al menos 8 caracteres";
+      return "The password must be at least 8 characters long";
     }
     if (!/(?=.*[a-z])/.test(pwd)) {
-      return "La contraseña debe contener al menos una letra minúscula";
+      return "The password must contain at least one lowercase letter";
     }
     if (!/(?=.*[A-Z])/.test(pwd)) {
-      return "La contraseña debe contener al menos una letra mayúscula";
+      return "The password must contain at least one uppercase letter";
     }
     if (!/(?=.*\d)/.test(pwd)) {
-      return "La contraseña debe contener al menos un número";
+      return "The password must contain at least one number";
     }
     return null;
   };
@@ -61,9 +59,8 @@ export default function ResetPassword() {
     setError("");
     setMessage("");
 
-    // Validaciones
     if (!password || !confirmPassword) {
-      setError("Por favor completa todos los campos");
+      setError("Please complete all fields");
       return;
     }
 
@@ -74,7 +71,7 @@ export default function ResetPassword() {
     }
 
     if (password !== confirmPassword) {
-      setError("Las contraseñas no coinciden");
+      setError("Passwords do not match");
       return;
     }
 
@@ -88,15 +85,14 @@ export default function ResetPassword() {
       if (error) {
         setError(error.message);
       } else {
-        setMessage("¡Contraseña actualizada exitosamente!");
+        setMessage("Password successfully updated!");
 
-        // Redirigir después de 2 segundos
         setTimeout(() => {
           router.push("/login?message=sucess");
         }, 2000);
       }
     } catch (err) {
-      setError("Error inesperado. Por favor intenta nuevamente.");
+      setError("Unexpected error. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -107,7 +103,7 @@ export default function ResetPassword() {
       <div className="min-h-screen flex items-center justify-center bg-black text-white">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
-          <p>Verificando sesión...</p>
+          <p>Verifying session...</p>
         </div>
       </div>
     );
@@ -120,15 +116,15 @@ export default function ResetPassword() {
           <div className="flex justify-center">
             <Lock className="h-12 w-12 text-white" />
           </div>
-          <h1 className="text-3xl font-bold">Cambiar Contraseña</h1>
-          <p className="text-gray-400">Ingresa tu nueva contraseña segura</p>
+          <h1 className="text-3xl font-bold">Change Password</h1>
+          <p className="text-gray-400">Enter your new password</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
             <div>
               <Label htmlFor="password" className="text-white">
-                Nueva Contraseña
+                New Password
               </Label>
               <div className="relative mt-1">
                 <Input
@@ -156,7 +152,7 @@ export default function ResetPassword() {
 
             <div>
               <Label htmlFor="confirmPassword" className="text-white">
-                Confirmar Contraseña
+                Confirm Password
               </Label>
               <div className="relative mt-1">
                 <Input
@@ -208,13 +204,13 @@ export default function ResetPassword() {
                 <span>Actualizando...</span>
               </div>
             ) : (
-              "Actualizar Contraseña"
+              "Update Password"
             )}
           </Button>
         </form>
 
         <div className="text-xs text-gray-500 space-y-2">
-          <p className="font-medium">Requisitos de la contraseña:</p>
+          <p className="font-medium">Requiirements for password:</p>
           <ul className="space-y-1">
             <li
               className={`flex items-center space-x-2 ${
@@ -222,7 +218,7 @@ export default function ResetPassword() {
               }`}
             >
               <span>•</span>
-              <span>Mínimo 8 caracteres</span>
+              <span>8 or more characters</span>
             </li>
             <li
               className={`flex items-center space-x-2 ${
@@ -232,7 +228,7 @@ export default function ResetPassword() {
               }`}
             >
               <span>•</span>
-              <span>Al menos una letra minúscula</span>
+              <span>At least one lowercase letter</span>
             </li>
             <li
               className={`flex items-center space-x-2 ${
@@ -242,7 +238,7 @@ export default function ResetPassword() {
               }`}
             >
               <span>•</span>
-              <span>Al menos una letra mayúscula</span>
+              <span>At least one capital letter</span>
             </li>
             <li
               className={`flex items-center space-x-2 ${
@@ -250,7 +246,7 @@ export default function ResetPassword() {
               }`}
             >
               <span>•</span>
-              <span>Al menos un número</span>
+              <span>At least one number</span>
             </li>
           </ul>
         </div>

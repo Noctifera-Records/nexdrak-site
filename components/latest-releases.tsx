@@ -84,8 +84,8 @@ export default function LatestReleases({ initialSongs = [] }: LatestReleasesProp
     return (
       <div className="text-center py-12">
         <Music className="h-16 w-16 text-gray-600 mx-auto mb-4" />
-        <p className="text-gray-400 text-lg">No hay música disponible</p>
-        <p className="text-gray-500 text-sm">Las canciones aparecerán aquí cuando se agreguen</p>
+        <p className="text-gray-400 text-lg">No music available</p>
+        <p className="text-gray-500 text-sm">The songs will appear here when they are added.</p>
       </div>
     )
   }

@@ -10,7 +10,7 @@ export default function StructuredData() {
         "description": "Electronic music artist specializing in dubstep, darkwave, and synth music",
         "url": "https://nexdrak.com",
         "sameAs": [
-          "https://open.spotify.com/artist/nexdrak",
+          "https://open.spotify.com/artist/1DRRpAYf6HmdFkLLPXeMEx",
           "https://soundcloud.com/nexdrak",
           "https://www.youtube.com/@nexdrak",
           "https://x.com/nexdrak",

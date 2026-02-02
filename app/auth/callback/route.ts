@@ -1,7 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
-// Configuración para rutas dinámicas
 export const dynamic = 'force-dynamic'
 
 
@@ -21,7 +20,6 @@ export async function GET(request: Request) {
       const { data, error } = await supabase.auth.exchangeCodeForSession(code)
       
       if (!error) {
-        // Verificar si hay una sesión y si es para recovery
         const { data: { session } } = await supabase.auth.getSession()
         console.log('Session after exchange:', { 
           hasSession: !!session, 
@@ -29,7 +27,6 @@ export async function GET(request: Request) {
           userEmail: session?.user?.email 
         })
 
-        // Detectar si es un enlace de restablecimiento de contraseña
         const isPasswordReset = type === 'recovery' || 
                                next.includes('reset') || 
                                searchParams.get('redirect_to')?.includes('reset') ||
@@ -41,14 +38,11 @@ export async function GET(request: Request) {
           return NextResponse.redirect(`${origin}/auth/reset-password`)
         }
 
-        // TEMPORAL: Si hay una sesión válida después del callback y no hay next específico,
-        // probablemente es un enlace de recovery
         if (session && next === '/') {
           console.log('Session found with default redirect, assuming password reset')
           return NextResponse.redirect(`${origin}/auth/reset-password`)
         }
         
-        // Para otros casos (confirmación de email, etc.), redirigir normalmente
         console.log('Redirecting to:', next)
         return NextResponse.redirect(`${origin}${next}`)
       } else {
@@ -57,7 +51,6 @@ export async function GET(request: Request) {
       }
     }
 
-    // Si no hay código, redirigir a error
     return NextResponse.redirect(`${origin}/auth/auth-error?error=no_code`)
   } catch (error) {
     console.error('Error en auth callback:', error)

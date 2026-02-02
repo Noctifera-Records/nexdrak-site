@@ -43,29 +43,29 @@ export class SongsService {
     return retrySupabaseOperation(async () => {
       // Validate required fields
       if (!songData.title?.trim()) {
-        throw new Error("El título es requerido");
+        throw new Error("Title is required");
       }
 
       if (!songData.artist?.trim()) {
-        throw new Error("El artista es requerido");
+        throw new Error("Artist is required");
       }
 
       if (!songData.stream_url?.trim()) {
-        throw new Error("La URL de streaming es requerida");
+        throw new Error("Stream URL is required");
       }
 
       // Validate URL format
       try {
         new URL(songData.stream_url);
       } catch {
-        throw new Error("La URL de streaming no es válida");
+        throw new Error("Stream URL is not valid");
       }
 
       // Validate date format if provided
       if (songData.release_date) {
         const date = new Date(songData.release_date);
         if (isNaN(date.getTime())) {
-          throw new Error("La fecha de lanzamiento no es válida");
+          throw new Error("Release date is not valid");
         }
       }
 
@@ -108,15 +108,15 @@ export class SongsService {
     return retrySupabaseOperation(async () => {
       // Validate required fields if they're being updated
       if (updates.title !== undefined && !updates.title?.trim()) {
-        throw new Error("El título es requerido");
+        throw new Error("Title is required");
       }
 
       if (updates.artist !== undefined && !updates.artist?.trim()) {
-        throw new Error("El artista es requerido");
+        throw new Error("Artist is required");
       }
 
       if (updates.stream_url !== undefined && !updates.stream_url?.trim()) {
-        throw new Error("La URL de streaming es requerida");
+        throw new Error("Stream URL is required");
       }
 
       // Validate URL format if being updated
@@ -124,7 +124,7 @@ export class SongsService {
         try {
           new URL(updates.stream_url);
         } catch {
-          throw new Error("La URL de streaming no es válida");
+          throw new Error("Stream URL is not valid");
         }
       }
 
@@ -132,7 +132,7 @@ export class SongsService {
       if (updates.release_date) {
         const date = new Date(updates.release_date);
         if (isNaN(date.getTime())) {
-          throw new Error("La fecha de lanzamiento no es válida");
+          throw new Error("Release date is not valid");
         }
       }
 
@@ -155,6 +155,7 @@ export class SongsService {
         } else {
            // Fallback to single if invalid, or ignore? 
            // Better to be safe and default to single if somehow invalid data comes in
+           // AAAAAAAAAAAAAAAAaaaaaAAA---
            cleanUpdates.type = "single";
         }
       }

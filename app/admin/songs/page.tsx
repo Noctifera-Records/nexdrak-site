@@ -10,7 +10,6 @@ export const metadata: Metadata = {
 
 export default async function SongsPage() {
   const supabase = await createClient()
-  // Obtener canciones
   const { data: songs, error } = await supabase
     .from('songs')
     .select('*')
