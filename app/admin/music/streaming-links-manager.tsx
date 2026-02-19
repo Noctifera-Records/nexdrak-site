@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { X, Plus, ExternalLink, Trash2, Star, StarOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -56,10 +56,6 @@ export function StreamingLinksManager({ song, streamingLinks, onClose }: Streami
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const supabase = createClient();
-
-  useEffect(() => {
-    setLinks(streamingLinks);
-  }, [streamingLinks]);
 
   const handleAddLink = async () => {
     if (!newLink.platform || !newLink.url) {

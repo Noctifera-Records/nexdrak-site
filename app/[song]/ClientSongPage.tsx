@@ -44,7 +44,40 @@
    created_at: string;
    updated_at: string;
  }
- 
+
+ const BrandIcon = ({ name, ...props }: { name: string } & React.HTMLAttributes<HTMLElement>) => {
+   const map: Record<string, string> = {
+     spotify: "fa-brands fa-spotify",
+     youtube: "fa-brands fa-youtube",
+     soundcloud: "fa-brands fa-soundcloud",
+     deezer: "fa-brands fa-deezer",
+     bandcamp: "fa-brands fa-bandcamp",
+     apple_music: "fa-brands fa-apple",
+   };
+   if (name === "tidal") {
+     return (
+       <svg
+         xmlns="http://www.w3.org/2000/svg"
+         viewBox="0 0 24 24"
+         width="16"
+         height="16"
+         className={props.className || ''}
+         style={props.style}
+         aria-hidden="true"
+       >
+         <g fill="currentColor">
+           <path d="M6 8 L8 6 L10 8 L8 10 Z" />
+           <path d="M12 8 L14 6 L16 8 L14 10 Z" />
+           <path d="M9 11 L11 9 L13 11 L11 13 Z" />
+           <path d="M15 11 L17 9 L19 11 L17 13 Z" />
+         </g>
+       </svg>
+     );
+   }
+   const cls = map[name] || "fa-solid fa-link";
+   return <i className={`${cls} text-[16px] ${props.className || ''}`} aria-hidden="true" style={props.style} />;
+ };
+
  export default function ClientSongPage({ slug }: { slug: string }) {
    const [song, setSong] = useState<Song | null>(null);
    const [streamingLinks, setStreamingLinks] = useState<StreamingLink[]>([]);
@@ -166,38 +199,6 @@
    };
  
    const getPlatformInfo = (platform: string) => {
-    const BrandIcon = ({ name, ...props }: { name: string } & React.HTMLAttributes<HTMLElement>) => {
-      const map: Record<string, string> = {
-        spotify: "fa-brands fa-spotify",
-        youtube: "fa-brands fa-youtube",
-        soundcloud: "fa-brands fa-soundcloud",
-        deezer: "fa-brands fa-deezer",
-        bandcamp: "fa-brands fa-bandcamp",
-        apple_music: "fa-brands fa-apple",
-      };
-      if (name === "tidal") {
-        return (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            width="16"
-            height="16"
-            className={props.className || ''}
-            style={props.style}
-            aria-hidden="true"
-          >
-            <g fill="currentColor">
-              <path d="M6 8 L8 6 L10 8 L8 10 Z" />
-              <path d="M12 8 L14 6 L16 8 L14 10 Z" />
-              <path d="M9 11 L11 9 L13 11 L11 13 Z" />
-              <path d="M15 11 L17 9 L19 11 L17 13 Z" />
-            </g>
-          </svg>
-        );
-      }
-      const cls = map[name] || "fa-solid fa-link";
-      return <i className={`${cls} text-[16px] ${props.className || ''}`} aria-hidden="true" style={props.style} />;
-    };
     const platforms = {
       spotify: { name: 'Spotify', color: '#1ed35e', icon: (props?: any) => <BrandIcon name="spotify" /> },
       youtube: { name: 'YouTube Music', color: '#ff0000', icon: (props?: any) => <BrandIcon name="youtube" /> },

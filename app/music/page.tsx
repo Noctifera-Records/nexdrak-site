@@ -42,8 +42,6 @@ export default function MusicPage() {
   const [activeTab, setActiveTab] = useState<'albums' | 'singles'>('singles');
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredAlbums, setFilteredAlbums] = useState<Album[]>([]);
-  const [filteredSingles, setFilteredSingles] = useState<Song[]>([]);
   const [streamingLinks, setStreamingLinks] = useState<StreamingLink[]>([]);
   const [albumsLoading, setAlbumsLoading] = useState(false);
   const [albumsLoaded, setAlbumsLoaded] = useState(false);
@@ -167,24 +165,10 @@ export default function MusicPage() {
     }
   }, [activeTab]);
 
-  // Initialize filtered data when albums/singles are loaded
-  useEffect(() => {
-    setFilteredAlbums(albums);
-    setFilteredSingles(singles);
-  }, [albums, singles]);
-
-  // Filter function for search
-  useEffect(() => {
-    if (!searchQuery.trim()) {
-      setFilteredAlbums(albums);
-      setFilteredSingles(singles);
-      return;
-    }
-
+  const filteredAlbums = (() => {
+    if (!searchQuery.trim()) return albums;
     const query = searchQuery.toLowerCase();
-    
-    // Filter albums and their songs
-    const filteredAlbumsData = albums.map(album => ({
+    return albums.map(album => ({
       ...album,
       songs: album.songs.filter(song => 
         song.title.toLowerCase().includes(query) ||
@@ -199,29 +183,16 @@ export default function MusicPage() {
       const bd = b.release_date ? new Date(b.release_date).getTime() : 0;
       return bd - ad;
     });
+  })();
 
-    // Filter singles
-    const filteredSinglesData = singles.filter(song =>
+  const filteredSingles = (() => {
+    if (!searchQuery.trim()) return singles;
+    const query = searchQuery.toLowerCase();
+    return singles.filter(song =>
       song.title.toLowerCase().includes(query) ||
       song.artist.toLowerCase().includes(query)
     );
-
-    setFilteredAlbums(filteredAlbumsData);
-    setFilteredSingles(filteredSinglesData);
-
-    // Auto-switch to tab with results when searching
-    if (searchQuery.trim()) {
-      if (filteredSinglesData.length > 0 && filteredAlbumsData.length === 0) {
-        setActiveTab('singles');
-      } else if (filteredAlbumsData.length > 0 && filteredSinglesData.length === 0) {
-        setActiveTab('albums');
-      } else if (filteredSinglesData.length > filteredAlbumsData.length) {
-        setActiveTab('singles');
-      } else if (filteredAlbumsData.length > 0) {
-        setActiveTab('albums');
-      }
-    }
-  }, [searchQuery, albums, singles]);
+  })();
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
