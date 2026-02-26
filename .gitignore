@@ -70,5 +70,6 @@ lerna-debug.log*
 *.njsproj
 *.sln
 *.sw?
+AGENTS.md
 
 README.md
