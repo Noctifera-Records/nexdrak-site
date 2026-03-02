@@ -61,13 +61,16 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  alternates: {
+    canonical: 'https://nexdrak.com',
+  },
   icons: {
     icon: '/favicon.ico',
     apple: '/apple-touch-icon.png',
   },
   manifest: '/site.webmanifest',
   verification: {
-    google: 'verification_token', // Add your Google verification token
+    google: 'Y11EQRYKxOipcjCVUThMxoAUZi1Vh1p6Z86DgYw2qUE', // Add your Google verification token
   },
 }
 

@@ -71,5 +71,5 @@ lerna-debug.log*
 *.sln
 *.sw?
 AGENTS.md
-
-README.md
+.agents
+skills-lock.json

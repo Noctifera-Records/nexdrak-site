@@ -31,6 +31,7 @@ export default function HeroSection() {
               height={400}
               className="w-auto h-40 mb-8 mx-auto object-contain"
               priority
+              fetchPriority="high"
             />
           </div>
 
@@ -43,6 +44,7 @@ export default function HeroSection() {
               height={300}
               className="w-auto h-32 mb-6 mx-auto object-contain"
               priority
+              fetchPriority="high"
             />
           </div>
 

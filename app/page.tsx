@@ -7,8 +7,12 @@ import {
   Music,
 } from "lucide-react";
 
-import LatestReleases from "@/components/latest-releases";
-import UpcomingEvents from "@/components/upcoming-events";
+const LatestReleases = dynamicImport(() => import("@/components/latest-releases"), {
+  loading: () => <div className="h-96 w-full animate-pulse bg-gray-900 rounded-lg" />,
+});
+const UpcomingEvents = dynamicImport(() => import("@/components/upcoming-events"), {
+  loading: () => <div className="h-96 w-full animate-pulse bg-gray-900 rounded-lg" />,
+});
 import HeroSection from "@/components/hero-section";
 
 const Newsletter = dynamicImport(() => import("@/components/newsletter"));
