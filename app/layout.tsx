@@ -70,7 +70,7 @@ export const metadata: Metadata = {
   },
   manifest: '/site.webmanifest',
   verification: {
-    google: 'Y11EQRYKxOipcjCVUThMxoAUZi1Vh1p6Z86DgYw2qUE', // Add your Google verification token
+    google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION,
   },
 }
 

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Music | NexDrak',
+  title: 'Music',
   description: 'Discover albums and singles by NexDrak with streaming links.',
   alternates: { canonical: '/music' },
   openGraph: {

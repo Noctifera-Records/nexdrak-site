@@ -10,7 +10,7 @@ import { createClient } from '@/lib/supabase/server';
 
 export const revalidate = 3600;
 export const metadata: Metadata = {
-  title: 'Upcoming Events | NexDrak',
+  title: 'Upcoming Events',
   description: 'Catch NexDrak live at venues around the world.',
   alternates: { canonical: '/events' }
 }
@@ -188,8 +188,8 @@ export default async function EventsPage() {
       ) : (
         <div className="text-center py-12">
           <Calendar className="h-16 w-16 text-gray-600 mx-auto mb-4" />
-          <p className="text-gray-400 text-lg">No hay eventos próximos programados</p>
-          <p className="text-gray-500 text-sm">Los próximos eventos aparecerán aquí cuando se anuncien</p>
+          <p className="text-gray-400 text-lg">There are no upcoming events scheduled.</p>
+          <p className="text-gray-500 text-sm">Upcoming events will be announced here when they are scheduled.</p>
         </div>
       )}
 

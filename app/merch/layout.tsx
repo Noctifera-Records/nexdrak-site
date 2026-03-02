@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Merch | NexDrak',
+  title: 'Merch',
   description: 'Official NexDrak merchandise and limited items.',
   alternates: { canonical: '/merch' },
   openGraph: {
