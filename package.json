@@ -89,16 +89,19 @@
     "postcss": "^8",
     "tailwindcss": "^3.4.17",
     "typescript": "^5",
-    "vercel": "^34.2.8",
+    "vercel": "^50.28.0",
     "wrangler": "^4.58.0"
   },
   "overrides": {
     "esbuild": "0.25.3",
     "undici": "^7.18.2",
     "path-to-regexp": "6.3.0",
-    "tar": "^7.5.6",
+    "tar": "^7.5.11",
     "@smithy/config-resolver": "^4.4.6",
-    "fast-xml-parser": "^5.3.8"
+    "fast-xml-parser": "^5.3.8",
+    "@tootallnate/once": "^3.0.1",
+    "ajv": "^8.17.1",
+    "minimatch": "^10.2.4"
   },
   "packageManager": "npm@10.8.1"
 }
