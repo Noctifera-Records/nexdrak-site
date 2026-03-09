@@ -7,14 +7,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     url: '/music',
-    title: 'Music | NexDrak',
+    title: 'Music',
     description: 'Discover albums and singles by NexDrak with streaming links.',
     siteName: 'NexDrak',
     images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Music | NexDrak',
+    title: 'Music',
     description: 'Discover albums and singles by NexDrak with streaming links.',
     images: ['/og-image.png'],
     creator: '@nexdrak',

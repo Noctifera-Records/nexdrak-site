@@ -146,7 +146,7 @@ export async function generateMetadata(
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://nexdrak.com';
   const canonical = `${siteUrl}/${slugParam}`;
 
-  const title = song?.title ? `${song.title} | NexDrak` : 'Music | NexDrak';
+  const title = song?.title ? `${song.title} | NexDrak` : 'Music';
   const description = song?.artist
     ? `Listen to ${song.title} by ${song.artist}.`
     : 'Discover NexDrak music releases.';

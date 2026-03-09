@@ -158,7 +158,7 @@ export default function AboutPage() {
       </div>
 
       <div className="text-center mb-16">
-        <h2 className="text-2xl font-bold mb-6">CONNECT WITH PULSE</h2>
+        <h2 className="text-2xl font-bold mb-6">CONNECT WITH NEXDRAK</h2>
         <div className="flex justify-center gap-4 flex-wrap">
           <Button variant="outline" size="lg" className="border-white/50 text-white hover:bg-white/20">
             <Instagram className="h-5 w-5 mr-2" />

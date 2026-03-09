@@ -2,90 +2,114 @@
  
  import { useState, useEffect, Suspense, lazy, useMemo } from "react";
  import { notFound } from "next/navigation";
- import Image from "next/image";
- import Link from "next/link";
- import { Button } from "@/components/ui/button";
- import { Card, CardContent } from "@/components/ui/card";
- import { 
-   ExternalLink, 
-   Share2, 
-   Music, 
-   Calendar, 
-   User, 
-   ArrowLeft,
-   Play,
-   Volume2
- } from "lucide-react";
- import { createClient } from "@/lib/supabase/client";
- 
- const YouTubePlayer = lazy(() => import('@/components/youtube-player'));
- 
- interface Song {
-   id: number;
-   title: string;
-   artist: string;
-   stream_url: string;
-   cover_image_url?: string;
-   type: 'album' | 'single';
-   album_name?: string;
-   track_number?: number;
-   release_date?: string;
-   created_at: string;
-   youtube_embed_id?: string;
-   slug?: string;
- }
- 
- interface StreamingLink {
-   id: number;
-   song_id: number;
-   platform: string;
-   url: string;
-   is_primary: boolean;
-   created_at: string;
-   updated_at: string;
- }
+import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { 
+  ExternalLink, 
+  Share2, 
+  Calendar, 
+  User, 
+  ArrowLeft,
+  Volume2
+} from "lucide-react";
+import Music from "lucide-react/dist/esm/icons/music";
+import Play from "lucide-react/dist/esm/icons/play";
+import { createClient } from "@/lib/supabase/client";
 
- const BrandIcon = ({ name, ...props }: { name: string } & React.HTMLAttributes<HTMLElement>) => {
-   const map: Record<string, string> = {
-     spotify: "fa-brands fa-spotify",
-     youtube: "fa-brands fa-youtube",
-     soundcloud: "fa-brands fa-soundcloud",
-     deezer: "fa-brands fa-deezer",
-     bandcamp: "fa-brands fa-bandcamp",
-     apple_music: "fa-brands fa-apple",
-   };
-   if (name === "tidal") {
-     return (
-       <svg
-         xmlns="http://www.w3.org/2000/svg"
-         viewBox="0 0 24 24"
-         width="16"
-         height="16"
-         className={props.className || ''}
-         style={props.style}
-         aria-hidden="true"
-       >
-         <g fill="currentColor">
-           <path d="M6 8 L8 6 L10 8 L8 10 Z" />
-           <path d="M12 8 L14 6 L16 8 L14 10 Z" />
-           <path d="M9 11 L11 9 L13 11 L11 13 Z" />
-           <path d="M15 11 L17 9 L19 11 L17 13 Z" />
-         </g>
-       </svg>
-     );
-   }
-   const cls = map[name] || "fa-solid fa-link";
-   return <i className={`${cls} text-[16px] ${props.className || ''}`} aria-hidden="true" style={props.style} />;
- };
+const YouTubePlayer = lazy(() => import('@/components/youtube-player'));
 
- export default function ClientSongPage({ slug }: { slug: string }) {
-   const [song, setSong] = useState<Song | null>(null);
-   const [streamingLinks, setStreamingLinks] = useState<StreamingLink[]>([]);
-   const [loading, setLoading] = useState(true);
-   const [dominantColor, setDominantColor] = useState<string>('#ff0080');
-   const [isAlbumView, setIsAlbumView] = useState(false);
-   const [albumSongs, setAlbumSongs] = useState<Song[]>([]);
-   const supabase = createClient();
+interface Song {
+  id: number;
+  title: string;
+  artist: string;
+  stream_url: string;
+  cover_image_url?: string;
+  type: 'album' | 'single';
+  album_name?: string;
+  track_number?: number;
+  release_date?: string;
+  created_at: string;
+  youtube_embed_id?: string;
+  slug?: string;
+}
+
+interface StreamingLink {
+  id: number;
+  song_id: number;
+  platform: string;
+  url: string;
+  is_primary: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+const BrandIcon = ({ name, ...props }: { name: string } & React.HTMLAttributes<HTMLElement>) => {
+  const map: Record<string, string> = {
+    spotify: "fa-brands fa-spotify",
+    youtube: "fa-brands fa-youtube",
+    soundcloud: "fa-brands fa-soundcloud",
+    deezer: "fa-brands fa-deezer",
+    bandcamp: "fa-brands fa-bandcamp",
+    apple_music: "fa-brands fa-apple",
+  };
+  if (name === "tidal") {
+    return (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        width="16"
+        height="16"
+        className={props.className || ''}
+        style={props.style}
+        aria-hidden="true"
+      >
+        <g fill="currentColor">
+          <path d="M6 8 L8 6 L10 8 L8 10 Z" />
+          <path d="M12 8 L14 6 L16 8 L14 10 Z" />
+          <path d="M9 11 L11 9 L13 11 L11 13 Z" />
+          <path d="M15 11 L17 9 L19 11 L17 13 Z" />
+        </g>
+      </svg>
+    );
+  }
+  const cls = map[name] || "fa-solid fa-link";
+  return <i className={`${cls} text-[16px] ${props.className || ''}`} aria-hidden="true" style={props.style} />;
+};
+
+const PLATFORMS_CONFIG = {
+  spotify: { name: 'Spotify', color: '#1ed35e', icon: (props?: any) => <BrandIcon name="spotify" /> },
+  youtube: { name: 'YouTube Music', color: '#ff0000', icon: (props?: any) => <BrandIcon name="youtube" /> },
+  apple_music: { name: 'Apple Music', color: '#fd118f', icon: (props?: any) => <BrandIcon name="apple_music" /> },
+  soundcloud: { name: 'SoundCloud', color: '#ff5500', icon: (props?: any) => <BrandIcon name="soundcloud" /> },
+  bandcamp: { name: 'Bandcamp', color: '#629aa0', icon: (props?: any) => <BrandIcon name="bandcamp" /> },
+  deezer: { name: 'Deezer', color: '#f6ff00', icon: (props?: any) => <BrandIcon name="deezer" /> },
+  tidal: { name: 'Tidal', color: '#f2f2f2', icon: (props?: any) => <BrandIcon name="tidal" /> },
+  amazon_music: { name: 'Amazon Music', color: '#00b7ff', icon: Music }
+};
+
+const getPlatformInfo = (platform: string) => {
+  return PLATFORMS_CONFIG[platform as keyof typeof PLATFORMS_CONFIG] || { 
+    name: platform.charAt(0).toUpperCase() + platform.slice(1), 
+    color: '#6b7280', 
+    icon: ExternalLink 
+  };
+};
+
+export default function ClientSongPage({ slug }: { slug: string }) {
+  const [song, setSong] = useState<Song | null>(null);
+  const [streamingLinks, setStreamingLinks] = useState<StreamingLink[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [notFoundError, setNotFoundError] = useState(false);
+  const [dominantColor, setDominantColor] = useState<string>('#ff0080');
+  const [isAlbumView, setIsAlbumView] = useState(false);
+  const [albumSongs, setAlbumSongs] = useState<Song[]>([]);
+  const supabase = createClient();
+
+  if (notFoundError) {
+    notFound();
+  }
  
   const getContrastColor = (hex: string) => {
     try {
@@ -160,31 +184,31 @@
          }
  
          if (error || !songData) {
-           notFound();
-           return;
-         }
- 
-         setSong(songData);
- 
-         const { data: linksData, error: linksError } = await supabase
-           .from('streaming_links')
-           .select('*')
-           .eq('song_id', songData.id)
-           .order('is_primary', { ascending: false })
-           .order('platform');
- 
-         if (linksData && !linksError) {
-           setStreamingLinks(linksData);
-         }
-       } catch {
-         notFound();
-       } finally {
-         setLoading(false);
-       }
-     };
- 
-     fetchSong();
-   }, [slug, supabase]);
+          setNotFoundError(true);
+          return;
+        }
+
+        setSong(songData);
+
+        const { data: linksData, error: linksError } = await supabase
+          .from('streaming_links')
+          .select('*')
+          .eq('song_id', songData.id)
+          .order('is_primary', { ascending: false })
+          .order('platform');
+
+        if (linksData && !linksError) {
+          setStreamingLinks(linksData);
+        }
+      } catch {
+        setNotFoundError(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSong();
+  }, [slug, supabase]);
  
    const formatDate = (dateString: string) => {
      return new Date(dateString).toLocaleDateString('en-US', {
@@ -413,36 +437,6 @@
  
   return (
     <div className="min-h-screen bg-black text-white relative overflow-hidden">
-      <div className="fixed inset-0 z-0">
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background: `radial-gradient(circle at 20% 30%, ${generateGradientColors(dominantColor)[0]} 0%, transparent 50%),
-                         radial-gradient(circle at 80% 20%, ${generateGradientColors(dominantColor)[1]} 0%, transparent 50%),
-                         linear-gradient(180deg, ${generateGradientColors(dominantColor)[4]} 0%, transparent 100%)`,
-          }}
-        />
-      </div>
-
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        {pixelPoints.map((p, i) => (
-          <div
-            key={i}
-            className="absolute w-2.5 h-2.5 rounded-sm"
-            style={{
-              left: `${p.left}%`,
-              top: `${p.top}%`,
-              background: `linear-gradient(135deg, ${dominantColor}66, #ff0080)`,
-              filter: 'blur(0.6px)',
-              animation: `pixelFloat ${3 + (i % 3)}s ease-in-out infinite`,
-              animationDelay: `${p.delay}s`,
-              transform: 'translate(-50%, -50%)',
-            }}
-          />
-        ))}
-      </div>
-
       <div className="relative z-10 max-w-5xl mx-auto px-4 pt-20 pb-8">
         <div className="flex items-center justify-start mb-6">
           <Link href="/music" aria-label="Back to Music">

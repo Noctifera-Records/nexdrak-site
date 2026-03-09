@@ -3,7 +3,7 @@
 interface LoadingSpinnerProps {
   size?: "sm" | "md" | "lg"
   className?: string
-  variant?: "default" | "pulse" | "dots"
+  variant?: "default" | "pulse" | "dots" | "audio"
 }
 
 export default function LoadingSpinner({ 
@@ -15,6 +15,22 @@ export default function LoadingSpinner({
     sm: "w-4 h-4",
     md: "w-8 h-8", 
     lg: "w-12 h-12"
+  }
+
+  if (variant === "audio") {
+    // Audio wave animation
+    const barClass = "bg-white w-1 mx-0.5 rounded-full animate-audio-wave";
+    const height = size === "sm" ? "h-3" : size === "md" ? "h-6" : "h-10";
+    
+    return (
+      <div className={`flex items-end justify-center ${height} ${className}`} role="status" aria-label="Loading">
+        <div className={`${barClass}`} style={{ animationDuration: "1s", animationDelay: "0.0s", height: "40%" }}></div>
+        <div className={`${barClass}`} style={{ animationDuration: "1.2s", animationDelay: "0.1s", height: "100%" }}></div>
+        <div className={`${barClass}`} style={{ animationDuration: "0.8s", animationDelay: "0.2s", height: "60%" }}></div>
+        <div className={`${barClass}`} style={{ animationDuration: "1.1s", animationDelay: "0.3s", height: "80%" }}></div>
+        <div className={`${barClass}`} style={{ animationDuration: "0.9s", animationDelay: "0.4s", height: "50%" }}></div>
+      </div>
+    )
   }
 
   if (variant === "pulse") {

@@ -68,10 +68,31 @@ const config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "audio-wave": {
+          "0%, 100%": { height: "20%" },
+          "50%": { height: "100%" },
+        },
+        "ken-burns": {
+          "0%": { transform: "scale(1.1) translate(0, 0)" },
+          "50%": { transform: "scale(1.2) translate(-2%, -2%)" },
+          "100%": { transform: "scale(1.1) translate(2%, 2%)" },
+        },
+        "pulse-glow": {
+          "0%, 100%": { opacity: "0.6" },
+          "50%": { opacity: "1" },
+        },
+        "pixel-float": {
+          "0%, 100%": { transform: "translate(-50%, -50%) translateY(0)" },
+          "50%": { transform: "translate(-50%, -50%) translateY(-10px)" },
+        }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "audio-wave": "audio-wave 1s ease-in-out infinite",
+        "ken-burns": "ken-burns 30s ease-in-out infinite alternate",
+        "pulse-glow": "pulse-glow 8s ease-in-out infinite",
+        "pixel-float": "pixel-float 3s ease-in-out infinite",
       },
     },
   },

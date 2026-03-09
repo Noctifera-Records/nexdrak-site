@@ -14,14 +14,15 @@ import StructuredData from "./structured-data"
 // import WebVitals from "@/components/web-vitals"
 import { Toaster } from "@/components/ui/toaster"
 import FooterBar from "@/components/footer-bar"
+import GlobalBackground from "@/components/global-background"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://nexdrak.com'),
   title: {
-    default: 'NexDrak - Official Artist Website',
-    template: '%s | NexDrak'
+    default: 'NexDrak | Electronic Music Artist',
+    template: '%s | NexDrak',
   },
   description: 'Official website of NexDrak. Listen to the latest electronic music releases, check upcoming events, and get exclusive merchandise.',
   keywords: ['Electronic Music', 'NexDrak', 'DJ', 'Producer', 'Techno', 'House', 'Music Events'],
@@ -101,7 +102,7 @@ export default function RootLayout({
               {/* <ResourcePreloader /> */}
               {/* <WebVitals /> */}
               {/* <BackgroundAnimation /> */}
-              <div className="fixed inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-900 via-black to-black opacity-40 pointer-events-none" aria-hidden="true" />
+              <GlobalBackground />
               
               {/* <HydrationFix> */}
                 <Navbar />
