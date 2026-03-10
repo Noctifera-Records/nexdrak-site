@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/select"
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { updateUserProfile } from './actions'
 
 interface User {
   id: string
@@ -67,12 +68,12 @@ export default function UsersTable({ users: initialUsers }: UsersTableProps) {
   const handleUpdateUser = async (userId: string, updates: { username?: string, role?: string }) => {
     setLoading(true)
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update(updates)
-        .eq('id', userId)
-
-      if (error) throw error
+      // Use server action for all updates to bypass RLS restrictions on other users' profiles
+      const result = await updateUserProfile(userId, updates)
+      
+      if (result.error) {
+        throw new Error(result.error)
+      }
 
       // Actualizar estado local
       setUsers(users.map(user => 
@@ -81,9 +82,9 @@ export default function UsersTable({ users: initialUsers }: UsersTableProps) {
       
       setEditingUser(null)
       router.refresh()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating user:', error)
-      alert('Error al actualizar usuario')
+      alert(`Error al actualizar usuario: ${error.message || 'Error desconocido'}`)
     } finally {
       setLoading(false)
     }

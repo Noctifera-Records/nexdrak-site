@@ -253,10 +253,31 @@ export function SongForm({ song, onClose }: SongFormProps) {
 
             <div className="space-y-2">
               <Label>Imagen de Portada</Label>
-              <AdminImageUpload
-                onImageUpload={handleImageUpload}
-                currentImage={formData.cover_image_url}
-              />
+              <div className="space-y-4 p-4 border rounded-lg bg-card">
+                <AdminImageUpload
+                  onImageUpload={handleImageUpload}
+                  currentImage={formData.cover_image_url}
+                />
+                
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-card px-2 text-muted-foreground">O usa una URL</span>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="cover_url" className="text-xs">URL de la Imagen</Label>
+                  <Input 
+                    id="cover_url"
+                    value={formData.cover_image_url || ''}
+                    onChange={(e) => setFormData(prev => ({ ...prev, cover_image_url: e.target.value }))}
+                    placeholder="https://ejemplo.com/imagen.jpg"
+                  />
+                </div>
+              </div>
             </div>
 
             {error && (

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default async function UsersPage() {
   const supabase = await createClient()
-  // Obtener usuarios con sus perfiles
+  // Obtener perfiles
   const { data: profiles, error } = await supabase
     .from('profiles')
     .select('id, username, role')
@@ -28,18 +28,14 @@ export default async function UsersPage() {
     )
   }
 
-  // Obtener emails de auth.users
-  const { data: authData } = await supabase.auth.admin.listUsers()
-  const authUsers = authData?.users || []
-
-  // Combinar datos de profiles con emails de auth
-  const usersWithEmails = profiles?.map((profile: { id: string; username: string | null; role: string }) => {
-    const authUser = authUsers.find((au: any) => au.id === profile.id)
+  // No necesitamos obtener emails de auth.admin para la tabla si no tenemos service role
+  // Vamos a usar solo los datos de profiles que sí podemos obtener con RLS si somos admin
+  const usersForTable = profiles?.map((profile: { id: string; username: string | null; role: string }) => {
     return {
       ...profile,
-      email: authUser?.email || 'N/A',
-      created_at: authUser?.created_at || null,
-      email_confirmed_at: authUser?.email_confirmed_at || null
+      email: 'Oculto (Admin Only)', // Por seguridad si no tenemos service role
+      created_at: null,
+      email_confirmed_at: null
     }
   }) || []
 
@@ -48,11 +44,11 @@ export default async function UsersPage() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Gestión de Usuarios</h1>
         <div className="text-sm text-gray-400">
-          Total: {usersWithEmails.length} usuarios
+          Total: {usersForTable.length} usuarios
         </div>
       </div>
       
-      <UsersTable users={usersWithEmails} />
+      <UsersTable users={usersForTable} />
     </div>
   )
 }

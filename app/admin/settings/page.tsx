@@ -39,22 +39,40 @@ export default function AdminSettingsPage() {
     try {
       const data = await adminService.getSiteSettings();
       
-      // Convert to the expected format
-      const settingsData = data.map((item, index) => ({
-        id: index + 1,
-        key: item.key,
-        value: item.value,
-        description: getSettingDescription(item.key),
-        type: getSettingType(item.key),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      }));
+      // Define all required keys to ensure they appear even if missing in DB
+      const requiredKeys = [
+        'site_title',
+        'site_description',
+        'contact_email',
+        'booking_email',
+        'hero_release_text',
+        'hero_album_link',
+        'hero_background_image',
+        'hero_release_image',
+        'site_logo',
+        'site_logo_mobile',
+        'navbar_logo'
+      ];
+
+      // Merge DB data with required keys
+      const mergedSettings = requiredKeys.map((key, index) => {
+        const existing = data.find(item => item.key === key);
+        return {
+          id: index + 1,
+          key: key,
+          value: existing?.value || '',
+          description: getSettingDescription(key),
+          type: getSettingType(key),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+      });
       
-      setSettings(settingsData);
+      setSettings(mergedSettings);
       
       // Inicializar formData con los valores actuales
       const initialData: Record<string, string> = {};
-      data.forEach(setting => {
+      mergedSettings.forEach(setting => {
         initialData[setting.key] = setting.value || '';
       });
       setFormData(initialData);

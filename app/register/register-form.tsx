@@ -80,11 +80,20 @@ export default function RegisterForm() {
       });
 
       if (error) {
-        showNotification({
-          type: 'error',
-          title: 'Registration Error',
-          message: error.message
-        });
+        // Handle specific unique constraint errors
+        if (error.message.includes('User already registered') || error.status === 400 || error.status === 422) {
+           showNotification({
+            type: 'error',
+            title: 'Registration Failed',
+            message: 'This email or username is already taken. Please try another one.'
+          });
+        } else {
+          showNotification({
+            type: 'error',
+            title: 'Registration Error',
+            message: error.message
+          });
+        }
         return;
       }
 

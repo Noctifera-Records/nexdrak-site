@@ -39,13 +39,18 @@ export default function AccountForm() {
       setUser(user);
 
       // Obtener perfil
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", user.id)
         .single();
 
+      if (profileError) {
+        console.error("Error fetching profile:", profileError);
+      }
+
       if (profile) {
+        console.log("Profile loaded:", profile);
         setProfile(profile);
         setFormData((prev: typeof formData) => ({
           ...prev,

@@ -42,10 +42,8 @@ export default function LogoutButton({
           message: 'You have successfully signed out'
         })
         
-        setTimeout(() => {
-          router.push('/login')
-          router.refresh()
-        }, 1000)
+        // Force a full page reload to clear all client states and ensure clean redirection
+        window.location.href = '/login'
       }
     } catch (err) {
       showNotification({

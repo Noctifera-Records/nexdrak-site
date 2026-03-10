@@ -248,7 +248,7 @@ export default function Navbar() {
         {isMainMenuOpen && (
           <div className="fixed inset-0 z-[100] md:hidden">
             <div 
-              className="absolute inset-0 bg-white/95 dark:bg-black/95 backdrop-blur-md transition-colors duration-300" 
+              className="absolute inset-0 bg-white/80 dark:bg-black/80 backdrop-blur-md transition-colors duration-300" 
             />
             <div className="relative h-full w-full flex flex-col p-6 animate-in slide-in-from-right-10 fade-in duration-300">
               <div className="flex justify-end items-center mb-8">

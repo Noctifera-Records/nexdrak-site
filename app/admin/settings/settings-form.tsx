@@ -107,16 +107,28 @@ export default function SettingsForm({ settings: initialSettings }: SettingsForm
       icon: <Image className="h-5 w-5" />,
       fields: [
         {
-          key: 'hero_image',
-          label: 'Imagen Principal',
-          placeholder: 'https://nexdrak.com/imagen.jpg',
+          key: 'hero_background_image',
+          label: 'Imagen Principal (Hero)',
+          placeholder: 'https://nexdrak.com/hero-bg.jpg',
           description: 'Imagen de fondo de la sección principal'
         },
         {
-          key: 'logo_url',
-          label: 'URL del Logo',
+          key: 'site_logo',
+          label: 'Logo Principal (Desktop)',
           placeholder: 'https://nexdrak.com/logo.png',
-          description: 'Logo que aparece en la navegación'
+          description: 'Logo grande que aparece en la sección principal (escritorio)'
+        },
+        {
+          key: 'site_logo_mobile',
+          label: 'Logo Móvil',
+          placeholder: 'https://nexdrak.com/logo-mobile.png',
+          description: 'Logo optimizado para dispositivos móviles'
+        },
+        {
+          key: 'navbar_logo',
+          label: 'Logo Barra de Navegación',
+          placeholder: 'https://nexdrak.com/nav-logo.png',
+          description: 'Logo pequeño que aparece en la barra superior'
         },
         {
           key: 'og_image',
