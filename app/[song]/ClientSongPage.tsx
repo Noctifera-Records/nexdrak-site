@@ -224,22 +224,22 @@ export default function ClientSongPage({ slug }: { slug: string }) {
  
    const getPlatformInfo = (platform: string) => {
     const platforms = {
-      spotify: { name: 'Spotify', color: '#1ed35e', icon: (props?: any) => <BrandIcon name="spotify" /> },
-      youtube: { name: 'YouTube Music', color: '#ff0000', icon: (props?: any) => <BrandIcon name="youtube" /> },
-      apple_music: { name: 'Apple Music', color: '#fd118f', icon: (props?: any) => <BrandIcon name="apple_music" /> },
-      soundcloud: { name: 'SoundCloud', color: '#ff5500', icon: (props?: any) => <BrandIcon name="soundcloud" /> },
-      bandcamp: { name: 'Bandcamp', color: '#629aa0', icon: (props?: any) => <BrandIcon name="bandcamp" /> },
-      deezer: { name: 'Deezer', color: '#f6ff00', icon: (props?: any) => <BrandIcon name="deezer" /> },
-      tidal: { name: 'Tidal', color: '#f2f2f2', icon: (props?: any) => <BrandIcon name="tidal" /> },
-      amazon_music: { name: 'Amazon Music', color: '#00b7ff', icon: Music }
+      spotify: { name: 'Spotify', color: '#1ed35e', icon: (props?: any) => <BrandIcon name="spotify" {...props} /> },
+      youtube: { name: 'YouTube Music', color: '#ff0000', icon: (props?: any) => <BrandIcon name="youtube" {...props} /> },
+      apple_music: { name: 'Apple Music', color: '#fd118f', icon: (props?: any) => <BrandIcon name="apple_music" {...props} /> },
+      soundcloud: { name: 'SoundCloud', color: '#ff5500', icon: (props?: any) => <BrandIcon name="soundcloud" {...props} /> },
+      bandcamp: { name: 'Bandcamp', color: '#629aa0', icon: (props?: any) => <BrandIcon name="bandcamp" {...props} /> },
+      deezer: { name: 'Deezer', color: '#f6ff00', icon: (props?: any) => <BrandIcon name="deezer" {...props} /> },
+      tidal: { name: 'Tidal', color: '#f2f2f2', icon: (props?: any) => <BrandIcon name="tidal" {...props} /> },
+      amazon_music: { name: 'Amazon Music', color: '#00b7ff', icon: (props?: any) => <Music {...props} /> }
     };
-     
-     return platforms[platform as keyof typeof platforms] || { 
-       name: platform.charAt(0).toUpperCase() + platform.slice(1), 
-       color: '#6b7280', 
-       icon: ExternalLink 
-     };
-   };
+    
+    return platforms[platform as keyof typeof platforms] || { 
+      name: platform.charAt(0).toUpperCase() + platform.slice(1), 
+      color: '#6b7280', 
+      icon: ExternalLink 
+    };
+  };
  
    const extractDominantColor = (imageUrl: string) => {
      if (!imageUrl) return;
@@ -408,87 +408,88 @@ export default function ClientSongPage({ slug }: { slug: string }) {
      }
    };
  
-   if (loading) {
-     return (
-       <div style={{ minHeight: '100vh', backgroundColor: '#000', color: 'white', padding: '96px 16px 32px 16px' }}>
-         <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-           <div style={{ 
-             width: '300px', 
-             height: '300px', 
-             backgroundColor: '#1f2937', 
-             borderRadius: '12px', 
-             margin: '0 auto 24px auto',
-             display: 'flex',
-             alignItems: 'center',
-             justifyContent: 'center'
-           }}>
-             <Music style={{ width: '64px', height: '64px', color: '#6b7280' }} />
-           </div>
-           <div style={{ height: '32px', backgroundColor: '#1f2937', borderRadius: '8px', marginBottom: '16px' }} />
-           <div style={{ height: '20px', backgroundColor: '#1f2937', borderRadius: '8px', width: '60%', margin: '0 auto' }} />
-         </div>
-       </div>
-     );
-   }
- 
-   if (!song) {
-     notFound();
-   }
- 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background text-foreground pt-24 pb-8 px-4">
+        <div className="max-w-3xl mx-auto text-center">
+          <div className="w-[300px] h-[300px] bg-muted rounded-xl mx-auto mb-6 flex items-center justify-center">
+            <Music className="w-16 h-16 text-muted-foreground" />
+          </div>
+          <div className="h-8 bg-muted rounded-lg mb-4 w-3/4 mx-auto animate-pulse" />
+          <div className="h-5 bg-muted rounded-lg w-1/2 mx-auto animate-pulse" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!song) {
+    notFound();
+  }
+
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground relative overflow-hidden">
+      {/* Background Gradient based on dominant color */}
+      <div 
+        className="absolute inset-0 opacity-10 pointer-events-none"
+        style={{
+          background: `radial-gradient(circle at 50% 30%, ${dominantColor}, transparent 70%)`
+        }}
+      />
+
       <div className="relative z-10 max-w-5xl mx-auto px-4 pt-20 pb-8">
         <div className="flex items-center justify-start mb-6">
           <Link href="/music" aria-label="Back to Music">
-            <Button className="bg-transparent border border-white/40 text-white hover:bg-white/10 transition-all duration-200 hover:brightness-110 px-4">
+            <Button variant="ghost" className="hover:bg-accent hover:text-accent-foreground">
               <ArrowLeft className="w-4 h-4 mr-2" /> Back
             </Button>
           </Link>
         </div>
 
-        <Card className="bg-black/50 backdrop-blur-sm border border-white/10">
+        <Card className="bg-card/50 backdrop-blur-sm border-border">
           <CardContent className="p-5">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-              <div className="flex flex-col items-center md:items-start">
-                <div className="w-64 h-64 bg-gray-800 rounded-lg overflow-hidden mb-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+              <div className="flex flex-col items-center md:items-start w-full">
+                <div className="relative w-full max-w-[300px] aspect-square bg-muted rounded-lg overflow-hidden mb-6 shadow-xl">
                   {song.cover_image_url ? (
                     <Image
                       src={song.cover_image_url}
                       alt={song.title}
-                      width={256}
-                      height={256}
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
+                      priority
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <Music className="w-16 h-16 text-gray-500" />
+                      <Music className="w-16 h-16 text-muted-foreground" />
                     </div>
                   )}
                 </div>
 
-                <div className="text-center md:text-left">
-                  <h1 className="text-2xl font-bold mb-1">{song.title}</h1>
+                <div className="text-center md:text-left w-full">
+                  <h1 className="text-3xl font-bold mb-2 text-foreground">{song.title}</h1>
                   {song.artist && (
-                    <div className="flex items-center justify-center md:justify-start text-gray-400 gap-2">
+                    <div className="flex items-center justify-center md:justify-start text-muted-foreground gap-2 mb-2">
                       <User className="w-4 h-4" />
                       <span>{song.artist}</span>
                     </div>
                   )}
                   {song.release_date && (
-                    <div className="flex items-center gap-2 mt-2 justify-center md:justify-start">
-                      <Calendar className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm text-gray-400">
+                    <div className="flex items-center gap-2 mb-6 justify-center md:justify-start">
+                      <Calendar className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">
                         Released {formatDate(song.release_date)}
                       </span>
                     </div>
                   )}
-                  <div className="flex gap-2 mt-3">
+                  
+                  <div className="flex flex-wrap gap-3 justify-center md:justify-start">
                     {(getPrimaryLink() || song.stream_url) && (
                       <Button
-                        className="text-white font-semibold px-4 py-2 border border-white/40 transition-all duration-200 hover:brightness-110"
-                        style={{ backgroundColor: dominantColor }}
-                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = adjustColor(dominantColor, 20); }}
-                        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = dominantColor; }}
+                        className="font-semibold px-6 transition-all duration-200 hover:brightness-110 hover:scale-105 shadow-lg"
+                        style={{ 
+                          backgroundColor: dominantColor,
+                          color: getContrastColor(dominantColor)
+                        }}
                         asChild
                       >
                         <a
@@ -497,13 +498,14 @@ export default function ClientSongPage({ slug }: { slug: string }) {
                           rel="noopener noreferrer"
                         >
                           <ExternalLink className="w-4 h-4 mr-2" />
-                          Listen
+                          Listen Now
                         </a>
                       </Button>
                     )}
                     <Button
-                      className="bg-transparent border border-white/40 text-white px-4 py-2 hover:bg-white/10 transition-all duration-200 hover:brightness-110"
+                      variant="outline"
                       onClick={handleShare}
+                      className="hover:bg-accent"
                     >
                       <Share2 className="w-4 h-4 mr-2" />
                       Share
@@ -512,69 +514,76 @@ export default function ClientSongPage({ slug }: { slug: string }) {
                 </div>
               </div>
 
-              <div className="w-full md:w-11/12 mx-auto">
-                <h3 className="text-lg font-bold mb-3 text-center md:text-left">Available on</h3>
-                <div className="grid gap-2">
+              <div className="w-full">
+                <h3 className="text-lg font-bold mb-4 text-center md:text-left text-foreground">Available on</h3>
+                <div className="grid gap-3">
                   {streamingLinks.length > 0 ? (
                     <>
                       {streamingLinks.map((link) => {
                         const platformInfo = getPlatformInfo(link.platform);
                         return (
-                          <Button
-                            key={link.id}
-                            className="justify-start px-4 py-3 bg-black/50 hover:bg-black/70 transition-all duration-200 hover:brightness-110 rounded-md"
-                            style={{
-                              border: `1.5px solid ${platformInfo.color}`,
-                              color: '#ffffff',
-                              backgroundColor: 'rgba(0,0,0,0.5)',
-                            }}
-                            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = hexToRgba(platformInfo.color, 0.18); }}
-                            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.5)'; }}
-                            asChild
-                          >
-                            <a
-                              href={link.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              aria-label={`Listen to ${song.title} on ${platformInfo.name}`}
-                            >
-                              <platformInfo.icon className="w-4 h-4 mr-2" style={{ color: '#ffffff' }} />
-                              <span className="mr-2">{platformInfo.name}</span>
-                              {link.is_primary && <span className="ml-2 text-emerald-400">Primary</span>}
-                              <ExternalLink className="w-4 h-4 ml-auto" />
-                            </a>
-                          </Button>
-                        );
-                      })}
-                      {song.stream_url && (
-                        <Button
-                          className="justify-start px-4 py-3 bg-black/40 hover:bg-black/60 transition-all duration-200 hover:brightness-110 rounded-md border border-white/40 text-white"
-                          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.12)'; }}
-                          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.4)'; }}
-                          asChild
-                        >
                           <a
-                            href={song.stream_url}
+                            key={link.id}
+                            href={link.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            aria-label={`Listen to ${song.title} on other platforms`}
+                            className="group flex items-center justify-between p-3 rounded-lg border border-border bg-card hover:bg-accent transition-all duration-200"
+                            aria-label={`Listen to ${song.title} on ${platformInfo.name}`}
                           >
-                            <ExternalLink className="w-4 h-4 mr-2" />
-                            Others
-                            <ExternalLink className="w-4 h-4 ml-auto" />
+                            <div className="flex items-center gap-3">
+                              <div 
+                                className="w-8 h-8 rounded-full flex items-center justify-center"
+                                style={{ backgroundColor: platformInfo.color + '20' }}
+                              >
+                                <platformInfo.icon 
+                                  className="w-4 h-4" 
+                                  style={{ color: platformInfo.color }} 
+                                />
+                              </div>
+                              <span className="font-medium text-foreground">{platformInfo.name}</span>
+                              {link.is_primary && (
+                                <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+                                  Primary
+                                </span>
+                              )}
+                            </div>
+                            <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-foreground" />
                           </a>
-                        </Button>
+                        );
+                      })}
+                      {song.stream_url && !streamingLinks.some(l => l.url === song.stream_url) && (
+                        <a
+                          href={song.stream_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group flex items-center justify-between p-3 rounded-lg border border-border bg-card hover:bg-accent transition-all duration-200"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                              <ExternalLink className="w-4 h-4 text-muted-foreground" />
+                            </div>
+                            <span className="font-medium text-foreground">Other Platform</span>
+                          </div>
+                          <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-foreground" />
+                        </a>
                       )}
                     </>
                   ) : (
                     song.stream_url && (
-                      <Button className="justify-start px-4 py-3 bg-black/40 hover:bg-black/60 transition-all duration-200 hover:brightness-110 rounded-md border border-white/40 text-white" asChild>
-                        <a href={song.stream_url} target="_blank" rel="noopener noreferrer" aria-label={`Listen to ${song.title}`}>
-                          <ExternalLink className="w-4 h-4 mr-2" />
-                          Listen
-                          <ExternalLink className="w-4 h-4 ml-auto" />
-                        </a>
-                      </Button>
+                      <a
+                        href={song.stream_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group flex items-center justify-between p-3 rounded-lg border border-border bg-card hover:bg-accent transition-all duration-200"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                            <ExternalLink className="w-4 h-4 text-muted-foreground" />
+                          </div>
+                          <span className="font-medium text-foreground">Listen</span>
+                        </div>
+                        <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-foreground" />
+                      </a>
                     )
                   )}
                 </div>
@@ -584,10 +593,10 @@ export default function ClientSongPage({ slug }: { slug: string }) {
         </Card>
 
         {getYouTubeEmbedId() && (
-          <Card className="bg-black/50 backdrop-blur-sm border border-white/10 mt-6">
-            <CardContent className="p-6">
-              <div className="relative" style={{ paddingBottom: '56.25%', height: 0 }}>
-                <Suspense fallback={<div className="h-52 bg-gray-800 rounded" />}>
+          <Card className="bg-card/50 backdrop-blur-sm border border-border mt-6 overflow-hidden">
+            <CardContent className="p-0">
+              <div className="relative w-full aspect-video bg-black">
+                <Suspense fallback={<div className="w-full h-full bg-muted animate-pulse" />}>
                   <YouTubePlayer 
                     videoId={getYouTubeEmbedId() || ''} 
                     title={`${song?.title} - ${song?.artist || ''}`} 
@@ -595,15 +604,14 @@ export default function ClientSongPage({ slug }: { slug: string }) {
                   />
                 </Suspense>
               </div>
-              <div className="flex justify-end mt-3">
-                <Button className="bg-transparent border border-white/40 text-white px-3 py-2 text-xs hover:bg-white/10 transition-all duration-200 hover:brightness-110" asChild>
+              <div className="p-4 flex justify-end bg-card border-t border-border">
+                <Button variant="ghost" size="sm" asChild>
                   <a
                     href={`https://www.youtube.com/watch?v=${getYouTubeEmbedId()}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={`Watch ${song.title} on YouTube`}
                   >
-                    <ExternalLink className="w-3 h-3 mr-1.5" />
+                    <BrandIcon name="youtube" className="w-4 h-4 mr-2 text-red-500" />
                     Watch on YouTube
                   </a>
                 </Button>
@@ -613,60 +621,68 @@ export default function ClientSongPage({ slug }: { slug: string }) {
         )}
 
         {isAlbumView && albumSongs.length > 1 && (
-          <Card className="bg-black/50 backdrop-blur-sm border border-white/10 mt-6">
+          <Card className="bg-card/50 backdrop-blur-sm border border-border mt-6">
             <CardContent className="p-6">
-              <h3 className="text-xl font-bold mb-4">Album Tracklist - {song?.album_name}</h3>
+              <h3 className="text-xl font-bold mb-4 text-foreground">Album Tracklist - {song?.album_name}</h3>
               <div className="flex flex-col gap-2">
-                {albumSongs.map((track, index) => (
-                  <div
-                    key={track.id}
-                    className="flex items-center justify-between px-4 py-3 rounded bg-white/5"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="bg-white/10 text-white rounded px-2 text-xs font-semibold min-w-6 text-center">
-                        {track.track_number || index + 1}
-                      </span>
-                      <div>
-                        <p className={track.id === song?.id ? 'font-semibold text-white' : 'text-gray-200'}>
-                          {track.title}
-                        </p>
-                        {track.id === song?.id && (
-                          <p className="text-xs" style={{ color: dominantColor }}>
-                            Now Playing
+                {albumSongs.map((track, index) => {
+                  const isCurrent = track.id === song?.id;
+                  return (
+                    <div
+                      key={track.id}
+                      className={`flex items-center justify-between px-4 py-3 rounded-lg transition-colors ${
+                        isCurrent 
+                          ? 'bg-primary/10 border border-primary/20' 
+                          : 'bg-card hover:bg-accent border border-transparent'
+                      }`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <span className={`text-sm font-mono w-6 text-center ${isCurrent ? 'text-primary font-bold' : 'text-muted-foreground'}`}>
+                          {track.track_number || index + 1}
+                        </span>
+                        <div>
+                          <p className={`font-medium ${isCurrent ? 'text-primary' : 'text-foreground'}`}>
+                            {track.title}
                           </p>
+                          {isCurrent && (
+                            <p className="text-xs text-primary/80">
+                              Now Playing
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-2">
+                        {isCurrent && (
+                          <div className="flex gap-0.5 h-3 items-end mr-2">
+                            <div className="w-1 bg-primary animate-[music-bar_1s_ease-in-out_infinite]" style={{ height: '60%' }}></div>
+                            <div className="w-1 bg-primary animate-[music-bar_1.1s_ease-in-out_infinite_0.1s]" style={{ height: '100%' }}></div>
+                            <div className="w-1 bg-primary animate-[music-bar_1.2s_ease-in-out_infinite_0.2s]" style={{ height: '40%' }}></div>
+                          </div>
+                        )}
+                        
+                        {!isCurrent && (
+                          <Button variant="ghost" size="sm" asChild className="h-8 w-8 p-0">
+                            <Link href={`/${track.slug}`} aria-label={`Go to ${track.title}`}>
+                              <Play className="w-4 h-4 text-muted-foreground" />
+                            </Link>
+                          </Button>
                         )}
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      {track.id === song?.id && (
-                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: dominantColor }} />
-                      )}
-                      <Button className="bg-transparent border border-white/40 text-white px-3 py-2 text-xs hover:bg-white/10 transition-all duration-200 hover:brightness-110" asChild>
-                        <a
-                          href={getPrimaryLink()?.url || track.stream_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label={`Listen to ${track.title}`}
-                        >
-                          <ExternalLink className="w-3 h-3 mr-1.5" />
-                          Listen
-                        </a>
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
         )}
-
-        <style jsx>{`
-          @keyframes pixelFloat {
-            0%,100% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
-            50% { transform: translate(-50%, -52%) scale(1.1); opacity: 1; }
-          }
-        `}</style>
       </div>
+      <style jsx global>{`
+        @keyframes music-bar {
+          0%, 100% { height: 40%; }
+          50% { height: 100%; }
+        }
+      `}</style>
     </div>
   );
- }
+}

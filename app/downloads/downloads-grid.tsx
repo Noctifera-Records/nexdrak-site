@@ -130,11 +130,11 @@ export default function DownloadsGrid({ downloads: initialDownloads }: Downloads
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'wallpaper':
-        return 'bg-blue-900/30 text-blue-300 border-blue-500/30'
+        return 'bg-blue-500/10 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300 border-blue-500/30'
       case 'mp3':
-        return 'bg-purple-900/30 text-purple-300 border-purple-500/30'
+        return 'bg-purple-500/10 text-purple-600 dark:bg-purple-900/30 dark:text-purple-300 border-purple-500/30'
       default:
-        return 'bg-gray-900/30 text-gray-300 border-gray-500/30'
+        return 'bg-muted text-muted-foreground border-border'
     }
   }
 
@@ -151,22 +151,22 @@ export default function DownloadsGrid({ downloads: initialDownloads }: Downloads
       {/* Filtros */}
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Buscar descargas..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-gray-900 border-gray-700 text-white"
+            className="pl-10 bg-background/80 border-input text-foreground backdrop-blur-sm"
           />
         </div>
         
         <div className="flex items-center space-x-2">
-          <Filter className="h-4 w-4 text-gray-400" />
+          <Filter className="h-4 w-4 text-muted-foreground" />
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="w-40 bg-gray-900 border-gray-700 text-white">
+            <SelectTrigger className="w-40 bg-background/80 border-input text-foreground backdrop-blur-sm">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-gray-900 border-gray-700">
+            <SelectContent>
               <SelectItem value="all">Todas</SelectItem>
               <SelectItem value="wallpaper">Wallpapers</SelectItem>
               <SelectItem value="mp3">Audio</SelectItem>
@@ -180,8 +180,8 @@ export default function DownloadsGrid({ downloads: initialDownloads }: Downloads
       {featuredDownloads.length > 0 && (
         <div>
           <div className="flex items-center space-x-2 mb-6">
-            <Star className="h-5 w-5 text-yellow-400" />
-            <h2 className="text-2xl font-bold text-white">Destacados</h2>
+            <Star className="h-5 w-5 text-yellow-500 dark:text-yellow-400" />
+            <h2 className="text-2xl font-bold text-foreground dark:text-white">Destacados</h2>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -205,7 +205,7 @@ export default function DownloadsGrid({ downloads: initialDownloads }: Downloads
       {/* Todas las descargas */}
       {regularDownloads.length > 0 && (
         <div>
-          <h2 className="text-2xl font-bold text-white mb-6">
+          <h2 className="text-2xl font-bold text-foreground dark:text-white mb-6">
             Todas las Descargas
           </h2>
           
@@ -229,14 +229,14 @@ export default function DownloadsGrid({ downloads: initialDownloads }: Downloads
       {/* Sin resultados */}
       {filteredDownloads.length === 0 && (
         <div className="text-center py-12">
-          <Package className="h-16 w-16 text-gray-600 mx-auto mb-4" />
-          <p className="text-gray-400 text-lg mb-2">
+          <Package className="h-16 w-16 text-muted-foreground dark:text-gray-600 mx-auto mb-4" />
+          <p className="text-muted-foreground dark:text-gray-400 text-lg mb-2">
             {searchTerm || categoryFilter !== 'all' 
               ? 'No se encontraron descargas' 
               : 'No hay descargas disponibles'
             }
           </p>
-          <p className="text-gray-500 text-sm">
+          <p className="text-muted-foreground/80 dark:text-gray-500 text-sm">
             {!searchTerm && categoryFilter === 'all' && 'Las descargas aparecerán aquí cuando se agreguen'}
           </p>
         </div>
@@ -258,18 +258,18 @@ function DownloadCard({
   download: Download
   onDownload: (download: Download) => void
   downloading: boolean
-  getCategoryIcon: (category: string) => JSX.Element
+  getCategoryIcon: (category: string) => React.ReactNode
   getCategoryLabel: (category: string) => string
   getCategoryColor: (category: string) => string
   formatDate: (date: string) => string
   featured?: boolean
 }) {
   return (
-    <Card className={`bg-gray-900 border-gray-700 overflow-hidden group hover:border-gray-600 transition-all ${
+    <Card className={`bg-card/50 dark:bg-black/50 backdrop-blur-sm border-border dark:border-white/20 overflow-hidden group hover:border-foreground/40 dark:hover:border-white/40 transition-all shadow-sm dark:shadow-none ${
       featured ? 'ring-2 ring-yellow-500/30' : ''
     }`}>
       {/* Thumbnail */}
-      <div className="relative aspect-video bg-gray-800">
+      <div className="relative aspect-video bg-muted dark:bg-gray-800">
         {download.thumbnail_url ? (
           <Image
             src={download.thumbnail_url}
@@ -278,7 +278,7 @@ function DownloadCard({
             className="object-cover group-hover:scale-105 transition-transform"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
+          <div className="w-full h-full flex items-center justify-center text-muted-foreground dark:text-gray-400">
             {getCategoryIcon(download.category)}
           </div>
         )}
@@ -286,7 +286,7 @@ function DownloadCard({
         {/* Badges */}
         <div className="absolute top-2 left-2 flex space-x-2">
           {featured && (
-            <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
+            <Badge className="bg-yellow-500/20 text-yellow-600 dark:text-yellow-300 border-yellow-500/30">
               <Star className="h-3 w-3 mr-1" />
               Destacado
             </Badge>
@@ -322,24 +322,24 @@ function DownloadCard({
       {/* Información */}
       <CardContent className="p-4 space-y-3">
         <div>
-          <h3 className="text-lg font-semibold text-white group-hover:text-gray-200 transition-colors">
+          <h3 className="text-lg font-semibold text-foreground dark:text-white group-hover:text-primary dark:group-hover:text-gray-200 transition-colors">
             {download.title}
           </h3>
           {download.description && (
-            <p className="text-sm text-gray-400 mt-1 line-clamp-2">
+            <p className="text-sm text-muted-foreground dark:text-gray-400 mt-1 line-clamp-2">
               {download.description}
             </p>
           )}
         </div>
 
         {/* Metadatos */}
-        <div className="flex items-center justify-between text-xs text-gray-500">
+        <div className="flex items-center justify-between text-xs text-muted-foreground dark:text-gray-500">
           <div className="flex items-center space-x-3">
             {download.file_size && (
               <span>{download.file_size}</span>
             )}
             {download.file_format && (
-              <span className="bg-gray-800 px-2 py-1 rounded">
+              <span className="bg-muted dark:bg-gray-800 px-2 py-1 rounded text-foreground dark:text-gray-300">
                 {download.file_format}
               </span>
             )}
@@ -350,7 +350,7 @@ function DownloadCard({
           </div>
         </div>
 
-        <div className="text-xs text-gray-500">
+        <div className="text-xs text-muted-foreground dark:text-gray-500">
           {formatDate(download.created_at)}
         </div>
 
@@ -358,11 +358,11 @@ function DownloadCard({
         <Button
           onClick={() => onDownload(download)}
           disabled={downloading}
-          className="w-full bg-white text-black hover:bg-gray-200"
+          className="w-full bg-foreground text-background hover:bg-foreground/90 dark:bg-white dark:text-black dark:hover:bg-gray-200 transition-colors"
         >
           {downloading ? (
             <div className="flex items-center">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black mr-2"></div>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
               Descargando...
             </div>
           ) : (

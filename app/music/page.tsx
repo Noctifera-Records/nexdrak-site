@@ -234,19 +234,19 @@ export default function MusicPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-24 mt-10">
+      <div className="container mx-auto px-4 py-24 mt-10 text-foreground">
         <div className="max-w-4xl mx-auto mb-12 text-center">
-          <h1 className="text-4xl font-bold mb-4">MUSIC</h1>
-          <p className="text-gray-300">Loading discography...</p>
+          <h1 className="text-4xl font-bold mb-4 text-foreground dark:text-white">MUSIC</h1>
+          <p className="text-muted-foreground dark:text-gray-300">Loading discography...</p>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
-            <Card key={i} className="bg-black/50 backdrop-blur-sm border-white/20">
-              <div className="aspect-square bg-gray-800 animate-pulse" />
+            <Card key={i} className="bg-card/50 dark:bg-black/50 backdrop-blur-sm border-border dark:border-white/20 shadow-sm dark:shadow-none">
+              <div className="aspect-square bg-muted dark:bg-gray-800 animate-pulse" />
               <CardContent className="p-4">
-                <div className="h-6 bg-gray-700 rounded animate-pulse mb-2" />
-                <div className="h-4 bg-gray-700 rounded animate-pulse w-2/3" />
+                <div className="h-6 bg-muted dark:bg-gray-700 rounded animate-pulse mb-2" />
+                <div className="h-4 bg-muted dark:bg-gray-700 rounded animate-pulse w-2/3" />
               </CardContent>
             </Card>
           ))}
@@ -256,7 +256,7 @@ export default function MusicPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-24 mt-10">
+    <div className="container mx-auto px-4 py-24 mt-10 text-foreground">
       {activeTab === 'singles' ? (
         <script
           type="application/ld+json"
@@ -332,72 +332,26 @@ export default function MusicPage() {
         }}
       />
       <div className="max-w-4xl mx-auto mb-12 text-center">
-        <h1 className="text-4xl font-bold mb-4">MUSIC</h1>
-        <p className="text-gray-300 mb-8">Explore NexDrak's complete discography, from albums to singles.</p>
+        <h1 className="text-4xl font-bold mb-4 text-foreground dark:text-white">MUSIC</h1>
+        <p className="text-muted-foreground dark:text-gray-300 mb-8">Explore NexDrak's complete discography, from albums to singles.</p>
         
         {/* Search Bar */}
-        <div style={{ 
-          width: '100%', 
-          maxWidth: '400px', 
-          margin: '0 auto 32px auto'
-        }}>
-          <div style={{ position: 'relative' }}>
+        <div className="w-full max-w-[400px] mx-auto mb-8">
+          <div className="relative">
             <input
               type="text"
               placeholder="Search songs, albums, or artists..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '12px 40px 12px 40px',
-                backgroundColor: 'rgba(31, 41, 55, 0.8)',
-                border: '1px solid rgba(75, 85, 99, 0.6)',
-                borderRadius: '8px',
-                color: 'white',
-                fontSize: '16px',
-                outline: 'none',
-                backdropFilter: 'blur(8px)',
-                transition: 'all 0.2s ease'
-              }}
-              onFocus={(e) => {
-                const target = e.target as HTMLInputElement;
-                target.style.borderColor = 'rgba(156, 163, 175, 0.8)';
-                target.style.backgroundColor = 'rgba(31, 41, 55, 0.9)';
-              }}
-              onBlur={(e) => {
-                const target = e.target as HTMLInputElement;
-                target.style.borderColor = 'rgba(75, 85, 99, 0.6)';
-                target.style.backgroundColor = 'rgba(31, 41, 55, 0.8)';
-              }}
+              className="w-full py-3 px-10 bg-background/80 dark:bg-gray-800/80 border border-input dark:border-gray-600 rounded-lg text-foreground dark:text-white text-base outline-none focus:border-ring focus:bg-background/90 dark:focus:bg-gray-800/90 transition-all backdrop-blur-md placeholder:text-muted-foreground dark:placeholder:text-gray-400"
             />
-            <div style={{
-              position: 'absolute',
-              left: '12px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              color: '#9ca3af',
-              pointerEvents: 'none'
-            }}>
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground dark:text-gray-400 pointer-events-none">
               <Search className="h-5 w-5" />
             </div>
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                style={{
-                  position: 'absolute',
-                  right: '12px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  color: '#9ca3af',
-                  backgroundColor: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: '4px',
-                  borderRadius: '4px',
-                  transition: 'color 0.2s ease'
-                }}
-                onMouseEnter={(e) => (e.target as HTMLButtonElement).style.color = 'white'}
-                onMouseLeave={(e) => (e.target as HTMLButtonElement).style.color = '#9ca3af'}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground dark:text-gray-400 bg-transparent border-none cursor-pointer p-1 rounded hover:text-foreground dark:hover:text-white transition-colors"
                 type="button"
               >
                 <X className="h-5 w-5" />
@@ -405,15 +359,10 @@ export default function MusicPage() {
             )}
           </div>
           {searchQuery && (
-            <div style={{ 
-              fontSize: '14px', 
-              color: '#9ca3af', 
-              marginTop: '8px', 
-              textAlign: 'center' 
-            }}>
+            <div className="text-sm text-muted-foreground dark:text-gray-400 mt-2 text-center">
               Searching for "{searchQuery}"
               {filteredAlbums.length > 0 && filteredSingles.length > 0 && (
-                <span style={{ display: 'block', marginTop: '4px', fontSize: '12px' }}>
+                <span className="block mt-1 text-xs">
                   Found in both Albums ({filteredAlbums.length}) and Singles ({filteredSingles.length})
                 </span>
               )}
@@ -424,27 +373,23 @@ export default function MusicPage() {
 
       {/* Tabs */}
       <div className="flex justify-center mb-8">
-        <div className="bg-black/50 backdrop-blur-sm rounded-lg p-1 border border-white/20 flex">
+        <div className="bg-muted/50 dark:bg-black/50 backdrop-blur-sm rounded-lg p-1 border border-border dark:border-white/20 flex">
           <button
             onClick={() => setActiveTab('singles')}
             className={`px-6 py-2 rounded-md transition-colors flex items-center gap-2 ${
               activeTab === 'singles'
-                ? 'bg-white text-black'
-                : 'text-gray-400 hover:text-white'
+                ? 'bg-background dark:bg-white text-foreground dark:text-black shadow-sm'
+                : 'text-muted-foreground dark:text-gray-400 hover:text-foreground dark:hover:text-white'
             }`}
           >
             <PlayCircle className="h-4 w-4" />
             Singles
             {searchQuery && filteredSingles.length > 0 && (
-              <span style={{
-                backgroundColor: activeTab === 'singles' ? '#000' : '#fff',
-                color: activeTab === 'singles' ? '#fff' : '#000',
-                borderRadius: '12px',
-                padding: '2px 8px',
-                fontSize: '12px',
-                fontWeight: 'bold',
-                marginLeft: '4px'
-              }}>
+              <span className={`ml-1 text-xs font-bold px-2 py-0.5 rounded-full ${
+                activeTab === 'singles' 
+                  ? 'bg-foreground text-background dark:bg-black dark:text-white' 
+                  : 'bg-muted text-foreground dark:bg-white dark:text-black'
+              }`}>
                 {filteredSingles.length}
               </span>
             )}
@@ -453,22 +398,18 @@ export default function MusicPage() {
             onClick={() => setActiveTab('albums')}
             className={`px-6 py-2 rounded-md transition-colors flex items-center gap-2 ${
               activeTab === 'albums'
-                ? 'bg-white text-black'
-                : 'text-gray-400 hover:text-white'
+                ? 'bg-background dark:bg-white text-foreground dark:text-black shadow-sm'
+                : 'text-muted-foreground dark:text-gray-400 hover:text-foreground dark:hover:text-white'
             }`}
           >
             <Disc className="h-4 w-4" />
             Albums
             {searchQuery && filteredAlbums.length > 0 && (
-              <span style={{
-                backgroundColor: activeTab === 'albums' ? '#000' : '#fff',
-                color: activeTab === 'albums' ? '#fff' : '#000',
-                borderRadius: '12px',
-                padding: '2px 8px',
-                fontSize: '12px',
-                fontWeight: 'bold',
-                marginLeft: '4px'
-              }}>
+              <span className={`ml-1 text-xs font-bold px-2 py-0.5 rounded-full ${
+                activeTab === 'albums' 
+                  ? 'bg-foreground text-background dark:bg-black dark:text-white' 
+                  : 'bg-muted text-foreground dark:bg-white dark:text-black'
+              }`}>
                 {filteredAlbums.length}
               </span>
             )}
@@ -482,11 +423,11 @@ export default function MusicPage() {
           {albumsLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(3)].map((_, i) => (
-                <Card key={i} className="bg-black/50 backdrop-blur-sm border-white/20">
-                  <div className="aspect-video bg-gray-800 animate-pulse" />
+                <Card key={i} className="bg-card/50 dark:bg-black/50 backdrop-blur-sm border-border dark:border-white/20 shadow-sm dark:shadow-none">
+                  <div className="aspect-video bg-muted dark:bg-gray-800 animate-pulse" />
                   <CardContent className="p-4">
-                    <div className="h-6 bg-gray-700 rounded animate-pulse mb-2" />
-                    <div className="h-4 bg-gray-700 rounded animate-pulse w-2/3" />
+                    <div className="h-6 bg-muted dark:bg-gray-700 rounded animate-pulse mb-2" />
+                    <div className="h-4 bg-muted dark:bg-gray-700 rounded animate-pulse w-2/3" />
                   </CardContent>
                 </Card>
               ))}
@@ -494,11 +435,11 @@ export default function MusicPage() {
           ) : filteredAlbums.length > 0 ? (
             <div className="space-y-8">
               {filteredAlbums.map((album, index) => (
-                <Card key={index} className="bg-black/50 backdrop-blur-sm border-white/20 overflow-hidden">
+                <Card key={index} className="bg-card/50 dark:bg-black/50 backdrop-blur-sm border-border dark:border-white/20 overflow-hidden shadow-sm dark:shadow-none">
                   <CardContent className="p-6">
                     <div className="flex flex-col lg:flex-row gap-6">
                       {album.cover_image_url && (
-                        <div className="relative w-full lg:w-64 h-64 bg-gray-800 rounded-lg overflow-hidden">
+                        <div className="relative w-full lg:w-64 h-64 bg-muted dark:bg-gray-800 rounded-lg overflow-hidden">
                           <Image
                             src={album.cover_image_url}
                             alt={album.name}
@@ -508,36 +449,36 @@ export default function MusicPage() {
                         </div>
                       )}
                       <div className="flex-1">
-                        <h2 className="text-3xl font-bold mb-2 text-white">{album.name}</h2>
+                        <h2 className="text-3xl font-bold mb-2 text-foreground dark:text-white">{album.name}</h2>
                         {album.artist && (
-                          <p className="text-gray-400 mb-2 text-lg">{album.artist}</p>
+                          <p className="text-muted-foreground dark:text-gray-400 mb-2 text-lg">{album.artist}</p>
                         )}
                         {album.release_date && (
-                          <div className="flex items-center text-gray-500 mb-6">
+                          <div className="flex items-center text-muted-foreground dark:text-gray-500 mb-6">
                             <Calendar className="h-4 w-4 mr-2" />
                             {formatDate(album.release_date)}
                           </div>
                         )}
                         <div className="space-y-2">
                           {album.songs.map((song) => (
-                            <div key={song.id} className="flex items-center justify-between p-3 hover:bg-white/5 rounded-lg transition-colors">
+                            <div key={song.id} className="flex items-center justify-between p-3 hover:bg-muted dark:hover:bg-white/5 rounded-lg transition-colors">
                               <div className="flex items-center gap-4">
-                                <span className="text-gray-500 w-8 text-center">{song.track_number}</span>
-                                <span className="text-white">{song.title}</span>
+                                <span className="text-muted-foreground dark:text-gray-500 w-8 text-center">{song.track_number}</span>
+                                <span className="text-foreground dark:text-white">{song.title}</span>
                               </div>
                               <div className="flex items-center gap-2">
                                 <Button
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => handleShare(song)}
-                                  className="text-gray-400 hover:text-white"
+                                  className="text-muted-foreground hover:text-foreground dark:text-gray-400 dark:hover:text-white"
                                 >
                                   <Share2 className="h-4 w-4" />
                                 </Button>
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  className="border-white/50 text-white hover:bg-white/20"
+                                  className="border-foreground/50 text-foreground hover:bg-foreground/10 dark:border-white/50 dark:text-white dark:hover:bg-white/20"
                                   asChild
                                 >
                                   <a 
@@ -561,16 +502,16 @@ export default function MusicPage() {
             </div>
           ) : (
             <div className="text-center py-12">
-              <Disc className="h-16 w-16 text-gray-600 mx-auto mb-4" />
+              <Disc className="h-16 w-16 text-muted-foreground dark:text-gray-600 mx-auto mb-4" />
               {searchQuery ? (
                 <>
-                  <p className="text-gray-400 text-lg">No albums found for "{searchQuery}"</p>
-                  <p className="text-gray-500 text-sm">Try searching with different keywords</p>
+                  <p className="text-muted-foreground dark:text-gray-400 text-lg">No albums found for "{searchQuery}"</p>
+                  <p className="text-muted-foreground/80 dark:text-gray-500 text-sm">Try searching with different keywords</p>
                 </>
               ) : (
                 <>
-                  <p className="text-gray-400 text-lg">No albums available</p>
-                  <p className="text-gray-500 text-sm">Albums will appear here when added</p>
+                  <p className="text-muted-foreground dark:text-gray-400 text-lg">No albums available</p>
+                  <p className="text-muted-foreground/80 dark:text-gray-500 text-sm">Albums will appear here when added</p>
                 </>
               )}
             </div>
@@ -584,8 +525,8 @@ export default function MusicPage() {
           {filteredSingles.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredSingles.map((song) => (
-                <Card key={song.id} className="bg-black/50 backdrop-blur-sm border-white/20 overflow-hidden group hover:border-white/40 transition-all">
-                  <div className="relative aspect-square bg-gray-800">
+                <Card key={song.id} className="bg-card/50 dark:bg-black/50 backdrop-blur-sm border-border dark:border-white/20 overflow-hidden group hover:border-foreground/40 dark:hover:border-white/40 transition-all shadow-sm dark:shadow-none">
+                  <div className="relative aspect-square bg-muted dark:bg-gray-800">
                     {song.cover_image_url ? (
                       <Image
                         src={song.cover_image_url}
@@ -595,7 +536,7 @@ export default function MusicPage() {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <Music className="h-16 w-16 text-gray-600" />
+                        <Music className="h-16 w-16 text-muted-foreground dark:text-gray-600" />
                       </div>
                     )}
                     
@@ -620,16 +561,16 @@ export default function MusicPage() {
 
                   <CardContent className="p-4">
                     <div className="space-y-2">
-                      <h3 className="text-xl font-bold text-white group-hover:text-gray-200 transition-colors">
+                      <h3 className="text-xl font-bold text-foreground dark:text-white group-hover:text-primary dark:group-hover:text-gray-200 transition-colors">
                         {song.title}
                       </h3>
                       
                       {song.artist && (
-                        <p className="text-gray-400">{song.artist}</p>
+                        <p className="text-muted-foreground dark:text-gray-400">{song.artist}</p>
                       )}
 
                       {song.release_date && (
-                        <div className="flex items-center text-sm text-gray-500">
+                        <div className="flex items-center text-sm text-muted-foreground/80 dark:text-gray-500">
                           <Calendar className="h-4 w-4 mr-2" />
                           {formatDate(song.release_date)}
                         </div>
@@ -639,7 +580,7 @@ export default function MusicPage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="border-white/50 text-white hover:bg-white/20 flex-1 mr-2"
+                          className="border-foreground/50 text-foreground hover:bg-foreground/10 dark:border-white/50 dark:text-white dark:hover:bg-white/20 flex-1 mr-2"
                           asChild
                         >
                           <a 
@@ -656,7 +597,7 @@ export default function MusicPage() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleShare(song)}
-                          className="text-white hover:bg-white/20"
+                          className="text-foreground hover:bg-muted dark:text-white dark:hover:bg-white/20"
                         >
                           <Share2 className="h-4 w-4" />
                         </Button>
@@ -668,16 +609,16 @@ export default function MusicPage() {
             </div>
           ) : (
             <div className="text-center py-12">
-              <PlayCircle className="h-16 w-16 text-gray-600 mx-auto mb-4" />
+              <PlayCircle className="h-16 w-16 text-muted-foreground dark:text-gray-600 mx-auto mb-4" />
               {searchQuery ? (
                 <>
-                  <p className="text-gray-400 text-lg">No singles found for "{searchQuery}"</p>
-                  <p className="text-gray-500 text-sm">Try searching with different keywords</p>
+                  <p className="text-muted-foreground dark:text-gray-400 text-lg">No singles found for "{searchQuery}"</p>
+                  <p className="text-muted-foreground/80 dark:text-gray-500 text-sm">Try searching with different keywords</p>
                 </>
               ) : (
                 <>
-                  <p className="text-gray-400 text-lg">No singles available</p>
-                  <p className="text-gray-500 text-sm">Singles will appear here when added</p>
+                  <p className="text-muted-foreground dark:text-gray-400 text-lg">No singles available</p>
+                  <p className="text-muted-foreground/80 dark:text-gray-500 text-sm">Singles will appear here when added</p>
                 </>
               )}
             </div>
@@ -686,13 +627,13 @@ export default function MusicPage() {
       )}
 
       {/* Licensing section */}
-      <div className="max-w-2xl mx-auto p-8 bg-black/50 backdrop-blur-sm border border-white/20 rounded-xl text-center">
-        <h2 className="text-2xl font-bold mb-4">LICENSING</h2>
-        <p className="text-gray-300 mb-6">
+      <div className="max-w-2xl mx-auto p-8 bg-card/50 dark:bg-black/50 backdrop-blur-sm border border-border dark:border-white/20 rounded-xl text-center shadow-sm dark:shadow-none">
+        <h2 className="text-2xl font-bold mb-4 text-foreground dark:text-white">LICENSING</h2>
+        <p className="text-muted-foreground dark:text-gray-300 mb-6">
           Interested in licensing NexDrak's music for your project, film, or commercial? 
           Get in touch with our licensing team.
         </p>
-        <Button className="bg-white hover:bg-gray-200 text-black">
+        <Button className="bg-foreground text-background hover:bg-foreground/90 dark:bg-white dark:hover:bg-gray-200 dark:text-black transition-colors">
           CONTACT FOR LICENSING
         </Button>
       </div>

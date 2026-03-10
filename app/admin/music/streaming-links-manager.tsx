@@ -314,15 +314,15 @@ export function StreamingLinksManager({ song, streamingLinks, onClose }: Streami
           </div>
 
           {error && (
-            <div className="bg-red-900/20 border border-red-500 text-red-200 px-4 py-3 rounded">
+            <div className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded">
               {error}
             </div>
           )}
 
           {/* Info */}
-          <div className="bg-blue-900/20 border border-blue-500 text-blue-200 px-4 py-3 rounded text-sm">
+          <div className="bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 px-4 py-3 rounded text-sm">
             <p className="font-medium mb-1">💡 Tips:</p>
-            <ul className="list-disc list-inside space-y-1 text-xs">
+            <ul className="list-disc list-inside space-y-1 text-xs opacity-90">
               <li>The primary link will be used for the main "LISTEN NOW" button</li>
               <li>All links will appear in the "Available on" section</li>
               <li>You can only have one link per platform per song</li>

@@ -84,6 +84,28 @@ const config = {
         "pixel-float": {
           "0%, 100%": { transform: "translate(-50%, -50%) translateY(0)" },
           "50%": { transform: "translate(-50%, -50%) translateY(-10px)" },
+        },
+        "logo-arrive": {
+          "0%": { 
+            opacity: "0",
+            transform: "scale(0.5) translateY(100px)",
+            filter: "blur(20px)"
+          },
+          "100%": { 
+            opacity: "1",
+            transform: "scale(1) translateY(0)",
+            filter: "blur(0)"
+          }
+        },
+        "fade-in-up": {
+          "0%": {
+            opacity: "0",
+            transform: "translateY(20px)"
+          },
+          "100%": {
+            opacity: "1",
+            transform: "translateY(0)"
+          }
         }
       },
       animation: {
@@ -93,6 +115,8 @@ const config = {
         "ken-burns": "ken-burns 30s ease-in-out infinite alternate",
         "pulse-glow": "pulse-glow 8s ease-in-out infinite",
         "pixel-float": "pixel-float 3s ease-in-out infinite",
+        "logo-arrive": "logo-arrive 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards",
+        "fade-in-up": "fade-in-up 0.8s ease-out forwards",
       },
     },
   },

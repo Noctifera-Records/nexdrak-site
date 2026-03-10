@@ -76,14 +76,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-white">Loading...</div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-foreground">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-900">
+    <div className="flex min-h-screen bg-background">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
@@ -96,19 +96,19 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       <aside
         className={`
         fixed lg:static inset-y-0 left-0 z-50
-        w-64 bg-gray-900 border-r border-gray-700 text-white flex flex-col
+        w-64 bg-card border-r border-border text-foreground flex flex-col
         transform transition-transform duration-300 ease-in-out
         ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-700">
+        <div className="flex items-center justify-between p-6 border-b border-border">
           <h2 className="text-xl font-bold">Admin Panel</h2>
           <Button
             variant="ghost"
             size="sm"
             onClick={closeSidebar}
-            className="lg:hidden text-white hover:bg-gray-800"
+            className="lg:hidden text-foreground hover:bg-muted"
           >
             <X className="h-5 w-5" />
           </Button>
@@ -128,8 +128,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors
                   ${
                     isActive
-                      ? "bg-blue-600 text-white"
-                      : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   }
                 `}
               >
@@ -141,21 +141,21 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         </nav>
 
         {/* User info and logout */}
-        <div className="border-t border-gray-700 p-4 space-y-3">
+        <div className="border-t border-border p-4 space-y-3">
           <div className="flex items-center space-x-3 px-2">
-            <div className="bg-gray-700 rounded-full p-2 flex-shrink-0">
+            <div className="bg-muted rounded-full p-2 flex-shrink-0">
               <User className="h-4 w-4" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">
+              <p className="text-sm font-medium text-foreground truncate">
                 {user?.email}
               </p>
-              <p className="text-xs text-gray-400">Admin</p>
+              <p className="text-xs text-muted-foreground">Admin</p>
             </div>
           </div>
 
           <LogoutButton
-            className="w-full justify-start hover:bg-gray-800 text-white"
+            className="w-full justify-start hover:bg-muted text-foreground"
             variant="ghost"
           />
         </div>
@@ -164,23 +164,23 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile header */}
-        <header className="lg:hidden bg-gray-800 border-b border-gray-700 p-4">
+        <header className="lg:hidden bg-card border-b border-border p-4">
           <div className="flex items-center justify-between">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setSidebarOpen(true)}
-              className="text-white hover:bg-gray-700"
+              className="text-foreground hover:bg-muted"
             >
               <Menu className="h-5 w-5" />
             </Button>
-            <h1 className="text-lg font-semibold text-white">Admin Panel</h1>
+            <h1 className="text-lg font-semibold text-foreground">Admin Panel</h1>
             <div className="w-10" /> {/* Spacer for centering */}
           </div>
         </header>
 
         {/* Page content */}
-        <main className="flex-1 bg-gray-800 text-white overflow-auto">
+        <main className="flex-1 bg-background text-foreground overflow-auto">
           <div className="p-4 lg:p-8">{children}</div>
         </main>
       </div>

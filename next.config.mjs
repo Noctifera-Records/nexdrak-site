@@ -193,6 +193,11 @@ const nextConfig = {
   async redirects() {
     return [
       {
+        source: "/press",
+        destination: "/press-kit",
+        permanent: true,
+      },
+      {
         source: "/playgroud",
         destination: "/playground",
         permanent: false,

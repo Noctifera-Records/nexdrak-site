@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 // @ts-ignore - CSS module import has no type declarations
-// import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeProvider } from "@/components/theme-provider"
 import Navbar from "@/components/navbar"
 // import BackgroundAnimation from "@/components/background-animation"
 import { NotificationProvider } from "@/components/notification-system"
@@ -21,11 +21,11 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   metadataBase: new URL('https://nexdrak.com'),
   title: {
-    default: 'NexDrak | Electronic Music Artist',
+    default: 'NexDrak',
     template: '%s | NexDrak',
   },
   description: 'Official website of NexDrak. Listen to the latest electronic music releases, check upcoming events, and get exclusive merchandise.',
-  keywords: ['Electronic Music', 'NexDrak', 'DJ', 'Producer', 'Techno', 'House', 'Music Events'],
+  keywords: ['Electronic Music', 'NexDrak', 'DJ', 'Producer', 'Techno', 'House', 'Music Events', 'Dubstep'],
   authors: [{ name: 'NexDrak' }],
   creator: 'NexDrak',
   openGraph: {
@@ -88,7 +88,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="dark scroll-smooth">
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <head>
         <link
           rel="stylesheet"
@@ -96,8 +96,14 @@ export default function RootLayout({
         />
         <StructuredData />
       </head>
-      <body className={`${inter.className} min-h-screen bg-black text-white antialiased overflow-x-hidden selection:bg-purple-500/30 selection:text-purple-200`}>
+      <body className={`${inter.className} min-h-screen bg-white dark:bg-black text-black dark:text-white antialiased overflow-x-hidden selection:bg-purple-500/30 selection:text-purple-900 dark:selection:text-purple-200 transition-colors duration-300`}>
         <ErrorBoundary>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem={false}
+            disableTransitionOnChange
+          >
             <NotificationProvider>
               {/* <ResourcePreloader /> */}
               {/* <WebVitals /> */}
@@ -113,6 +119,7 @@ export default function RootLayout({
                 <Toaster />
               {/* </HydrationFix> */}
             </NotificationProvider>
+          </ThemeProvider>
         </ErrorBoundary>
       </body>
     </html>

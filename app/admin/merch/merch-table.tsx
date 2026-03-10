@@ -98,9 +98,9 @@ export function MerchTable({ items, onEdit, onDelete }: MerchTableProps) {
                 </thead>
                 <tbody>
                   {items.map((item) => (
-                    <tr key={item.id} className="border-b hover:bg-gray-50 dark:hover:bg-gray-800">
+                    <tr key={item.id} className="border-b border-border hover:bg-muted/50">
                       <td className="p-2">
-                        <div className="w-12 h-12 relative bg-gray-200 rounded">
+                        <div className="w-12 h-12 relative bg-muted rounded">
                           {item.image_url ? (
                             <Image
                               src={item.image_url}
@@ -109,7 +109,7 @@ export function MerchTable({ items, onEdit, onDelete }: MerchTableProps) {
                               className="object-cover rounded"
                             />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+                            <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
                               No img
                             </div>
                           )}
@@ -117,14 +117,14 @@ export function MerchTable({ items, onEdit, onDelete }: MerchTableProps) {
                       </td>
                       <td className="p-2">
                         <div>
-                          <p className="font-medium">{item.name}</p>
+                          <p className="font-medium text-foreground">{item.name}</p>
                           {item.description && (
-                            <p className="text-sm text-gray-500 line-clamp-1">{item.description}</p>
+                            <p className="text-sm text-muted-foreground line-clamp-1">{item.description}</p>
                           )}
                         </div>
                       </td>
                       <td className="p-2">
-                        <span className="font-semibold">${item.price}</span>
+                        <span className="font-semibold text-foreground">${item.price}</span>
                       </td>
                       <td className="p-2">
                         <Badge variant="secondary">{item.category}</Badge>
@@ -135,7 +135,7 @@ export function MerchTable({ items, onEdit, onDelete }: MerchTableProps) {
                           size="sm"
                           onClick={() => toggleAvailability(item)}
                           disabled={updatingAvailability === item.id}
-                          className={item.is_available ? 'text-green-600' : 'text-red-600'}
+                          className={item.is_available ? 'text-green-500' : 'text-destructive'}
                         >
                           {updatingAvailability === item.id ? (
                             <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -146,7 +146,7 @@ export function MerchTable({ items, onEdit, onDelete }: MerchTableProps) {
                           )}
                         </Button>
                       </td>
-                      <td className="p-2 text-sm text-gray-500">
+                      <td className="p-2 text-sm text-muted-foreground">
                         {formatDate(item.created_at)}
                       </td>
                       <td className="p-2">
@@ -162,7 +162,7 @@ export function MerchTable({ items, onEdit, onDelete }: MerchTableProps) {
                               rel="noopener noreferrer"
                               title="Ver enlace de compra"
                             >
-                              <ExternalLink className="h-4 w-4" />
+                              <ExternalLink className="h-4 w-4 text-muted-foreground" />
                             </a>
                           </Button>
                           <Button
@@ -170,13 +170,13 @@ export function MerchTable({ items, onEdit, onDelete }: MerchTableProps) {
                             size="sm"
                             onClick={() => onEdit(item)}
                           >
-                            <Edit className="h-4 w-4" />
+                            <Edit className="h-4 w-4 text-muted-foreground" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => onDelete(item.id)}
-                            className="text-red-600 hover:text-red-700"
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -197,7 +197,7 @@ export function MerchTable({ items, onEdit, onDelete }: MerchTableProps) {
           <Card key={item.id}>
             <CardContent className="p-4">
               <div className="flex gap-4">
-                <div className="w-16 h-16 relative bg-gray-200 rounded flex-shrink-0">
+                <div className="w-16 h-16 relative bg-muted rounded flex-shrink-0">
                   {item.image_url ? (
                     <Image
                       src={item.image_url}
@@ -206,7 +206,7 @@ export function MerchTable({ items, onEdit, onDelete }: MerchTableProps) {
                       className="object-cover rounded"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+                    <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
                       No img
                     </div>
                   )}
@@ -214,13 +214,13 @@ export function MerchTable({ items, onEdit, onDelete }: MerchTableProps) {
                 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-medium truncate">{item.name}</h3>
+                    <h3 className="font-medium truncate text-foreground">{item.name}</h3>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => toggleAvailability(item)}
                       disabled={updatingAvailability === item.id}
-                      className={item.is_available ? 'text-green-600' : 'text-red-600'}
+                      className={item.is_available ? 'text-green-500' : 'text-destructive'}
                     >
                       {updatingAvailability === item.id ? (
                         <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -233,15 +233,15 @@ export function MerchTable({ items, onEdit, onDelete }: MerchTableProps) {
                   </div>
                   
                   {item.description && (
-                    <p className="text-sm text-gray-500 mb-2 line-clamp-2">{item.description}</p>
+                    <p className="text-sm text-muted-foreground mb-2 line-clamp-2">{item.description}</p>
                   )}
                   
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="font-semibold">${item.price}</span>
+                    <span className="font-semibold text-foreground">${item.price}</span>
                     <Badge variant="secondary" className="text-xs">{item.category}</Badge>
                   </div>
                   
-                  <p className="text-xs text-gray-500 mb-3">
+                  <p className="text-xs text-muted-foreground mb-3">
                     Creado: {formatDate(item.created_at)}
                   </p>
                   
@@ -272,7 +272,7 @@ export function MerchTable({ items, onEdit, onDelete }: MerchTableProps) {
                       variant="outline"
                       size="sm"
                       onClick={() => onDelete(item.id)}
-                      className="text-red-600 hover:text-red-700"
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

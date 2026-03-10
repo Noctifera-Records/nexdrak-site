@@ -19,11 +19,11 @@ export default function LoadingSpinner({
 
   if (variant === "audio") {
     // Audio wave animation
-    const barClass = "bg-white w-1 mx-0.5 rounded-full animate-audio-wave";
+    const barClass = "bg-current w-1 mx-0.5 rounded-full animate-audio-wave";
     const height = size === "sm" ? "h-3" : size === "md" ? "h-6" : "h-10";
     
     return (
-      <div className={`flex items-end justify-center ${height} ${className}`} role="status" aria-label="Loading">
+      <div className={`flex items-end justify-center ${height} ${className} text-foreground dark:text-white`} role="status" aria-label="Loading">
         <div className={`${barClass}`} style={{ animationDuration: "1s", animationDelay: "0.0s", height: "40%" }}></div>
         <div className={`${barClass}`} style={{ animationDuration: "1.2s", animationDelay: "0.1s", height: "100%" }}></div>
         <div className={`${barClass}`} style={{ animationDuration: "0.8s", animationDelay: "0.2s", height: "60%" }}></div>
@@ -35,25 +35,25 @@ export default function LoadingSpinner({
 
   if (variant === "pulse") {
     return (
-      <div className={`flex items-center justify-center ${className}`}>
-        <div className={`${sizeClasses[size]} bg-white/20 rounded-full animate-pulse`} />
+      <div className={`flex items-center justify-center ${className} text-foreground dark:text-white`}>
+        <div className={`${sizeClasses[size]} bg-current/20 rounded-full animate-pulse`} />
       </div>
     )
   }
 
   if (variant === "dots") {
     return (
-      <div className={`flex items-center justify-center space-x-1 ${className}`}>
-        <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-        <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-        <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+      <div className={`flex items-center justify-center space-x-1 ${className} text-foreground dark:text-white`}>
+        <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+        <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+        <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
       </div>
     )
   }
 
   return (
-    <div className={`flex items-center justify-center ${className}`} role="status" aria-label="Loading">
-      <div className={`${sizeClasses[size]} border-2 border-white/20 border-t-white rounded-full animate-spin`} />
+    <div className={`flex items-center justify-center ${className} text-foreground dark:text-white`} role="status" aria-label="Loading">
+      <div className={`${sizeClasses[size]} border-2 border-current/20 border-t-current rounded-full animate-spin`} />
     </div>
   )
 }

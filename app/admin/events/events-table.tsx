@@ -139,9 +139,9 @@ export function EventsTable({ events, onEdit, onDelete }: EventsTableProps) {
                 </thead>
                 <tbody>
                   {events.map((event) => (
-                    <tr key={event.id} className="border-b hover:bg-gray-50 dark:hover:bg-gray-800">
+                    <tr key={event.id} className="border-b border-border hover:bg-muted/50">
                       <td className="p-2">
-                        <div className="w-12 h-12 relative bg-gray-200 rounded">
+                        <div className="w-12 h-12 relative bg-muted rounded">
                           {event.image_url ? (
                             <Image
                               src={event.image_url}
@@ -150,7 +150,7 @@ export function EventsTable({ events, onEdit, onDelete }: EventsTableProps) {
                               className="object-cover rounded"
                             />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-400">
+                            <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                               <Calendar className="h-6 w-6" />
                             </div>
                           )}
@@ -158,17 +158,17 @@ export function EventsTable({ events, onEdit, onDelete }: EventsTableProps) {
                       </td>
                       <td className="p-2">
                         <div>
-                          <p className="font-medium">{event.title}</p>
+                          <p className="font-medium text-foreground">{event.title}</p>
                           {event.venue && (
-                            <p className="text-sm text-gray-500">{event.venue}</p>
+                            <p className="text-sm text-muted-foreground">{event.venue}</p>
                           )}
                         </div>
                       </td>
                       <td className="p-2">
                         <div>
-                          <p className="text-sm">{formatDate(event.date)}</p>
+                          <p className="text-sm text-foreground">{formatDate(event.date)}</p>
                           {event.time && (
-                            <p className="text-xs text-gray-500">{formatTime(event.time)}</p>
+                            <p className="text-xs text-muted-foreground">{formatTime(event.time)}</p>
                           )}
                           {isUpcoming(event.date) && (
                             <Badge variant="secondary" className="text-xs mt-1">Próximo</Badge>
@@ -176,7 +176,7 @@ export function EventsTable({ events, onEdit, onDelete }: EventsTableProps) {
                         </div>
                       </td>
                       <td className="p-2">
-                        <p className="text-sm">{event.location || '-'}</p>
+                        <p className="text-sm text-foreground">{event.location || '-'}</p>
                       </td>
                       <td className="p-2">
                         <div className="flex items-center gap-2">
@@ -185,7 +185,7 @@ export function EventsTable({ events, onEdit, onDelete }: EventsTableProps) {
                             size="sm"
                             onClick={() => togglePublished(event)}
                             disabled={updatingStatus === event.id}
-                            className={event.is_published ? 'text-green-600' : 'text-red-600'}
+                            className={event.is_published ? 'text-green-500' : 'text-destructive'}
                           >
                             {updatingStatus === event.id ? (
                               <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -200,7 +200,7 @@ export function EventsTable({ events, onEdit, onDelete }: EventsTableProps) {
                             size="sm"
                             onClick={() => toggleFeatured(event)}
                             disabled={updatingFeatured === event.id}
-                            className={event.is_featured ? 'text-yellow-600' : 'text-gray-400'}
+                            className={event.is_featured ? 'text-yellow-500' : 'text-muted-foreground'}
                           >
                             {updatingFeatured === event.id ? (
                               <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -226,7 +226,7 @@ export function EventsTable({ events, onEdit, onDelete }: EventsTableProps) {
                                 rel="noopener noreferrer"
                                 title="Ver tickets"
                               >
-                                <ExternalLink className="h-4 w-4" />
+                                <ExternalLink className="h-4 w-4 text-muted-foreground" />
                               </a>
                             </Button>
                           )}
@@ -235,13 +235,13 @@ export function EventsTable({ events, onEdit, onDelete }: EventsTableProps) {
                             size="sm"
                             onClick={() => onEdit(event)}
                           >
-                            <Edit className="h-4 w-4" />
+                            <Edit className="h-4 w-4 text-muted-foreground" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => onDelete(event.id)}
-                            className="text-red-600 hover:text-red-700"
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -262,7 +262,7 @@ export function EventsTable({ events, onEdit, onDelete }: EventsTableProps) {
           <Card key={event.id}>
             <CardContent className="p-4">
               <div className="flex gap-4">
-                <div className="w-16 h-16 relative bg-gray-200 rounded flex-shrink-0">
+                <div className="w-16 h-16 relative bg-muted rounded flex-shrink-0">
                   {event.image_url ? (
                     <Image
                       src={event.image_url}
@@ -271,7 +271,7 @@ export function EventsTable({ events, onEdit, onDelete }: EventsTableProps) {
                       className="object-cover rounded"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                    <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                       <Calendar className="h-8 w-8" />
                     </div>
                   )}
@@ -280,9 +280,9 @@ export function EventsTable({ events, onEdit, onDelete }: EventsTableProps) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between mb-2">
                     <div>
-                      <h3 className="font-medium truncate">{event.title}</h3>
+                      <h3 className="font-medium truncate text-foreground">{event.title}</h3>
                       {event.venue && (
-                        <p className="text-sm text-gray-600">{event.venue}</p>
+                        <p className="text-sm text-muted-foreground">{event.venue}</p>
                       )}
                     </div>
                     <div className="flex items-center gap-1">
@@ -291,7 +291,7 @@ export function EventsTable({ events, onEdit, onDelete }: EventsTableProps) {
                         size="sm"
                         onClick={() => togglePublished(event)}
                         disabled={updatingStatus === event.id}
-                        className={event.is_published ? 'text-green-600' : 'text-red-600'}
+                        className={event.is_published ? 'text-green-500' : 'text-destructive'}
                       >
                         {updatingStatus === event.id ? (
                           <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -306,7 +306,7 @@ export function EventsTable({ events, onEdit, onDelete }: EventsTableProps) {
                         size="sm"
                         onClick={() => toggleFeatured(event)}
                         disabled={updatingFeatured === event.id}
-                        className={event.is_featured ? 'text-yellow-600' : 'text-gray-400'}
+                        className={event.is_featured ? 'text-yellow-500' : 'text-muted-foreground'}
                       >
                         {updatingFeatured === event.id ? (
                           <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -320,12 +320,12 @@ export function EventsTable({ events, onEdit, onDelete }: EventsTableProps) {
                   </div>
                   
                   <div className="mb-2">
-                    <p className="text-sm font-medium">{formatDate(event.date)}</p>
+                    <p className="text-sm font-medium text-foreground">{formatDate(event.date)}</p>
                     {event.time && (
-                      <p className="text-xs text-gray-500">{formatTime(event.time)}</p>
+                      <p className="text-xs text-muted-foreground">{formatTime(event.time)}</p>
                     )}
                     {event.location && (
-                      <p className="text-xs text-gray-500">{event.location}</p>
+                      <p className="text-xs text-muted-foreground">{event.location}</p>
                     )}
                   </div>
                   
@@ -334,7 +334,7 @@ export function EventsTable({ events, onEdit, onDelete }: EventsTableProps) {
                       <Badge variant="secondary" className="text-xs">Próximo</Badge>
                     )}
                     {event.is_featured && (
-                      <Badge className="text-xs bg-yellow-100 text-yellow-800">Destacado</Badge>
+                      <Badge className="text-xs bg-yellow-500/20 text-yellow-500">Destacado</Badge>
                     )}
                     {!event.is_published && (
                       <Badge variant="destructive" className="text-xs">No publicado</Badge>
@@ -370,7 +370,7 @@ export function EventsTable({ events, onEdit, onDelete }: EventsTableProps) {
                       variant="outline"
                       size="sm"
                       onClick={() => onDelete(event.id)}
-                      className="text-red-600 hover:text-red-700"
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

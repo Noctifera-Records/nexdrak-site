@@ -110,7 +110,7 @@ export default function RegisterForm() {
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-4">
         <div>
-          <Label htmlFor="email" className="text-white">Email</Label>
+          <Label htmlFor="email">Email</Label>
           <Input
             id="email"
             name="email"
@@ -118,13 +118,12 @@ export default function RegisterForm() {
             value={formData.email}
             onChange={handleChange}
             placeholder="example@email.com"
-            className="bg-gray-700 border-gray-600 text-white"
             required
           />
         </div>
 
         <div>
-          <Label htmlFor="username" className="text-white">Username</Label>
+          <Label htmlFor="username">Username</Label>
           <Input
             id="username"
             name="username"
@@ -132,13 +131,12 @@ export default function RegisterForm() {
             value={formData.username}
             onChange={handleChange}
             placeholder="your_username"
-            className="bg-gray-700 border-gray-600 text-white"
             required
           />
         </div>
 
         <div>
-          <Label htmlFor="password" className="text-white">Password</Label>
+          <Label htmlFor="password">Password</Label>
           <Input
             id="password"
             name="password"
@@ -146,13 +144,12 @@ export default function RegisterForm() {
             value={formData.password}
             onChange={handleChange}
             placeholder="••••••••"
-            className="bg-gray-700 border-gray-600 text-white"
             required
           />
         </div>
 
         <div>
-          <Label htmlFor="confirmPassword" className="text-white">Confirm Password</Label>
+          <Label htmlFor="confirmPassword">Confirm Password</Label>
           <Input
             id="confirmPassword"
             name="confirmPassword"
@@ -160,7 +157,6 @@ export default function RegisterForm() {
             value={formData.confirmPassword}
             onChange={handleChange}
             placeholder="••••••••"
-            className="bg-gray-700 border-gray-600 text-white"
             required
           />
         </div>
@@ -169,15 +165,15 @@ export default function RegisterForm() {
       <Button
         type="submit"
         disabled={loading}
-        className="w-full bg-white text-black hover:bg-gray-200"
+        className="w-full bg-foreground text-background hover:bg-foreground/90 dark:bg-white dark:text-black dark:hover:bg-gray-200"
       >
         {loading ? 'Creating account...' : 'Create Account'}
       </Button>
 
       <div className="text-center">
-        <p className="text-gray-400">
+        <p className="text-muted-foreground">
           Already have an account?{' '}
-          <Link href="/login" className="text-white hover:underline">
+          <Link href="/login" className="text-foreground hover:underline">
             Sign in
           </Link>
         </p>

@@ -16,7 +16,7 @@ export default function GlobalBackground() {
   if (!settings.hero_background_image) {
     return (
       <div 
-        className="fixed inset-0 -z-20 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-900 via-black to-black opacity-40 pointer-events-none" 
+        className="fixed inset-0 -z-20 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:via-black dark:to-black opacity-100 dark:opacity-40 pointer-events-none transition-colors duration-500" 
         aria-hidden="true" 
       />
     );
@@ -24,16 +24,17 @@ export default function GlobalBackground() {
 
   return (
     <>
+      {/* Background Image - Only visible in dark mode or with reduced opacity in light mode */}
       <div 
-        className="fixed inset-0 -z-20 bg-cover bg-center bg-no-repeat bg-fixed transition-opacity duration-1000 blur-sm"
+        className="fixed inset-0 -z-20 bg-cover bg-center bg-no-repeat bg-fixed transition-all duration-1000 blur-sm opacity-20 dark:opacity-100"
         style={{
           backgroundImage: `url(${settings.hero_background_image})`,
         }}
         aria-hidden="true"
       />
-      {/* Overlay with darkening */}
+      {/* Overlay with darkening for dark mode, lightening for light mode */}
       <div 
-        className="fixed inset-0 -z-10 bg-black/70 transition-all duration-1000"
+        className="fixed inset-0 -z-10 bg-white/80 dark:bg-black/70 transition-all duration-500"
         aria-hidden="true"
       />
     </>

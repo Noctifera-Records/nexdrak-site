@@ -72,17 +72,17 @@ export default function UpcomingEvents({ limit, initialEvents = [] }: UpcomingEv
         {[...Array(limit || 3)].map((_, i) => (
           <Card
             key={i}
-            className="bg-black/50 backdrop-blur-sm border-white/20"
+            className="bg-card/50 dark:bg-black/50 backdrop-blur-sm border-border dark:border-white/20 shadow-sm dark:shadow-none"
           >
             <CardContent className="p-6 space-y-4">
-              <div className="h-6 bg-gray-700 rounded animate-pulse" />
+              <div className="h-6 bg-muted dark:bg-gray-700 rounded animate-pulse" />
               <div className="space-y-2">
-                <div className="h-4 bg-gray-700 rounded animate-pulse" />
-                <div className="h-4 bg-gray-700 rounded animate-pulse w-3/4" />
+                <div className="h-4 bg-muted dark:bg-gray-700 rounded animate-pulse" />
+                <div className="h-4 bg-muted dark:bg-gray-700 rounded animate-pulse w-3/4" />
               </div>
             </CardContent>
             <CardFooter className="px-6 pb-6 pt-0">
-              <div className="h-10 bg-gray-700 rounded animate-pulse w-full" />
+              <div className="h-10 bg-muted dark:bg-gray-700 rounded animate-pulse w-full" />
             </CardFooter>
           </Card>
         ))}
@@ -93,9 +93,9 @@ export default function UpcomingEvents({ limit, initialEvents = [] }: UpcomingEv
   if (events.length === 0) {
     return (
       <div className="text-center py-12">
-        <Calendar className="h-16 w-16 text-gray-600 mx-auto mb-4" />
-        <p className="text-gray-400 text-lg">No upcoming events</p>
-        <p className="text-gray-500 text-sm">
+        <Calendar className="h-16 w-16 text-muted-foreground dark:text-gray-600 mx-auto mb-4" />
+        <p className="text-muted-foreground dark:text-gray-400 text-lg">No upcoming events</p>
+        <p className="text-muted-foreground/80 dark:text-gray-500 text-sm">
           Upcoming events will appear here as they are scheduled.
         </p>
       </div>
@@ -107,14 +107,14 @@ export default function UpcomingEvents({ limit, initialEvents = [] }: UpcomingEv
       {events.map((event) => (
         <Card
           key={event.id}
-          className="bg-black/50 backdrop-blur-sm border-white/20"
+          className="bg-card/50 dark:bg-black/50 backdrop-blur-sm border-border dark:border-white/20 shadow-sm dark:shadow-none transition-colors"
         >
           <CardContent className="p-6 space-y-4">
             <div className="flex justify-between items-start">
-              <h3 className="text-xl font-bold">{event.title}</h3>
+              <h3 className="text-xl font-bold text-foreground dark:text-white">{event.title}</h3>
               <Badge
                 variant="outline"
-                className="bg-blue-500/20 text-blue-300 border-blue-500/50"
+                className="bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-300 border-blue-500/30 dark:border-blue-500/50"
               >
                 NEXT
               </Badge>
@@ -122,13 +122,13 @@ export default function UpcomingEvents({ limit, initialEvents = [] }: UpcomingEv
 
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <CalendarDays className="h-4 w-4 text-white" />
-                <span>{formatDate(event.date)}</span>
+                <CalendarDays className="h-4 w-4 text-muted-foreground dark:text-white" />
+                <span className="text-muted-foreground dark:text-gray-300">{formatDate(event.date)}</span>
               </div>
               {event.location && (
                 <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-white" />
-                  <span>{event.location}</span>
+                  <MapPin className="h-4 w-4 text-muted-foreground dark:text-white" />
+                  <span className="text-muted-foreground dark:text-gray-300">{event.location}</span>
                 </div>
               )}
             </div>
@@ -136,7 +136,7 @@ export default function UpcomingEvents({ limit, initialEvents = [] }: UpcomingEv
           <CardFooter className="px-6 pb-6 pt-0">
             {event.ticket_url ? (
               <Button
-                className="w-full bg-white hover:bg-gray-200 text-black"
+                className="w-full bg-foreground text-background hover:bg-foreground/90 dark:bg-white dark:hover:bg-gray-200 dark:text-black transition-colors"
                 asChild
               >
                 <a
@@ -151,7 +151,7 @@ export default function UpcomingEvents({ limit, initialEvents = [] }: UpcomingEv
               </Button>
             ) : (
               <Button
-                className="w-full bg-gray-700 hover:bg-gray-700 cursor-not-allowed"
+                className="w-full bg-muted text-muted-foreground dark:bg-gray-700 dark:hover:bg-gray-700 cursor-not-allowed"
                 disabled
               >
                 COMING SOON

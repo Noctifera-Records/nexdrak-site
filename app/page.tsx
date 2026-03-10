@@ -31,7 +31,7 @@ export default function Home() {
       <HeroSection />
 
       {/* Content Below Red Line */}
-      <div className="bg-black">
+      <div className="bg-background text-foreground transition-colors duration-300">
         {/* Latest Releases Section */}
         <section className="py-20">
           <div className="container mx-auto px-4">
@@ -44,7 +44,7 @@ export default function Home() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="border-white text-white hover:bg-white hover:text-black tracking-widest"
+                  className="border-foreground text-foreground hover:bg-foreground hover:text-background tracking-widest transition-colors"
                 >
                   VIEW ALL MUSIC
                 </Button>
@@ -54,7 +54,7 @@ export default function Home() {
         </section>
 
         {/* Upcoming Events Preview */}
-        <section className="py-20 bg-black/50">
+        <section className="py-20 bg-muted/30 dark:bg-black/50">
           <div className="container mx-auto px-4">
             <h2 className="text-4xl font-bold mb-12 text-center">
               UPCOMING EVENTS
@@ -64,7 +64,7 @@ export default function Home() {
               <Button
                 asChild
                 variant="outline"
-                className="border-white text-white hover:bg-white/20 rounded-md px-8"
+                className="border-foreground text-foreground hover:bg-foreground/10 dark:hover:bg-white/20 rounded-md px-8 transition-colors"
               >
                 <Link href="/events">VIEW ALL EVENTS</Link>
               </Button>
@@ -78,31 +78,31 @@ export default function Home() {
             <h2 className="text-4xl font-bold mb-12 text-center">EXPLORE</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <Link href="/events" className="group">
-                <div className="bg-black/50 backdrop-blur-sm border border-white/20 rounded-xl p-6 flex flex-col items-center text-center hover:bg-white/10 transition-all h-full">
-                  <CalendarDays className="h-12 w-12 text-white mb-4" />
+                <div className="bg-card/50 dark:bg-black/50 backdrop-blur-sm border border-border dark:border-white/20 rounded-xl p-6 flex flex-col items-center text-center hover:bg-muted dark:hover:bg-white/10 transition-all h-full shadow-sm dark:shadow-none">
+                  <CalendarDays className="h-12 w-12 text-foreground dark:text-white mb-4" />
                   <h3 className="text-xl font-bold mb-2">TOUR DATES</h3>
-                  <p className="text-gray-400">
+                  <p className="text-muted-foreground dark:text-gray-400">
                     Catch NexDrak live at venues around the world
                   </p>
                 </div>
               </Link>
 
               <Link href="/merch" className="group">
-                <div className="bg-black/50 backdrop-blur-sm border border-white/20 rounded-xl p-6 flex flex-col items-center text-center hover:bg-white/10 transition-all h-full">
-                  <ShoppingBag className="h-12 w-12 text-white mb-4" />
+                <div className="bg-card/50 dark:bg-black/50 backdrop-blur-sm border border-border dark:border-white/20 rounded-xl p-6 flex flex-col items-center text-center hover:bg-muted dark:hover:bg-white/10 transition-all h-full shadow-sm dark:shadow-none">
+                  <ShoppingBag className="h-12 w-12 text-foreground dark:text-white mb-4" />
                   <h3 className="text-xl font-bold mb-2">MERCH STORE</h3>
-                  <p className="text-gray-400">
+                  <p className="text-muted-foreground dark:text-gray-400">
                     Official merchandise and limited edition items
                   </p>
                 </div>
               </Link>
 
               <Link href="/music" className="group">
-                <div className="bg-black/50 backdrop-blur-sm border border-white/20 rounded-xl p-6 flex flex-col items-center text-center hover:bg-white/10 transition-all h-full">
-                  <Music className="h-12 w-12 text-white mb-4" />
+                <div className="bg-card/50 dark:bg-black/50 backdrop-blur-sm border border-border dark:border-white/20 rounded-xl p-6 flex flex-col items-center text-center hover:bg-muted dark:hover:bg-white/10 transition-all h-full shadow-sm dark:shadow-none">
+                  <Music className="h-12 w-12 text-foreground dark:text-white mb-4" />
                   <h3 className="text-xl font-bold mb-2">DISCOGRAPHY</h3>
-                  <p className="text-gray-400">
-                    Stream and download the complete collection
+                  <p className="text-muted-foreground dark:text-gray-400">
+                    Listen to the latest tracks and albums
                   </p>
                 </div>
               </Link>
@@ -110,18 +110,23 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Social Links */}
-        <section className="py-20 bg-black/50">
+        {/* Newsletter Section */}
+        <section className="py-20 bg-muted/30 dark:bg-black/50">
           <div className="container mx-auto px-4">
-            <h2 className="text-4xl font-bold mb-12 text-center">CONNECT</h2>
-            <SocialLinks />
+            <h2 className="text-3xl font-bold mb-8 text-center">
+              JOIN THE NEWSLETTER
+            </h2>
+            <div className="max-w-md mx-auto">
+              <Newsletter />
+            </div>
           </div>
         </section>
 
-        {/* Newsletter */}
+        {/* Social Links */}
         <section className="py-20">
-          <div className="container mx-auto px-4">
-            <Newsletter />
+          <div className="container mx-auto px-4 text-center">
+            <h2 className="text-3xl font-bold mb-12">FOLLOW NEXDRAK</h2>
+            <SocialLinks />
           </div>
         </section>
       </div>

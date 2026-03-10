@@ -54,10 +54,10 @@ export default function HydrationFix({ children }: HydrationFixProps) {
   // Show loading state during hydration issues
   if (!isHydrated) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-white">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
-          <p>Loading...</p>
+      <div className="min-h-screen bg-background flex items-center justify-center transition-colors duration-300">
+        <div className="text-foreground">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-current mx-auto mb-4"></div>
+          <p className="text-lg font-medium">Loading...</p>
         </div>
       </div>
     );

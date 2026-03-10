@@ -26,7 +26,7 @@ const defaultSettings: SiteSettings = {
   site_logo_mobile: "/img/logo.png",
   navbar_logo: "/nav-logo.webp",
   site_title: "NexDrak",
-  site_description: "Official website of NexDrak - Electronic Music Artist",
+  site_description: "Official website of NexDrak - Music Artist",
   contact_email: "contact@nexdrak.com",
   booking_email: "mgmt@nexdrak.com",
 };

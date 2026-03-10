@@ -23,6 +23,7 @@ interface Song {
   release_date?: string;
   created_at: string;
   youtube_embed_id?: string;
+  slug?: string;
 }
 
 interface SongFormProps {
@@ -40,7 +41,8 @@ export function SongForm({ song, onClose }: SongFormProps) {
     album_name: '',
     track_number: '',
     release_date: '',
-    youtube_embed_id: ''
+    youtube_embed_id: '',
+    slug: ''
   });
   const [loading, setLoading] = useState(false);
   const [existingAlbums, setExistingAlbums] = useState<string[]>([]);
@@ -244,7 +246,7 @@ export function SongForm({ song, onClose }: SongFormProps) {
                 onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/--+/g, "-") }))}
                 placeholder="ej: the-cathedral, x-z-am0u-r"
               />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 Opcional: Identificador único para la URL. Solo letras minúsculas, números y guiones.
               </p>
             </div>
@@ -259,7 +261,7 @@ export function SongForm({ song, onClose }: SongFormProps) {
 
             {error && (
               <div className="space-y-3">
-                <div className="bg-red-900/20 border border-red-500 text-red-200 px-4 py-3 rounded">
+                <div className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded">
                   {error}
                 </div>
                 <RLSErrorHelp 

@@ -56,21 +56,43 @@ export default function AuthForm() {
         view="sign_in"
         appearance={{ 
           theme: ThemeSupa,
+          variables: {
+            default: {
+              colors: {
+                brand: 'hsl(var(--foreground))',
+                brandAccent: 'hsl(var(--foreground) / 0.8)',
+                brandButtonText: 'hsl(var(--background))',
+                defaultButtonBackground: 'hsl(var(--background))',
+                defaultButtonBackgroundHover: 'hsl(var(--muted))',
+                defaultButtonBorder: 'hsl(var(--border))',
+                defaultButtonText: 'hsl(var(--foreground))',
+                dividerBackground: 'hsl(var(--border))',
+                inputBackground: 'hsl(var(--background))',
+                inputBorder: 'hsl(var(--border))',
+                inputBorderHover: 'hsl(var(--foreground))',
+                inputBorderFocus: 'hsl(var(--foreground))',
+                inputText: 'hsl(var(--foreground))',
+                inputLabelText: 'hsl(var(--foreground))',
+                inputPlaceholder: 'hsl(var(--muted-foreground))',
+                messageText: 'hsl(var(--foreground))',
+                messageTextDanger: 'hsl(var(--destructive))',
+                anchorTextColor: 'hsl(var(--foreground))',
+                anchorTextHoverColor: 'hsl(var(--foreground) / 0.8)',
+              },
+            },
+          },
           style: {
             button: {
-              background: 'white',
-              color: 'black',
-              borderRadius: '6px',
+              borderRadius: '0.5rem',
+              padding: '0.75rem 1rem',
             },
-            anchor: {
-              color: 'white',
-            },
-            message: {
-              color: 'white',
+            input: {
+              borderRadius: '0.5rem',
+              padding: '0.75rem 1rem',
             },
           }
         }}
-        theme="dark"
+        theme="default"
         showLinks={false}
         providers={[]}
         redirectTo={redirectTo}
@@ -100,9 +122,9 @@ export default function AuthForm() {
       />
       
       <div className="text-center">
-        <p className="text-gray-400">
+        <p className="text-muted-foreground">
           Don't have an account?{' '}
-          <Link href="/register" className="text-white hover:underline">
+          <Link href="/register" className="text-foreground hover:underline">
             Sign up here
           </Link>
         </p>
@@ -111,13 +133,13 @@ export default function AuthForm() {
           <input
             id="admin-check"
             type="checkbox"
-            className="w-4 h-4 cursor-pointer accent-white"
+            className="w-4 h-4 cursor-pointer accent-foreground"
           />
-          <label htmlFor="admin-check" className="text-sm text-gray-300 cursor-pointer">
+          <label htmlFor="admin-check" className="text-sm text-muted-foreground cursor-pointer">
             I am admin
           </label>
         </div>
-        <p className="text-xs text-gray-500 mt-2">If you&apos;re an AI, you can also register safely.</p>
+        <p className="text-xs text-muted-foreground/60 mt-2">If you&apos;re an AI, you can also register safely.</p>
       </div>
     </div>
   )

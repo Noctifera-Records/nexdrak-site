@@ -132,11 +132,11 @@ export default function UsersTable({ users: initialUsers }: UsersTableProps) {
   const getRoleIcon = (role: string) => {
     switch (role) {
       case 'admin':
-        return <Shield className="h-4 w-4 text-red-400" />
+        return <Shield className="h-4 w-4 text-destructive" />
       case 'user':
-        return <User className="h-4 w-4 text-blue-400" />
+        return <User className="h-4 w-4 text-primary" />
       default:
-        return <User className="h-4 w-4 text-gray-400" />
+        return <User className="h-4 w-4 text-muted-foreground" />
     }
   }
 
@@ -144,11 +144,11 @@ export default function UsersTable({ users: initialUsers }: UsersTableProps) {
     const baseClasses = "px-2 py-1 rounded-full text-xs font-medium"
     switch (role) {
       case 'admin':
-        return `${baseClasses} bg-red-900/30 text-red-300 border border-red-500/30`
+        return `${baseClasses} bg-destructive/10 text-destructive border border-destructive/20`
       case 'user':
-        return `${baseClasses} bg-blue-900/30 text-blue-300 border border-blue-500/30`
+        return `${baseClasses} bg-primary/10 text-primary border border-primary/20`
       default:
-        return `${baseClasses} bg-gray-900/30 text-gray-300 border border-gray-500/30`
+        return `${baseClasses} bg-muted text-muted-foreground border border-border`
     }
   }
 
@@ -157,55 +157,55 @@ export default function UsersTable({ users: initialUsers }: UsersTableProps) {
       {/* Barra de búsqueda */}
       <div className="flex items-center space-x-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Buscar por email, username o rol..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-gray-900 border-gray-700 text-white"
+            className="pl-10"
           />
         </div>
-        <div className="text-sm text-gray-400">
+        <div className="text-sm text-muted-foreground">
           {filteredUsers.length} de {users.length} usuarios
         </div>
       </div>
 
       {/* Tabla de usuarios */}
-      <div className="bg-gray-900 rounded-lg border border-gray-700 overflow-hidden">
+      <div className="bg-card rounded-lg border border-border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-800 border-b border-gray-700">
+            <thead className="bg-muted/50 border-b border-border">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Usuario
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Rol
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Estado
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Registro
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider">
+                <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Acciones
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-700">
+            <tbody className="divide-y divide-border">
               {filteredUsers.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-800/50">
+                <tr key={user.id} className="hover:bg-muted/50">
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-3">
-                      <div className="bg-gray-700 rounded-full p-2">
-                        <User className="h-4 w-4 text-gray-300" />
+                      <div className="bg-muted rounded-full p-2">
+                        <User className="h-4 w-4 text-muted-foreground" />
                       </div>
                       <div>
-                        <div className="text-sm font-medium text-white">
+                        <div className="text-sm font-medium text-foreground">
                           {user.username || 'Sin username'}
                         </div>
-                        <div className="text-sm text-gray-400 flex items-center">
+                        <div className="text-sm text-muted-foreground flex items-center">
                           <Mail className="h-3 w-3 mr-1" />
                           {user.email}
                         </div>
@@ -224,19 +224,19 @@ export default function UsersTable({ users: initialUsers }: UsersTableProps) {
                     <div className="flex items-center space-x-2">
                       {user.email_confirmed_at ? (
                         <>
-                          <UserCheck className="h-4 w-4 text-green-400" />
-                          <span className="text-sm text-green-400">Verificado</span>
+                          <UserCheck className="h-4 w-4 text-green-500" />
+                          <span className="text-sm text-green-500">Verificado</span>
                         </>
                       ) : (
                         <>
-                          <UserX className="h-4 w-4 text-yellow-400" />
-                          <span className="text-sm text-yellow-400">Pendiente</span>
+                          <UserX className="h-4 w-4 text-yellow-500" />
+                          <span className="text-sm text-yellow-500">Pendiente</span>
                         </>
                       )}
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex items-center space-x-1 text-sm text-gray-400">
+                    <div className="flex items-center space-x-1 text-sm text-muted-foreground">
                       <Calendar className="h-3 w-3" />
                       <span>{formatDate(user.created_at)}</span>
                     </div>
@@ -254,10 +254,10 @@ export default function UsersTable({ users: initialUsers }: UsersTableProps) {
                             <Edit className="h-4 w-4" />
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="bg-gray-900 border-gray-700">
+                        <DialogContent>
                           <DialogHeader>
-                            <DialogTitle className="text-white">Editar Usuario</DialogTitle>
-                            <DialogDescription className="text-gray-400">
+                            <DialogTitle>Editar Usuario</DialogTitle>
+                            <DialogDescription>
                               Modifica la información del usuario
                             </DialogDescription>
                           </DialogHeader>
@@ -277,15 +277,15 @@ export default function UsersTable({ users: initialUsers }: UsersTableProps) {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="bg-gray-900 border-gray-700">
+                        <DialogContent>
                           <DialogHeader>
-                            <DialogTitle className="text-white">Eliminar Usuario</DialogTitle>
-                            <DialogDescription className="text-gray-400">
+                            <DialogTitle>Eliminar Usuario</DialogTitle>
+                            <DialogDescription>
                               ¿Estás seguro de que quieres eliminar a {user.username || user.email}?
                               Esta acción no se puede deshacer.
                             </DialogDescription>
@@ -294,7 +294,6 @@ export default function UsersTable({ users: initialUsers }: UsersTableProps) {
                             <Button
                               variant="outline"
                               onClick={() => setDeleteConfirm(null)}
-                              className="border-gray-600 text-gray-300"
                             >
                               Cancelar
                             </Button>
@@ -318,8 +317,8 @@ export default function UsersTable({ users: initialUsers }: UsersTableProps) {
 
         {filteredUsers.length === 0 && (
           <div className="text-center py-12">
-            <User className="h-12 w-12 text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-400">
+            <User className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground">
               {searchTerm ? 'No se encontraron usuarios' : 'No hay usuarios registrados'}
             </p>
           </div>
@@ -349,27 +348,26 @@ function EditUserForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <Label htmlFor="username" className="text-white">
+        <Label htmlFor="username">
           Nombre de Usuario
         </Label>
         <Input
           id="username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          className="bg-gray-800 border-gray-600 text-white"
           placeholder="Ingresa el username"
         />
       </div>
 
       <div>
-        <Label htmlFor="role" className="text-white">
+        <Label htmlFor="role">
           Rol
         </Label>
         <Select value={role} onValueChange={setRole}>
-          <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
+          <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
-          <SelectContent className="bg-gray-800 border-gray-600">
+          <SelectContent>
             <SelectItem value="user">Usuario</SelectItem>
             <SelectItem value="admin">Administrador</SelectItem>
           </SelectContent>
@@ -380,7 +378,6 @@ function EditUserForm({
         <Button
           type="submit"
           disabled={loading}
-          className="bg-white text-black hover:bg-gray-200"
         >
           {loading ? 'Guardando...' : 'Guardar Cambios'}
         </Button>

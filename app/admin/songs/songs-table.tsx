@@ -217,10 +217,10 @@ export default function SongsTable({ songs: initialSongs }: SongsTableProps) {
               Agregar Canción
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-gray-900 border-gray-700 max-w-2xl">
+          <DialogContent className="bg-card border-border max-w-2xl">
             <DialogHeader>
-              <DialogTitle className="text-white">Nueva Canción</DialogTitle>
-              <DialogDescription className="text-gray-400">
+              <DialogTitle className="text-foreground">Nueva Canción</DialogTitle>
+              <DialogDescription className="text-muted-foreground">
                 Agrega una nueva canción a tu catálogo
               </DialogDescription>
             </DialogHeader>
@@ -234,10 +234,10 @@ export default function SongsTable({ songs: initialSongs }: SongsTableProps) {
         {filteredSongs.map((song) => (
           <div
             key={song.id}
-            className="bg-gray-900 rounded-lg border border-gray-700 overflow-hidden group hover:border-gray-600 transition-all"
+            className="bg-card rounded-lg border border-border overflow-hidden group hover:border-foreground/20 transition-all shadow-sm"
           >
             {/* Imagen de portada */}
-            <div className="aspect-square bg-gray-800 relative">
+            <div className="aspect-square bg-muted relative">
               {song.cover_image_url ? (
                 <Image
                   src={song.cover_image_url}
@@ -247,7 +247,7 @@ export default function SongsTable({ songs: initialSongs }: SongsTableProps) {
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <Music className="h-16 w-16 text-gray-600" />
+                  <Music className="h-16 w-16 text-muted-foreground" />
                 </div>
               )}
 
@@ -274,38 +274,39 @@ export default function SongsTable({ songs: initialSongs }: SongsTableProps) {
             {/* Información */}
             <div className="p-4 space-y-3">
               <div>
-                <h3 className="text-lg font-semibold text-white truncate">
+                <h3 className="text-lg font-semibold text-foreground truncate">
                   {song.title}
                 </h3>
                 {song.artist && (
-                  <div className="flex items-center text-sm text-gray-400 mt-1">
+                  <div className="flex items-center text-sm text-muted-foreground mt-1">
                     <User className="h-3 w-3 mr-1" />
                     {song.artist}
                   </div>
                 )}
-                <div className="text-xs text-gray-500 mt-1">
+                <div className="text-xs text-muted-foreground mt-1">
                   {formatDate(song.created_at)}
                 </div>
               </div>
 
               {/* Acciones */}
-              <div className="flex items-center justify-end space-x-2 pt-2 border-t border-gray-700">
+              <div className="flex items-center justify-end space-x-2 pt-2 border-t border-border">
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => setEditingSong(song)}
+                      className="text-foreground hover:bg-muted"
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="bg-gray-900 border-gray-700 max-w-2xl">
+                  <DialogContent className="bg-card border-border max-w-2xl">
                     <DialogHeader>
-                      <DialogTitle className="text-white">
+                      <DialogTitle className="text-foreground">
                         Editar Canción
                       </DialogTitle>
-                      <DialogDescription className="text-gray-400">
+                      <DialogDescription className="text-muted-foreground">
                         Modifica la información de la canción
                       </DialogDescription>
                     </DialogHeader>
@@ -326,17 +327,17 @@ export default function SongsTable({ songs: initialSongs }: SongsTableProps) {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="bg-gray-900 border-gray-700">
+                  <DialogContent className="bg-card border-border">
                     <DialogHeader>
-                      <DialogTitle className="text-white">
+                      <DialogTitle className="text-foreground">
                         Eliminar Canción
                       </DialogTitle>
-                      <DialogDescription className="text-gray-400">
+                      <DialogDescription className="text-muted-foreground">
                         ¿Estás seguro de que quieres eliminar "{song.title}"?
                         Esta acción no se puede deshacer.
                       </DialogDescription>
@@ -344,7 +345,7 @@ export default function SongsTable({ songs: initialSongs }: SongsTableProps) {
                     <DialogFooter>
                       <Button
                         variant="outline"
-                        className="border-gray-600 text-gray-300"
+                        className="border-input text-foreground"
                       >
                         Cancelar
                       </Button>
@@ -366,11 +367,11 @@ export default function SongsTable({ songs: initialSongs }: SongsTableProps) {
 
       {filteredSongs.length === 0 && (
         <div className="text-center py-12">
-          <Music className="h-16 w-16 text-gray-600 mx-auto mb-4" />
-          <p className="text-gray-400 text-lg mb-2">
+          <Music className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+          <p className="text-muted-foreground text-lg mb-2">
             {searchTerm ? "No se encontraron canciones" : "No hay canciones"}
           </p>
-          <p className="text-gray-500 text-sm">
+          <p className="text-muted-foreground/80 text-sm">
             {!searchTerm && "Agrega tu primera canción para comenzar"}
           </p>
         </div>
@@ -425,56 +426,56 @@ function SongForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-6 max-h-[70vh] overflow-y-auto"
+      className="space-y-6 max-h-[70vh] overflow-y-auto p-1"
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="title" className="text-white">
+          <Label htmlFor="title" className="text-foreground">
             Título de la Canción *
           </Label>
           <Input
             id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="bg-gray-800 border-gray-600 text-white"
+            className="bg-background border-input text-foreground"
             placeholder="Nombre de la canción"
             required
           />
         </div>
 
         <div>
-          <Label htmlFor="artist" className="text-white">
+          <Label htmlFor="artist" className="text-foreground">
             Artista
           </Label>
           <Input
             id="artist"
             value={artist}
             onChange={(e) => setArtist(e.target.value)}
-            className="bg-gray-800 border-gray-600 text-white"
+            className="bg-background border-input text-foreground"
             placeholder="Nombre del artista"
           />
         </div>
       </div>
 
       <div>
-        <Label htmlFor="streamUrl" className="text-white">
+        <Label htmlFor="streamUrl" className="text-foreground">
           URL de Streaming *
         </Label>
         <Input
           id="streamUrl"
           value={streamUrl}
           onChange={(e) => setStreamUrl(e.target.value)}
-          className="bg-gray-800 border-gray-600 text-white"
+          className="bg-background border-input text-foreground"
           placeholder="https://open.spotify.com/track/..."
           required
         />
-        <p className="text-xs text-gray-400 mt-1">
+        <p className="text-xs text-muted-foreground mt-1">
           Enlace a Spotify, Apple Music, YouTube, etc.
         </p>
       </div>
 
       <div>
-        <Label htmlFor="type" className="text-white">
+        <Label htmlFor="type" className="text-foreground">
           Tipo *
         </Label>
         <Select
@@ -484,15 +485,15 @@ function SongForm({
             setType(value);
           }}
         >
-          <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
+          <SelectTrigger className="bg-background border-input text-foreground">
             <SelectValue placeholder="Selecciona el tipo" />
           </SelectTrigger>
-          <SelectContent className="bg-gray-800 border-gray-600">
+          <SelectContent className="bg-background border-input text-foreground">
             <SelectItem value="single">Single</SelectItem>
             <SelectItem value="album">Álbum</SelectItem>
           </SelectContent>
         </Select>
-        <p className="text-xs text-gray-400 mt-1">
+        <p className="text-xs text-muted-foreground mt-1">
           Valor actual: {type} (tipo: {typeof type})
         </p>
       </div>
@@ -500,20 +501,20 @@ function SongForm({
       {type === "album" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="albumName" className="text-white">
+            <Label htmlFor="albumName" className="text-foreground">
               Nombre del Álbum
             </Label>
             <Input
               id="albumName"
               value={albumName}
               onChange={(e) => setAlbumName(e.target.value)}
-              className="bg-gray-800 border-gray-600 text-white"
+              className="bg-background border-input text-foreground"
               placeholder="Nombre del álbum"
             />
           </div>
 
           <div>
-            <Label htmlFor="trackNumber" className="text-white">
+            <Label htmlFor="trackNumber" className="text-foreground">
               Número de Track
             </Label>
             <Input
@@ -522,7 +523,7 @@ function SongForm({
               min="1"
               value={trackNumber}
               onChange={(e) => setTrackNumber(e.target.value)}
-              className="bg-gray-800 border-gray-600 text-white"
+              className="bg-background border-input text-foreground"
               placeholder="1"
             />
           </div>
@@ -530,7 +531,7 @@ function SongForm({
       )}
 
       <div>
-        <Label htmlFor="releaseDate" className="text-white">
+        <Label htmlFor="releaseDate" className="text-foreground">
           Fecha de Lanzamiento
         </Label>
         <Input
@@ -538,12 +539,12 @@ function SongForm({
           type="date"
           value={releaseDate}
           onChange={(e) => setReleaseDate(e.target.value)}
-          className="bg-gray-800 border-gray-600 text-white"
+          className="bg-background border-input text-foreground"
         />
       </div>
 
       <div>
-        <Label className="text-white">Imagen de Portada</Label>
+        <Label className="text-foreground">Imagen de Portada</Label>
         <div className="space-y-3">
           <ImageUpload
             value={coverImageUrl}
@@ -551,13 +552,13 @@ function SongForm({
             label=""
             maxSize={3}
           />
-          <div className="text-xs text-gray-400">
+          <div className="text-xs text-muted-foreground">
             O ingresa una URL directamente:
           </div>
           <Input
             value={coverImageUrl}
             onChange={(e) => setCoverImageUrl(e.target.value)}
-            className="bg-gray-800 border-gray-600 text-white"
+            className="bg-background border-input text-foreground"
             placeholder="https://ejemplo.com/imagen.jpg"
           />
         </div>
@@ -567,7 +568,7 @@ function SongForm({
         <Button
           type="submit"
           disabled={loading || !title || !streamUrl}
-          className="bg-white text-black hover:bg-gray-200"
+          className="bg-primary text-primary-foreground hover:bg-primary/90"
         >
           {loading ? "Guardando..." : song ? "Actualizar" : "Crear"}
         </Button>

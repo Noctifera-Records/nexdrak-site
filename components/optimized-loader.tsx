@@ -77,21 +77,21 @@ export default function OptimizedLoader({ children }: OptimizedLoaderProps) {
 
   if (hasError) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-center text-white p-8">
+      <div className="min-h-screen bg-background flex items-center justify-center transition-colors duration-300">
+        <div className="text-center text-foreground p-8">
           <h2 className="text-2xl font-bold mb-4">Loading Error</h2>
-          <p className="text-gray-300 mb-4">
+          <p className="text-muted-foreground mb-4">
             Some resources failed to load, but you can continue.
           </p>
           <button
             onClick={handleRetry}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded mr-4"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded mr-4 transition-colors"
           >
             Retry
           </button>
           <button
             onClick={() => setIsLoaded(true)}
-            className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded"
+            className="bg-muted hover:bg-muted/80 text-muted-foreground px-4 py-2 rounded transition-colors"
           >
             Continue Anyway
           </button>
@@ -102,10 +102,10 @@ export default function OptimizedLoader({ children }: OptimizedLoaderProps) {
 
   if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center transition-colors duration-300">
         <div className="text-center">
-          <div className="animate-pulse text-white mb-4">Loading...</div>
-          <div className="text-gray-400 text-sm">
+          <div className="animate-pulse text-foreground mb-4 text-xl font-medium">Loading...</div>
+          <div className="text-muted-foreground text-sm">
             If this takes too long, there might be network issues
           </div>
         </div>

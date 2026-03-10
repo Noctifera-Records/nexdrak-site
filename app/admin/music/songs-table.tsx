@@ -52,7 +52,7 @@ export function SongsTable({ songs, streamingLinks, onEdit, onDelete, onManageLi
   };
 
   const getTypeColor = (type: 'album' | 'single') => {
-    return type === 'album' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800';
+    return type === 'album' ? 'bg-blue-500/10 text-blue-500' : 'bg-green-500/10 text-green-500';
   };
 
   const getSongStreamingLinks = (songId: number) => {
@@ -82,8 +82,8 @@ export function SongsTable({ songs, streamingLinks, onEdit, onDelete, onManageLi
     return (
       <Card>
         <CardContent className="p-8 text-center">
-          <Music className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-500">No hay canciones registradas.</p>
+          <Music className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+          <p className="text-muted-foreground">No hay canciones registradas.</p>
         </CardContent>
       </Card>
     );
@@ -101,22 +101,22 @@ export function SongsTable({ songs, streamingLinks, onEdit, onDelete, onManageLi
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b">
-                    <th className="text-left p-2">Portada</th>
-                    <th className="text-left p-2">Título</th>
-                    <th className="text-left p-2">Artista</th>
-                    <th className="text-left p-2">Tipo</th>
-                    <th className="text-left p-2">Álbum/Track</th>
-                    <th className="text-left p-2">Enlaces</th>
-                    <th className="text-left p-2">Fecha</th>
-                    <th className="text-left p-2">Acciones</th>
+                  <tr className="border-b border-border">
+                    <th className="text-left p-2 text-muted-foreground">Portada</th>
+                    <th className="text-left p-2 text-muted-foreground">Título</th>
+                    <th className="text-left p-2 text-muted-foreground">Artista</th>
+                    <th className="text-left p-2 text-muted-foreground">Tipo</th>
+                    <th className="text-left p-2 text-muted-foreground">Álbum/Track</th>
+                    <th className="text-left p-2 text-muted-foreground">Enlaces</th>
+                    <th className="text-left p-2 text-muted-foreground">Fecha</th>
+                    <th className="text-left p-2 text-muted-foreground">Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
                   {songs.map((song) => (
-                    <tr key={song.id} className="border-b hover:bg-gray-50 dark:hover:bg-gray-800">
+                    <tr key={song.id} className="border-b border-border hover:bg-muted/50">
                       <td className="p-2">
-                        <div className="w-12 h-12 relative bg-gray-200 rounded">
+                        <div className="w-12 h-12 relative bg-muted rounded">
                           {song.cover_image_url ? (
                             <Image
                               src={song.cover_image_url}
@@ -125,17 +125,17 @@ export function SongsTable({ songs, streamingLinks, onEdit, onDelete, onManageLi
                               className="object-cover rounded"
                             />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-400">
+                            <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                               <Music className="h-6 w-6" />
                             </div>
                           )}
                         </div>
                       </td>
                       <td className="p-2">
-                        <p className="font-medium">{song.title}</p>
+                        <p className="font-medium text-foreground">{song.title}</p>
                       </td>
                       <td className="p-2">
-                        <p className="text-gray-600">{song.artist}</p>
+                        <p className="text-muted-foreground">{song.artist}</p>
                       </td>
                       <td className="p-2">
                         <Badge className={getTypeColor(song.type)}>
@@ -148,13 +148,13 @@ export function SongsTable({ songs, streamingLinks, onEdit, onDelete, onManageLi
                       <td className="p-2">
                         {song.type === 'album' && song.album_name ? (
                           <div>
-                            <p className="font-medium text-sm">{song.album_name}</p>
+                            <p className="font-medium text-sm text-foreground">{song.album_name}</p>
                             {song.track_number && (
-                              <p className="text-xs text-gray-500">Track #{song.track_number}</p>
+                              <p className="text-xs text-muted-foreground">Track #{song.track_number}</p>
                             )}
                           </div>
                         ) : (
-                          <span className="text-gray-400">-</span>
+                          <span className="text-muted-foreground">-</span>
                         )}
                       </td>
                       <td className="p-2">
@@ -164,7 +164,7 @@ export function SongsTable({ songs, streamingLinks, onEdit, onDelete, onManageLi
                           
                           if (links.length === 0) {
                             return (
-                              <div className="flex items-center gap-1 text-gray-400">
+                              <div className="flex items-center gap-1 text-muted-foreground">
                                 <ExternalLink className="h-3 w-3" />
                                 <span className="text-xs">Legacy URL</span>
                               </div>
@@ -179,8 +179,8 @@ export function SongsTable({ songs, streamingLinks, onEdit, onDelete, onManageLi
                                   return (
                                     <div
                                       key={link.id}
-                                      className={`w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-xs ${
-                                        link.is_primary ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'
+                                      className={`w-6 h-6 rounded-full border-2 border-background flex items-center justify-center text-xs ${
+                                        link.is_primary ? 'bg-green-500 text-white' : 'bg-muted text-muted-foreground'
                                       }`}
                                       title={`${link.platform}${link.is_primary ? ' (Primary)' : ''}`}
                                     >
@@ -190,14 +190,14 @@ export function SongsTable({ songs, streamingLinks, onEdit, onDelete, onManageLi
                                 })}
                               </div>
                               {links.length > 3 && (
-                                <span className="text-xs text-gray-500">+{links.length - 3}</span>
+                                <span className="text-xs text-muted-foreground">+{links.length - 3}</span>
                               )}
-                              <span className="text-xs text-gray-500">({links.length})</span>
+                              <span className="text-xs text-muted-foreground">({links.length})</span>
                             </div>
                           );
                         })()}
                       </td>
-                      <td className="p-2 text-sm text-gray-500">
+                      <td className="p-2 text-sm text-muted-foreground">
                         {song.release_date ? formatDate(song.release_date) : formatDate(song.created_at)}
                       </td>
                       <td className="p-2">
@@ -218,7 +218,7 @@ export function SongsTable({ songs, streamingLinks, onEdit, onDelete, onManageLi
                                   rel="noopener noreferrer"
                                   title="Escuchar canción"
                                 >
-                                  <ExternalLink className="h-4 w-4" />
+                                  <ExternalLink className="h-4 w-4 text-muted-foreground" />
                                 </a>
                               </Button>
                             );
@@ -229,20 +229,20 @@ export function SongsTable({ songs, streamingLinks, onEdit, onDelete, onManageLi
                             onClick={() => onManageLinks(song)}
                             title="Gestionar enlaces de streaming"
                           >
-                            <Link className="h-4 w-4" />
+                            <Link className="h-4 w-4 text-muted-foreground" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => onEdit(song)}
                           >
-                            <Edit className="h-4 w-4" />
+                            <Edit className="h-4 w-4 text-muted-foreground" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => onDelete(song.id)}
-                            className="text-red-600 hover:text-red-700"
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -263,7 +263,7 @@ export function SongsTable({ songs, streamingLinks, onEdit, onDelete, onManageLi
           <Card key={song.id}>
             <CardContent className="p-4">
               <div className="flex gap-4">
-                <div className="w-16 h-16 relative bg-gray-200 rounded flex-shrink-0">
+                <div className="w-16 h-16 relative bg-muted rounded flex-shrink-0">
                   {song.cover_image_url ? (
                     <Image
                       src={song.cover_image_url}
@@ -272,7 +272,7 @@ export function SongsTable({ songs, streamingLinks, onEdit, onDelete, onManageLi
                       className="object-cover rounded"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                    <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                       <Music className="h-8 w-8" />
                     </div>
                   )}
@@ -281,8 +281,8 @@ export function SongsTable({ songs, streamingLinks, onEdit, onDelete, onManageLi
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between mb-2">
                     <div>
-                      <h3 className="font-medium truncate">{song.title}</h3>
-                      <p className="text-sm text-gray-600">{song.artist}</p>
+                      <h3 className="font-medium truncate text-foreground">{song.title}</h3>
+                      <p className="text-sm text-muted-foreground">{song.artist}</p>
                     </div>
                     <Badge className={getTypeColor(song.type)}>
                       <div className="flex items-center gap-1">
@@ -294,14 +294,14 @@ export function SongsTable({ songs, streamingLinks, onEdit, onDelete, onManageLi
                   
                   {song.type === 'album' && song.album_name && (
                     <div className="mb-2">
-                      <p className="text-sm font-medium">{song.album_name}</p>
+                      <p className="text-sm font-medium text-foreground">{song.album_name}</p>
                       {song.track_number && (
-                        <p className="text-xs text-gray-500">Track #{song.track_number}</p>
+                        <p className="text-xs text-muted-foreground">Track #{song.track_number}</p>
                       )}
                     </div>
                   )}
                   
-                  <p className="text-xs text-gray-500 mb-2">
+                  <p className="text-xs text-muted-foreground mb-2">
                     {song.release_date ? formatDate(song.release_date) : formatDate(song.created_at)}
                   </p>
                   
@@ -312,7 +312,7 @@ export function SongsTable({ songs, streamingLinks, onEdit, onDelete, onManageLi
                       
                       if (links.length === 0) {
                         return (
-                          <div className="flex items-center gap-1 text-gray-400">
+                          <div className="flex items-center gap-1 text-muted-foreground">
                             <ExternalLink className="h-3 w-3" />
                             <span className="text-xs">Using legacy URL</span>
                           </div>
@@ -327,8 +327,8 @@ export function SongsTable({ songs, streamingLinks, onEdit, onDelete, onManageLi
                               return (
                                 <div
                                   key={link.id}
-                                  className={`w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-xs ${
-                                    link.is_primary ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'
+                                  className={`w-6 h-6 rounded-full border-2 border-background flex items-center justify-center text-xs ${
+                                    link.is_primary ? 'bg-green-500 text-white' : 'bg-muted text-muted-foreground'
                                   }`}
                                   title={`${link.platform}${link.is_primary ? ' (Primary)' : ''}`}
                                 >
@@ -337,7 +337,7 @@ export function SongsTable({ songs, streamingLinks, onEdit, onDelete, onManageLi
                               );
                             })}
                           </div>
-                          <span className="text-xs text-gray-500">{links.length} platform{links.length !== 1 ? 's' : ''}</span>
+                          <span className="text-xs text-muted-foreground">{links.length} platform{links.length !== 1 ? 's' : ''}</span>
                         </div>
                       );
                     })()}
@@ -385,7 +385,7 @@ export function SongsTable({ songs, streamingLinks, onEdit, onDelete, onManageLi
                       variant="outline"
                       size="sm"
                       onClick={() => onDelete(song.id)}
-                      className="text-red-600 hover:text-red-700"
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
                     >
                       <Trash2 className="h-4 w-4 mr-2" />
                       Delete

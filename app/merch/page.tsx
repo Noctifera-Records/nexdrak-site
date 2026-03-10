@@ -91,19 +91,19 @@ export default function MerchPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-24 mt-10">
+      <div className="container mx-auto px-4 py-24 mt-10 text-foreground">
         <div className="max-w-4xl mx-auto mb-12 text-center">
-          <h1 className="text-4xl font-bold mb-4">OFFICIAL MERCH</h1>
-          <p className="text-gray-300">Cargando productos...</p>
+          <h1 className="text-4xl font-bold mb-4 text-foreground dark:text-white">OFFICIAL MERCH</h1>
+          <p className="text-muted-foreground dark:text-gray-300">Cargando productos...</p>
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[...Array(8)].map((_, i) => (
-            <Card key={i} className="bg-black/50 backdrop-blur-sm border-white/20">
-              <div className="aspect-square bg-gray-800 animate-pulse" />
+            <Card key={i} className="bg-card/50 dark:bg-black/50 backdrop-blur-sm border-border dark:border-white/20 shadow-sm dark:shadow-none">
+              <div className="aspect-square bg-muted dark:bg-gray-800 animate-pulse" />
               <CardContent className="p-4">
-                <div className="h-6 bg-gray-700 rounded animate-pulse mb-2" />
-                <div className="h-4 bg-gray-700 rounded animate-pulse w-2/3" />
+                <div className="h-6 bg-muted dark:bg-gray-700 rounded animate-pulse mb-2" />
+                <div className="h-4 bg-muted dark:bg-gray-700 rounded animate-pulse w-2/3" />
               </CardContent>
             </Card>
           ))}
@@ -113,7 +113,7 @@ export default function MerchPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-24 mt-10">
+    <div className="container mx-auto px-4 py-24 mt-10 text-foreground">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -139,17 +139,17 @@ export default function MerchPage() {
         }}
       />
       <div className="max-w-4xl mx-auto mb-12 text-center">
-        <h1 className="text-4xl font-bold mb-4">OFFICIAL MERCH</h1>
-        <p className="text-gray-300">Official NexDrak merchandise. Limited editions and exclusive designs.</p>
+        <h1 className="text-4xl font-bold mb-4 text-foreground dark:text-white">OFFICIAL MERCH</h1>
+        <p className="text-muted-foreground dark:text-gray-300">Official NexDrak merchandise. Limited editions and exclusive designs.</p>
       </div>
 
       {merchItems.length > 0 && (
         <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
           <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-gray-400" />
-            <span className="text-sm text-gray-400">Filter by:</span>
+            <Filter className="h-4 w-4 text-muted-foreground dark:text-gray-400" />
+            <span className="text-sm text-muted-foreground dark:text-gray-400">Filter by:</span>
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-[180px] bg-black/50 border-white/20">
+              <SelectTrigger className="w-[180px] bg-background/80 dark:bg-black/50 border-input dark:border-white/20 text-foreground dark:text-white backdrop-blur-sm">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent>
@@ -164,9 +164,9 @@ export default function MerchPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-400">Sort by:</span>
+            <span className="text-sm text-muted-foreground dark:text-gray-400">Sort by:</span>
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[180px] bg-black/50 border-white/20">
+              <SelectTrigger className="w-[180px] bg-background/80 dark:bg-black/50 border-input dark:border-white/20 text-foreground dark:text-white backdrop-blur-sm">
                 <SelectValue placeholder="Sort" />
               </SelectTrigger>
               <SelectContent>
@@ -183,8 +183,8 @@ export default function MerchPage() {
       {filteredItems.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {filteredItems.map((item) => (
-            <Card key={item.id} className="bg-black/50 backdrop-blur-sm border-white/20 overflow-hidden group hover:border-white/40 transition-all">
-              <div className="aspect-square relative bg-black/30">
+            <Card key={item.id} className="bg-card/50 dark:bg-black/50 backdrop-blur-sm border-border dark:border-white/20 overflow-hidden group hover:border-foreground/40 dark:hover:border-white/40 transition-all shadow-sm dark:shadow-none">
+              <div className="aspect-square relative bg-muted dark:bg-black/30">
                 {item.image_url ? (
                   <Image
                     src={item.image_url}
@@ -194,23 +194,23 @@ export default function MerchPage() {
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
-                    <ShoppingCart className="h-16 w-16 text-gray-600" />
+                    <ShoppingCart className="h-16 w-16 text-muted-foreground dark:text-gray-600" />
                   </div>
                 )}
               </div>
               <CardContent className="p-4">
-                <h3 className="font-semibold text-lg text-white">{item.name}</h3>
+                <h3 className="font-semibold text-lg text-foreground dark:text-white group-hover:text-primary dark:group-hover:text-gray-200 transition-colors">{item.name}</h3>
                 {item.description && (
-                  <p className="text-gray-400 text-sm mt-1 line-clamp-2">{item.description}</p>
+                  <p className="text-muted-foreground dark:text-gray-400 text-sm mt-1 line-clamp-2">{item.description}</p>
                 )}
-                <p className="text-white font-bold mt-2">${item.price}</p>
-                <span className="inline-block bg-gray-800 text-gray-300 text-xs px-2 py-1 rounded mt-2">
+                <p className="text-foreground dark:text-white font-bold mt-2">${item.price}</p>
+                <span className="inline-block bg-muted dark:bg-gray-800 text-muted-foreground dark:text-gray-300 text-xs px-2 py-1 rounded mt-2 border border-border dark:border-gray-700">
                   {item.category}
                 </span>
               </CardContent>
               <CardFooter className="p-4 pt-0">
                 <Button 
-                  className="w-full bg-white hover:bg-gray-200 text-black"
+                  className="w-full bg-foreground text-background hover:bg-foreground/90 dark:bg-white dark:hover:bg-gray-200 dark:text-black transition-colors"
                   asChild
                 >
                   <a 
@@ -228,20 +228,20 @@ export default function MerchPage() {
         </div>
       ) : (
         <div className="text-center py-12">
-          <ShoppingCart className="h-16 w-16 text-gray-600 mx-auto mb-4" />
-          <p className="text-gray-400 text-lg">
+          <ShoppingCart className="h-16 w-16 text-muted-foreground dark:text-gray-600 mx-auto mb-4" />
+          <p className="text-muted-foreground dark:text-gray-400 text-lg">
             {merchItems.length === 0 ? 'No hay productos disponibles' : 'No se encontraron productos en esta categoría'}
           </p>
-          <p className="text-gray-500 text-sm">Los productos aparecerán aquí cuando se agreguen</p>
+          <p className="text-muted-foreground/80 dark:text-gray-500 text-sm">Los productos aparecerán aquí cuando se agreguen</p>
         </div>
       )}
 
-      {/* <div className="max-w-2xl mx-auto mt-16 p-8 bg-black/50 backdrop-blur-sm border border-white/20 rounded-xl text-center">
-        <h2 className="text-2xl font-bold mb-4">CUSTOM ORDERS</h2>
-        <p className="text-gray-300 mb-6">
+      {/* <div className="max-w-2xl mx-auto mt-16 p-8 bg-card/50 dark:bg-black/50 backdrop-blur-sm border border-border dark:border-white/20 rounded-xl text-center shadow-sm dark:shadow-none">
+        <h2 className="text-2xl font-bold mb-4 text-foreground dark:text-white">CUSTOM ORDERS</h2>
+        <p className="text-muted-foreground dark:text-gray-300 mb-6">
           Looking for custom merchandise for your event or group? Contact us for bulk orders and custom designs.
         </p>
-        <Button className="bg-white hover:bg-gray-200 text-black">CONTACT FOR CUSTOM ORDERS</Button>
+        <Button className="bg-foreground text-background hover:bg-foreground/90 dark:bg-white dark:hover:bg-gray-200 dark:text-black transition-colors">CONTACT FOR CUSTOM ORDERS</Button>
       </div> */}
     </div>
   );

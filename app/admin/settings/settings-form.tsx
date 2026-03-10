@@ -109,19 +109,19 @@ export default function SettingsForm({ settings: initialSettings }: SettingsForm
         {
           key: 'hero_image',
           label: 'Imagen Principal',
-          placeholder: 'https://ejemplo.com/imagen.jpg',
+          placeholder: 'https://nexdrak.com/imagen.jpg',
           description: 'Imagen de fondo de la sección principal'
         },
         {
           key: 'logo_url',
           label: 'URL del Logo',
-          placeholder: 'https://ejemplo.com/logo.png',
+          placeholder: 'https://nexdrak.com/logo.png',
           description: 'Logo que aparece en la navegación'
         },
         {
           key: 'og_image',
           label: 'Imagen para Redes Sociales',
-          placeholder: 'https://ejemplo.com/og-image.jpg',
+          placeholder: 'https://nexdrak.com/og-image.jpg',
           description: 'Imagen que aparece al compartir en redes sociales'
         }
       ]
@@ -169,7 +169,7 @@ export default function SettingsForm({ settings: initialSettings }: SettingsForm
         {
           key: 'twitter_url',
           label: 'Twitter/X',
-          placeholder: 'https://twitter.com/...',
+          placeholder: 'https://x.com/...',
           description: 'Enlace a tu perfil de Twitter'
         },
         {

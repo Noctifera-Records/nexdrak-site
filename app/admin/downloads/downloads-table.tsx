@@ -172,11 +172,11 @@ export default function DownloadsTable({ downloads: initialDownloads }: Download
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'wallpaper':
-        return 'bg-blue-900/30 text-blue-300 border-blue-500/30'
+        return 'bg-blue-500/10 text-blue-500 border-blue-500/20'
       case 'mp3':
-        return 'bg-purple-900/30 text-purple-300 border-purple-500/30'
+        return 'bg-purple-500/10 text-purple-500 border-purple-500/20'
       default:
-        return 'bg-gray-900/30 text-gray-300 border-gray-500/30'
+        return 'bg-muted text-muted-foreground border-border'
     }
   }
 
@@ -194,20 +194,20 @@ export default function DownloadsTable({ downloads: initialDownloads }: Download
       <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
         <div className="flex flex-col md:flex-row gap-4 flex-1">
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Buscar descargas..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-gray-900 border-gray-700 text-white"
+              className="pl-10"
             />
           </div>
           
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="w-full md:w-48 bg-gray-900 border-gray-700 text-white">
+            <SelectTrigger className="w-full md:w-48">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-gray-900 border-gray-700">
+            <SelectContent>
               <SelectItem value="all">Todas las categorías</SelectItem>
               <SelectItem value="wallpaper">Wallpapers</SelectItem>
               <SelectItem value="mp3">Audio</SelectItem>
@@ -218,15 +218,15 @@ export default function DownloadsTable({ downloads: initialDownloads }: Download
         
         <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
           <DialogTrigger asChild>
-            <Button className="bg-white text-black hover:bg-gray-200">
+            <Button>
               <Plus className="h-4 w-4 mr-2" />
               Agregar Descarga
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-gray-900 border-gray-700 max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-white">Nueva Descarga</DialogTitle>
-              <DialogDescription className="text-gray-400">
+              <DialogTitle>Nueva Descarga</DialogTitle>
+              <DialogDescription>
                 Agrega nuevo contenido para descargar
               </DialogDescription>
             </DialogHeader>
@@ -241,9 +241,9 @@ export default function DownloadsTable({ downloads: initialDownloads }: Download
       {/* Grid de descargas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredDownloads.map((download) => (
-          <div key={download.id} className="bg-gray-900 rounded-lg border border-gray-700 overflow-hidden group hover:border-gray-600 transition-all">
+          <div key={download.id} className="bg-card rounded-lg border border-border overflow-hidden group hover:border-primary/50 transition-all">
             {/* Thumbnail */}
-            <div className="relative aspect-video bg-gray-800">
+            <div className="relative aspect-video bg-muted">
               {download.thumbnail_url ? (
                 <Image
                   src={download.thumbnail_url}
@@ -252,7 +252,7 @@ export default function DownloadsTable({ downloads: initialDownloads }: Download
                   className="object-cover group-hover:scale-105 transition-transform"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center">
+                <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                   {getCategoryIcon(download.category)}
                 </div>
               )}
@@ -260,7 +260,7 @@ export default function DownloadsTable({ downloads: initialDownloads }: Download
               {/* Badges */}
               <div className="absolute top-2 left-2 flex space-x-2">
                 {download.is_featured && (
-                  <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
+                  <Badge className="bg-yellow-500/20 text-yellow-500 border-yellow-500/30">
                     <Star className="h-3 w-3 mr-1" />
                     Destacado
                   </Badge>
@@ -275,19 +275,19 @@ export default function DownloadsTable({ downloads: initialDownloads }: Download
             {/* Información */}
             <div className="p-4 space-y-3">
               <div>
-                <h3 className="text-lg font-semibold text-white truncate">
+                <h3 className="text-lg font-semibold text-foreground truncate">
                   {download.title}
                 </h3>
                 {download.description && (
-                  <p className="text-sm text-gray-400 line-clamp-2 mt-1">
+                  <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
                     {download.description}
                   </p>
                 )}
-                <div className="flex items-center justify-between text-xs text-gray-500 mt-2">
+                <div className="flex items-center justify-between text-xs text-muted-foreground mt-2">
                   <div className="flex items-center space-x-2">
                     {download.file_size && <span>{download.file_size}</span>}
                     {download.file_format && (
-                      <span className="bg-gray-800 px-2 py-1 rounded">
+                      <span className="bg-muted px-2 py-1 rounded">
                         {download.file_format}
                       </span>
                     )}
@@ -297,19 +297,19 @@ export default function DownloadsTable({ downloads: initialDownloads }: Download
                     <span>{download.download_count}</span>
                   </div>
                 </div>
-                <div className="text-xs text-gray-500 mt-1">
+                <div className="text-xs text-muted-foreground mt-1">
                   {formatDate(download.created_at)}
                 </div>
               </div>
 
               {/* Controles */}
-              <div className="flex items-center justify-between pt-2 border-t border-gray-700">
+              <div className="flex items-center justify-between pt-2 border-t border-border">
                 <div className="flex items-center space-x-2">
                   <Switch
                     checked={download.is_featured}
                     onCheckedChange={(checked) => toggleFeatured(download.id, checked)}
                   />
-                  <span className="text-xs text-gray-400">Destacado</span>
+                  <span className="text-xs text-muted-foreground">Destacado</span>
                 </div>
 
                 <div className="flex items-center space-x-2">
@@ -324,10 +324,10 @@ export default function DownloadsTable({ downloads: initialDownloads }: Download
                         <Edit className="h-4 w-4" />
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="bg-gray-900 border-gray-700 max-w-3xl max-h-[90vh] overflow-y-auto">
+                    <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
                       <DialogHeader>
-                        <DialogTitle className="text-white">Editar Descarga</DialogTitle>
-                        <DialogDescription className="text-gray-400">
+                        <DialogTitle>Editar Descarga</DialogTitle>
+                        <DialogDescription>
                           Modifica la información de la descarga
                         </DialogDescription>
                       </DialogHeader>
@@ -347,21 +347,21 @@ export default function DownloadsTable({ downloads: initialDownloads }: Download
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="bg-gray-900 border-gray-700">
+                    <DialogContent>
                       <DialogHeader>
-                        <DialogTitle className="text-white">Eliminar Descarga</DialogTitle>
-                        <DialogDescription className="text-gray-400">
+                        <DialogTitle>Eliminar Descarga</DialogTitle>
+                        <DialogDescription>
                           ¿Estás seguro de que quieres eliminar "{download.title}"?
                           Esta acción no se puede deshacer.
                         </DialogDescription>
                       </DialogHeader>
                       <DialogFooter>
-                        <Button variant="outline" className="border-gray-600 text-gray-300">
+                        <Button variant="outline">
                           Cancelar
                         </Button>
                         <Button
@@ -383,11 +383,11 @@ export default function DownloadsTable({ downloads: initialDownloads }: Download
 
       {filteredDownloads.length === 0 && (
         <div className="text-center py-12">
-          <Download className="h-16 w-16 text-gray-600 mx-auto mb-4" />
-          <p className="text-gray-400 text-lg mb-2">
+          <Download className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+          <p className="text-muted-foreground text-lg mb-2">
             {searchTerm || categoryFilter !== 'all' ? 'No se encontraron descargas' : 'No hay descargas'}
           </p>
-          <p className="text-gray-500 text-sm">
+          <p className="text-muted-foreground text-sm">
             {!searchTerm && categoryFilter === 'all' && 'Agrega tu primera descarga para comenzar'}
           </p>
         </div>
@@ -432,28 +432,27 @@ function DownloadForm({
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="title" className="text-white">
+          <Label htmlFor="title">
             Título *
           </Label>
           <Input
             id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="bg-gray-800 border-gray-600 text-white"
             placeholder="Nombre de la descarga"
             required
           />
         </div>
 
         <div>
-          <Label htmlFor="category" className="text-white">
+          <Label htmlFor="category">
             Categoría *
           </Label>
           <Select value={category} onValueChange={setCategory}>
-            <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
+            <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-gray-800 border-gray-600">
+            <SelectContent>
               <SelectItem value="wallpaper">Wallpaper</SelectItem>
               <SelectItem value="mp3">Audio</SelectItem>
               <SelectItem value="other">Otro</SelectItem>
@@ -463,38 +462,36 @@ function DownloadForm({
       </div>
 
       <div>
-        <Label htmlFor="description" className="text-white">
+        <Label htmlFor="description">
           Descripción
         </Label>
         <Textarea
           id="description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="bg-gray-800 border-gray-600 text-white"
           placeholder="Descripción de la descarga"
           rows={3}
         />
       </div>
 
       <div>
-        <Label htmlFor="fileUrl" className="text-white">
+        <Label htmlFor="fileUrl">
           URL del Archivo *
         </Label>
         <Input
           id="fileUrl"
           value={fileUrl}
           onChange={(e) => setFileUrl(e.target.value)}
-          className="bg-gray-800 border-gray-600 text-white"
           placeholder="https://ejemplo.com/archivo.zip"
           required
         />
-        <p className="text-xs text-gray-400 mt-1">
+        <p className="text-xs text-muted-foreground mt-1">
           Enlace directo al archivo alojado en otra plataforma
         </p>
       </div>
 
       <div>
-        <Label className="text-white">
+        <Label>
           Imagen de Vista Previa
         </Label>
         <div className="space-y-3">
@@ -504,13 +501,12 @@ function DownloadForm({
             label=""
             maxSize={2}
           />
-          <div className="text-xs text-gray-400">
+          <div className="text-xs text-muted-foreground">
             O ingresa una URL directamente:
           </div>
           <Input
             value={thumbnailUrl}
             onChange={(e) => setThumbnailUrl(e.target.value)}
-            className="bg-gray-800 border-gray-600 text-white"
             placeholder="https://ejemplo.com/preview.jpg"
           />
         </div>
@@ -518,27 +514,25 @@ function DownloadForm({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="fileSize" className="text-white">
+          <Label htmlFor="fileSize">
             Tamaño del Archivo
           </Label>
           <Input
             id="fileSize"
             value={fileSize}
             onChange={(e) => setFileSize(e.target.value)}
-            className="bg-gray-800 border-gray-600 text-white"
             placeholder="2.5 MB"
           />
         </div>
 
         <div>
-          <Label htmlFor="fileFormat" className="text-white">
+          <Label htmlFor="fileFormat">
             Formato
           </Label>
           <Input
             id="fileFormat"
             value={fileFormat}
             onChange={(e) => setFileFormat(e.target.value)}
-            className="bg-gray-800 border-gray-600 text-white"
             placeholder="ZIP, MP3, JPG, etc."
           />
         </div>
@@ -549,14 +543,13 @@ function DownloadForm({
           checked={isFeatured}
           onCheckedChange={setIsFeatured}
         />
-        <Label className="text-white">Destacado</Label>
+        <Label>Destacado</Label>
       </div>
 
       <DialogFooter>
         <Button
           type="submit"
           disabled={loading || !title || !fileUrl}
-          className="bg-white text-black hover:bg-gray-200"
         >
           {loading ? 'Guardando...' : (download ? 'Actualizar' : 'Crear')}
         </Button>

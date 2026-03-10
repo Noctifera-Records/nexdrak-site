@@ -11,7 +11,7 @@ export default async function DownloadsPage() {
   const { data: { user } } = await supabase.auth.getUser()
   
   if (!user) {
-    redirect('/login?message=You must sign in to access downloads')
+    redirect('/login?')
   }
 
   // Obtener descargas
@@ -24,24 +24,24 @@ export default async function DownloadsPage() {
   if (error) {
     console.error('Error fetching downloads:', error)
     return (
-      <div className="container mx-auto px-4 py-24 mt-10">
-        <h1 className="text-4xl font-bold mb-6 text-center">DOWNLOADS</h1>
-        <div className="bg-red-900/20 border border-red-500 rounded-lg p-4 max-w-md mx-auto">
-          <p className="text-red-400 text-center">Error loading downloads</p>
+      <div className="container mx-auto px-4 py-24 mt-10 text-foreground">
+        <h1 className="text-4xl font-bold mb-6 text-center text-foreground dark:text-white">DOWNLOADS</h1>
+        <div className="bg-destructive/10 border border-destructive rounded-lg p-4 max-w-md mx-auto">
+          <p className="text-destructive text-center">Error loading downloads</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto px-4 py-24 mt-10">
+    <div className="container mx-auto px-4 py-24 mt-10 text-foreground">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">EXCLUSIVE DOWNLOADS</h1>
-          <p className="text-gray-300 text-lg">
+          <h1 className="text-4xl font-bold mb-4 text-foreground dark:text-white">EXCLUSIVE DOWNLOADS</h1>
+          <p className="text-muted-foreground dark:text-gray-300 text-lg">
             Exclusive content for registered members
           </p>
-          <p className="text-gray-400 text-sm mt-2">
+          <p className="text-muted-foreground/80 dark:text-gray-400 text-sm mt-2">
             Wallpapers, instrumental music, and more free content
           </p>
         </div>
