@@ -308,7 +308,6 @@ export default function DownloadsTable({ downloads: initialDownloads }: Download
                   <Switch
                     checked={download.is_featured}
                     onCheckedChange={(checked) => toggleFeatured(download.id, checked)}
-                    size="sm"
                   />
                   <span className="text-xs text-gray-400">Destacado</span>
                 </div>
@@ -501,7 +500,7 @@ function DownloadForm({
         <div className="space-y-3">
           <ImageUpload
             value={thumbnailUrl}
-            onChange={setThumbnailUrl}
+            onChange={(url) => setThumbnailUrl(url || '')}
             label=""
             maxSize={2}
           />

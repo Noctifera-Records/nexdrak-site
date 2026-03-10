@@ -61,9 +61,6 @@ export default function Navbar() {
     return () => subscription.unsubscribe();
   }, [supabase.auth]);
 
-  // Verificar si el usuario es admin
-  const isAdmin = profile?.role === 'admin';
-
   // Cerrar menús cuando se hace clic fuera o se presiona Escape
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -77,6 +74,11 @@ export default function Navbar() {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  // Verificar si el usuario es admin
+  const isAdmin = profile?.role === 'admin';
+
+  const showPlaceholder = false;
+
   const navItems = [
     { name: "HOME", href: "/" },
     { name: "EVENTS", href: "/events" },
@@ -87,15 +89,16 @@ export default function Navbar() {
   ];
 
   return (
-    <header className="fixed top-0 w-full z-50 bg-black/70 backdrop-blur-md">
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-5">
+    <>
+      <header className="fixed top-0 w-full z-50 bg-black/70 backdrop-blur-md">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-5">
           <Link href="/" aria-label="Go to homepage">
-            <img
-              src={settings.navbar_logo}
-              alt={`${settings.site_title} logo`}
-              className="h-8 w-auto"
-            />
+              <img
+                src={settings.navbar_logo}
+                alt={`${settings.site_title} logo`}
+                className="h-8 w-auto"
+              />
           </Link>
           <span className="h-6 w-px bg-white/20" aria-hidden="true" />
           <div className="flex items-center gap-3">
@@ -105,6 +108,7 @@ export default function Navbar() {
               rel="noopener noreferrer"
               aria-label="Instagram"
               className="text-white/60 hover:text-white/80"
+              suppressHydrationWarning
             >
               <i className="fa-brands fa-instagram text-[14px]" />
             </a>
@@ -114,6 +118,7 @@ export default function Navbar() {
               rel="noopener noreferrer"
               aria-label="Twitter"
               className="text-white/60 hover:text-white/80"
+              suppressHydrationWarning
             >
               <i className="fa-brands fa-x-twitter text-[14px]" />
             </a>
@@ -123,6 +128,7 @@ export default function Navbar() {
               rel="noopener noreferrer"
               aria-label="YouTube"
               className="text-white/60 hover:text-white/80"
+              suppressHydrationWarning
             >
               <i className="fa-brands fa-youtube text-[14px]" />
             </a>
@@ -132,6 +138,7 @@ export default function Navbar() {
               rel="noopener noreferrer"
               aria-label="Spotify"
               className="text-white/60 hover:text-white/80"
+              suppressHydrationWarning
             >
               <i className="fa-brands fa-spotify text-[14px]" />
             </a>
@@ -144,9 +151,11 @@ export default function Navbar() {
             <Link
               key={item.name}
               href={item.href}
-              className="text-sm tracking-widest hover:text-white transition-colors"
+              className="text-sm tracking-widest text-white/70 hover:text-white transition-all duration-300 hover:scale-105 relative group"
+              suppressHydrationWarning
             >
               {item.name}
+              <span className="absolute -bottom-1 left-0 w-0 h-px bg-white transition-all duration-300 group-hover:w-full" />
             </Link>
           ))}
 
@@ -155,18 +164,22 @@ export default function Navbar() {
               {!isAdmin && (
                 <Link
                   href="/account"
-                  className="text-sm tracking-widest hover:text-white transition-colors"
+                  className="text-sm tracking-widest text-white/70 hover:text-white transition-all duration-300 hover:scale-105 relative group"
+                  suppressHydrationWarning
                 >
                   ACCOUNT
+                  <span className="absolute -bottom-1 left-0 w-0 h-px bg-white transition-all duration-300 group-hover:w-full" />
                 </Link>
               )}
             
               {isAdmin && (
                 <Link
                   href="/admin"
-                  className="text-sm tracking-widest hover:text-white transition-colors"
+                  className="text-sm tracking-widest text-white/70 hover:text-white transition-all duration-300 hover:scale-105 relative group"
+                  suppressHydrationWarning
                 >
                   ADMIN
+                  <span className="absolute -bottom-1 left-0 w-0 h-px bg-white transition-all duration-300 group-hover:w-full" />
                 </Link>
               )}
               
@@ -181,6 +194,7 @@ export default function Navbar() {
               variant="outline"
               className="border-white text-white hover:bg-white/20 rounded-md px-6"
               asChild
+              suppressHydrationWarning
             >
               <Link href="/login">LOGIN</Link>
             </Button>
@@ -200,6 +214,7 @@ export default function Navbar() {
                   ? "text-blue-300 bg-blue-900/50"
                   : "text-blue-400 hover:text-blue-300 hover:bg-blue-900/30"
               }`}
+              suppressHydrationWarning
             >
               <Settings className="h-5 w-5" />
             </Button>
@@ -219,30 +234,32 @@ export default function Navbar() {
             )}
           </Button>
         </div>
+      </div>
+    </header>
 
-        {/* Main Navigation Menu Overlay */}
+        {/* Main Navigation Menu Overlay - Rendered OUTSIDE header */}
         {isMainMenuOpen && (
-          <div className="fixed inset-0 z-[60] md:hidden">
-            <div
-              className="fixed inset-0 bg-black/80 backdrop-blur-sm"
-              onClick={() => setIsMainMenuOpen(false)}
+          <div className="fixed inset-0 z-[100] md:hidden">
+            <div 
+              className="absolute inset-0 bg-black/70 backdrop-blur-md" 
             />
-            <div className="fixed right-0 top-0 h-full w-[300px] bg-black border-l border-white/10 p-6 shadow-2xl z-[70]">
+            <div className="relative h-full w-full flex flex-col p-6 animate-in slide-in-from-right-10 fade-in duration-300">
               <div className="flex justify-end items-center mb-8">
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => setIsMainMenuOpen(false)}
+                  className="text-white hover:bg-white/10"
                 >
-                  <X className="h-6 w-6" />
+                  <X className="h-8 w-8" />
                 </Button>
               </div>
-              <nav className="flex flex-col space-y-6">
+              <nav className="flex flex-col items-center justify-center space-y-8 flex-grow">
                 {navItems.map((item) => (
                   <Link
                     key={item.name}
                     href={item.href}
-                    className="text-lg tracking-widest hover:text-white transition-colors"
+                    className="text-2xl font-bold tracking-widest hover:text-purple-400 transition-colors"
                     onClick={() => setIsMainMenuOpen(false)}
                   >
                     {item.name}
@@ -250,39 +267,43 @@ export default function Navbar() {
                 ))}
 
                 {user ? (
-                  <div className="border-t border-white/20 pt-6 mt-6 space-y-4">
-                    {/* Solo mostrar ACCOUNT si NO es admin */}
+                  <div className="border-t border-white/10 pt-8 mt-4 flex flex-col items-center gap-6 w-full max-w-xs">
                     {!isAdmin && (
                       <Link
                         href="/account"
-                        className="block text-lg tracking-widest hover:text-white transition-colors"
+                        className="text-xl tracking-widest hover:text-purple-400 transition-colors"
                         onClick={() => setIsMainMenuOpen(false)}
                       >
                         ACCOUNT
                       </Link>
                     )}
                     
-                    {/* Botón de logout para usuarios NO-admin (los admin ya lo tienen en su menú xd) */}
-                    {!isAdmin && (
-                      <LogoutButton
-                        variant="outline"
-                        className="w-full border-white text-white hover:bg-white/20 rounded-md"
-                      />
+                    {isAdmin && (
+                      <Link
+                        href="/admin"
+                        className="text-xl tracking-widest hover:text-purple-400 transition-colors"
+                        onClick={() => setIsMainMenuOpen(false)}
+                      >
+                        ADMIN
+                      </Link>
                     )}
+                    
+                    <LogoutButton
+                      variant="outline"
+                      className="w-full border-white/20 text-white hover:bg-white/10 text-lg py-6"
+                    />
                   </div>
                 ) : (
-                  <Button
-                    variant="outline"
-                    className="border-white text-white hover:bg-white/20 rounded-md mt-4"
-                    asChild
-                  >
-                    <Link
-                      href="/login"
+                  <div className="pt-8 mt-4 w-full max-w-xs">
+                    <Button
+                      variant="outline"
+                      className="w-full border-white text-white hover:bg-white/20 text-lg py-6 rounded-none"
+                      asChild
                       onClick={() => setIsMainMenuOpen(false)}
                     >
-                      LOGIN
-                    </Link>
-                  </Button>
+                      <Link href="/login">LOGIN</Link>
+                    </Button>
+                  </div>
                 )}
               </nav>
             </div>
@@ -376,7 +397,6 @@ export default function Navbar() {
             </div>
           </div>
         )}
-      </div>
-    </header>
+    </>
   );
 }
