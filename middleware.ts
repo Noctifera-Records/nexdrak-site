@@ -26,10 +26,3 @@ export const config = {
     '/account/:path*',
   ]
 }
-
-export const config = {
-  matcher: [
-    '/admin/:path*',
-    '/account/:path*',
-  ]
-}
