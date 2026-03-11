@@ -2,8 +2,8 @@ import { defineCloudflareConfig } from "@opennextjs/cloudflare";
 
 export default defineCloudflareConfig({
   build: {
-    minify: false,
+    minify: true,
     // Exclude pg-native from build (it's optional and fails in Workers)
-    external: ["pg-native"],
+    external: ["pg-native", "better-sqlite3", "mysql2"],
   },
 });
