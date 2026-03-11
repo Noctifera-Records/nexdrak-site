@@ -51,6 +51,13 @@ if (fs.existsSync(workerSrc)) {
   process.exit(1);
 }
 
+// 2.5 Copy .build directory (Contains Durable Objects and other essential logic)
+const buildSrc = path.join(sourceDir, '.build');
+if (fs.existsSync(buildSrc)) {
+  console.log('  Copying .build directory...');
+  copyDirRecursive(buildSrc, path.join(assetsDir, '.build'));
+}
+
 // 3. Copy server-functions directory (ESSENTIAL for splitting)
 // These contain chunks that _worker.js imports dynamically.
 const functionsSrc = path.join(sourceDir, 'server-functions');
