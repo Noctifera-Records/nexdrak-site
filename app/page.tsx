@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { getSiteSettings } from "@/lib/site-settings";
 import { getPublicSongs } from "@/app/music/actions";
+import HeroSection from "@/components/hero-section";
 
 const LatestReleases = dynamicImport(() => import("@/components/latest-releases"), {
   loading: () => <div className="h-96 w-full animate-pulse bg-gray-900 rounded-lg" />,
@@ -15,127 +16,134 @@ const LatestReleases = dynamicImport(() => import("@/components/latest-releases"
 const UpcomingEvents = dynamicImport(() => import("@/components/upcoming-events"), {
   loading: () => <div className="h-96 w-full animate-pulse bg-gray-900 rounded-lg" />,
 });
-import HeroSection from "@/components/hero-section";
-
 const Newsletter = dynamicImport(() => import("@/components/newsletter"));
-const SocialLinks = dynamicImport(() => import("@/components/social-links"));
-import CookieBanner from "@/components/cookie-banner";
 
-export const dynamic = 'force-static';
+export const runtime = 'edge';
 
 export default async function Home() {
   const settings = await getSiteSettings();
-  const { songs } = await getPublicSongs();
-  const latestSongs = songs.slice(0, 4); // Get only the 4 most recent
+  const { songs = [] } = await getPublicSongs();
+  
+  // Show only featured or latest 3 songs
+  const featuredSongs = songs.slice(0, 3);
 
   return (
-    <div className="relative min-h-screen flex flex-col">
-      {/* Hero section with logo fix */}
-      <CookieBanner />
+    <div className="flex flex-col min-h-screen">
+      {/* Hero Section */}
+      <HeroSection 
+        title={settings.hero_title || "NEXDRAK"}
+        subtitle={settings.hero_subtitle || "Electronic Music Producer & DJ"}
+        ctaText={settings.hero_cta_text || "Listen Now"}
+        ctaLink={settings.hero_cta_link || "/music"}
+      />
 
-      {/* Hero Section with New Single */}
-      <HeroSection settings={settings} />
-
-      {/* Content Below Red Line */}
-      <div className="bg-background text-foreground transition-colors duration-300">
-        {/* Latest Releases Section */}
-        <section className="py-20">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl md:text-5xl font-bold text-center mb-12 tracking-wider">
-              LATEST RELEASES
-            </h2>
-            <LatestReleases initialSongs={latestSongs} />
-            <div className="text-center mt-12">
-              <Link href="/music">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="border-foreground text-foreground hover:bg-foreground hover:text-background tracking-widest transition-colors"
-                >
-                  VIEW ALL MUSIC
-                </Button>
-              </Link>
-            </div>
+      {/* Quick Links Section */}
+      <section className="py-12 bg-black border-y border-white/5">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <Link 
+              href="/music" 
+              className="group p-6 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all duration-300 flex items-center space-x-4"
+            >
+              <div className="p-3 bg-white/10 rounded-full group-hover:scale-110 transition-transform">
+                <Music className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="font-bold text-lg">Music</h3>
+                <p className="text-white/60 text-sm">Latest releases & tracks</p>
+              </div>
+            </Link>
+            
+            <Link 
+              href="/events" 
+              className="group p-6 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all duration-300 flex items-center space-x-4"
+            >
+              <div className="p-3 bg-white/10 rounded-full group-hover:scale-110 transition-transform">
+                <CalendarDays className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="font-bold text-lg">Events</h3>
+                <p className="text-white/60 text-sm">Shows & performances</p>
+              </div>
+            </Link>
+            
+            <Link 
+              href="/merch" 
+              className="group p-6 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all duration-300 flex items-center space-x-4"
+            >
+              <div className="p-3 bg-white/10 rounded-full group-hover:scale-110 transition-transform">
+                <ShoppingBag className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="font-bold text-lg">Merch</h3>
+                <p className="text-white/60 text-sm">Exclusive artist gear</p>
+              </div>
+            </Link>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Upcoming Events Preview */}
-        <section className="py-20 bg-muted/30 dark:bg-black/50">
-          <div className="container mx-auto px-4">
-            <h2 className="text-4xl font-bold mb-12 text-center">
-              UPCOMING EVENTS
-            </h2>
-            <UpcomingEvents limit={3} />
-            <div className="flex justify-center mt-12">
-              <Button
-                asChild
-                variant="outline"
-                className="border-foreground text-foreground hover:bg-foreground/10 dark:hover:bg-white/20 rounded-md px-8 transition-colors"
-              >
-                <Link href="/events">VIEW ALL EVENTS</Link>
+      {/* Latest Releases Section */}
+      <section id="music" className="py-20 bg-black">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-black mb-4 uppercase tracking-tighter">
+                Latest <span className="text-white/40">Releases</span>
+              </h2>
+              <p className="text-white/60 max-w-xl">
+                Explore the latest sounds from NexDrak. From high-energy techno to immersive house beats.
+              </p>
+            </div>
+            <Link href="/music">
+              <Button variant="outline" className="border-white/20 hover:bg-white/10 hover:text-white uppercase tracking-widest text-xs h-12 px-8">
+                View All Tracks
               </Button>
+            </Link>
+          </div>
+          <LatestReleases initialSongs={featuredSongs} />
+        </div>
+      </section>
+
+      {/* Upcoming Events Section */}
+      <section id="events" className="py-20 bg-zinc-950">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-black mb-4 uppercase tracking-tighter">
+                Tour <span className="text-white/40">Dates</span>
+              </h2>
+              <p className="text-white/60 max-w-xl">
+                Catch NexDrak live at festivals and clubs near you. Secure your tickets for the next experience.
+              </p>
             </div>
+            <Link href="/events">
+              <Button variant="outline" className="border-white/20 hover:bg-white/10 hover:text-white uppercase tracking-widest text-xs h-12 px-8">
+                See Full Schedule
+              </Button>
+            </Link>
           </div>
-        </section>
+          <UpcomingEvents />
+        </div>
+      </section>
 
-        {/* Featured Content */}
-        <section className="py-20">
-          <div className="container mx-auto px-4">
-            <h2 className="text-4xl font-bold mb-12 text-center">EXPLORE</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <Link href="/events" className="group">
-                <div className="bg-card/50 dark:bg-black/50 backdrop-blur-sm border border-border dark:border-white/20 rounded-xl p-6 flex flex-col items-center text-center hover:bg-muted dark:hover:bg-white/10 transition-all h-full shadow-sm dark:shadow-none">
-                  <CalendarDays className="h-12 w-12 text-foreground dark:text-white mb-4" />
-                  <h3 className="text-xl font-bold mb-2">TOUR DATES</h3>
-                  <p className="text-muted-foreground dark:text-gray-400">
-                    Catch NexDrak live at venues around the world
-                  </p>
-                </div>
-              </Link>
-
-              <Link href="/merch" className="group">
-                <div className="bg-card/50 dark:bg-black/50 backdrop-blur-sm border border-border dark:border-white/20 rounded-xl p-6 flex flex-col items-center text-center hover:bg-muted dark:hover:bg-white/10 transition-all h-full shadow-sm dark:shadow-none">
-                  <ShoppingBag className="h-12 w-12 text-foreground dark:text-white mb-4" />
-                  <h3 className="text-xl font-bold mb-2">MERCH STORE</h3>
-                  <p className="text-muted-foreground dark:text-gray-400">
-                    Official merchandise and limited edition items
-                  </p>
-                </div>
-              </Link>
-
-              <Link href="/music" className="group">
-                <div className="bg-card/50 dark:bg-black/50 backdrop-blur-sm border border-border dark:border-white/20 rounded-xl p-6 flex flex-col items-center text-center hover:bg-muted dark:hover:bg-white/10 transition-all h-full shadow-sm dark:shadow-none">
-                  <Music className="h-12 w-12 text-foreground dark:text-white mb-4" />
-                  <h3 className="text-xl font-bold mb-2">DISCOGRAPHY</h3>
-                  <p className="text-muted-foreground dark:text-gray-400">
-                    Listen to the latest tracks and albums
-                  </p>
-                </div>
-              </Link>
-            </div>
+      {/* Connect Section */}
+      <section className="py-20 bg-black relative overflow-hidden">
+        {/* Abstract background element */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-white/5 blur-[120px] rounded-full -z-10" />
+        
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-4xl md:text-6xl font-black mb-8 uppercase tracking-tighter">
+            Stay in <span className="text-white/40">The Loop</span>
+          </h2>
+          <p className="text-white/60 max-w-2xl mx-auto mb-12 text-lg">
+            Join the community for early access to new music, exclusive tour announcements, and limited merchandise drops.
+          </p>
+          <div className="max-w-xl mx-auto">
+            <Newsletter />
           </div>
-        </section>
-
-        {/* Newsletter Section */}
-        <section className="py-20 bg-muted/30 dark:bg-black/50">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold mb-8 text-center">
-              JOIN THE NEWSLETTER
-            </h2>
-            <div className="max-w-md mx-auto">
-              <Newsletter />
-            </div>
-          </div>
-        </section>
-
-        {/* Social Links */}
-        <section className="py-20">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl font-bold mb-12">FOLLOW NEXDRAK</h2>
-            <SocialLinks />
-          </div>
-        </section>
-      </div>
+        </div>
+      </section>
     </div>
   );
 }
