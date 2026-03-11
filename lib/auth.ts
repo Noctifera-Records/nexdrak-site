@@ -18,7 +18,7 @@ export const auth = (() => {
     
     return betterAuth({
       database: drizzleAdapter(db, {
-        provider: "neon", // Use 'neon' to avoid bundling 'pg' native driver
+        provider: "pg", // Use 'pg' for postgres dialect
       }),
       emailAndPassword: {
         enabled: true,

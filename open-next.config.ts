@@ -1,6 +1,9 @@
 import { defineCloudflareConfig } from "@opennextjs/cloudflare";
 
-export default defineCloudflareConfig({
+const cloudflareConfig = defineCloudflareConfig();
+
+export default {
+  ...cloudflareConfig,
   build: {
     minify: true,
     // Externalize EVERYTHING that Cloudflare provides via nodejs_compat or is not needed.
@@ -18,7 +21,4 @@ export default defineCloudflareConfig({
       "@vercel/node", "@vercel/remix-builder", "undici"
     ],
   },
-  experimental: {
-    splitting: true,
-  },
-});
+} as any;

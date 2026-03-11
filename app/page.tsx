@@ -30,12 +30,7 @@ export default async function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <HeroSection 
-        title={settings.hero_title || "NEXDRAK"}
-        subtitle={settings.hero_subtitle || "Electronic Music Producer & DJ"}
-        ctaText={settings.hero_cta_text || "Listen Now"}
-        ctaLink={settings.hero_cta_link || "/music"}
-      />
+      <HeroSection settings={settings} />
 
       {/* Quick Links Section */}
       <section className="py-12 bg-black border-y border-white/5">
