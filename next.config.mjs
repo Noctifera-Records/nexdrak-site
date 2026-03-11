@@ -28,7 +28,10 @@ const nextConfig = {
   trailingSlash: false,
   reactStrictMode: true, // Enable strict mode for better performance
 
-  serverExternalPackages: ["@neondatabase/serverless", "drizzle-orm"],
+  // NOTE: Do NOT add packages here for Cloudflare Workers deployment.
+  // Workers have no node_modules at runtime — packages must be bundled.
+  // Use the 'external' array in open-next.config.ts instead.
+  serverExternalPackages: [],
   experimental: {
     optimizeCss: false,
     optimizePackageImports: [
@@ -55,34 +58,6 @@ const nextConfig = {
   turbopack: {},
 
   webpack: (config, { isServer, dev }) => {
-    // Optimize bundle splitting
-    if (!isServer && !dev) {
-      config.optimization = {
-        ...config.optimization,
-        splitChunks: {
-          chunks: 'all',
-          cacheGroups: {
-            vendor: {
-              test: /[\\/]node_modules[\\/]/,
-              name: 'vendors',
-              chunks: 'all',
-              priority: 10,
-            },
-            common: {
-              name: 'common',
-              minChunks: 2,
-              chunks: 'all',
-              priority: 5,
-              reuseExistingChunk: true,
-            },
-          },
-        },
-        usedExports: true,
-        sideEffects: false,
-      };
-    }
-
-
     return config;
   },
 

@@ -2,12 +2,12 @@ import { defineCloudflareConfig } from "@opennextjs/cloudflare";
 
 export default defineCloudflareConfig({
   build: {
-    minify: true, // Required to stay under Cloudflare free plan 3 MiB worker limit
-    // Exclude packages that are not needed / problematic in Cloudflare Workers.
-    // The project uses @neondatabase/serverless (Neon HTTP) for DB — not pg.
-    // Externalizing pg and other unused heavy packages reduces bundle size significantly.
+    minify: true,
+    // Externalize packages not needed in the Cloudflare Worker runtime.
+    // The project uses @neondatabase/serverless (Neon HTTP) for DB — NOT pg.
+    // Externalizing these reduces the compressed Worker size significantly.
     external: [
-      // Native / OS-level drivers — never work in Workers
+      // Native / OS-level DB drivers — never work in Workers
       "pg-native",
       "better-sqlite3",
       "mysql2",
@@ -15,7 +15,7 @@ export default defineCloudflareConfig({
       "tedious",
       "sqlite3",
       "@vscode/sqlite3",
-      // pg: project uses Neon HTTP driver, pg is NOT called at runtime in the Worker
+      // pg: project uses Neon HTTP driver, pg is NOT called at runtime
       "pg",
       "pg-pool",
       "pg-protocol",
@@ -27,17 +27,11 @@ export default defineCloudflareConfig({
       // Vercel-specific packages — not needed on Cloudflare
       "@vercel/node",
       "@vercel/remix-builder",
-      // Dev tools / analysis — never bundled but just in case
-      "lighthouse",
+      // undici: Cloudflare Workers has native fetch/HTTP via nodejs_compat
+      "undici",
     ],
   },
-  // Ensure middleware is handled correctly
-  middleware: {
-    external: true,
-    // Ensure middleware is compatible with Edge Runtime
-    override: {
-      wrapper: "cloudflare-edge",
-      converter: "edge",
-    },
+  experimental: {
+    splitting: true,
   },
-} as any);
+});

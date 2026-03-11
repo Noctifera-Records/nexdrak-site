@@ -10,7 +10,7 @@
     "vercel-build": "next build",
     "build:cf": "opennextjs-cloudflare build",
     "preview:cf": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "deploy:cf": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "deploy:cf": "npm run build:ci && npx wrangler pages deploy .open-next/assets --project-name nex-website",
     "build:ci": "opennextjs-cloudflare build && node scripts/prepare-cf-assets.js",
     "analyze": "ANALYZE=true npm run build",
     "optimize-images": "node scripts/optimize-images.js",
@@ -88,7 +88,7 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@opennextjs/cloudflare": "^1.14.8",
+    "@opennextjs/cloudflare": "^1.17.1",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^22",
     "@types/pg": "^8.18.0",

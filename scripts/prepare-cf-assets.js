@@ -1,127 +1,104 @@
 const fs = require('fs');
 const path = require('path');
 
-// Define source and destination directories
-// We are in 'scripts', so we go up one level to root
 const projectRoot = path.join(__dirname, '..');
 const sourceDir = path.join(projectRoot, '.open-next');
-const destDir = path.join(projectRoot, '.open-next/assets');
+const assetsDir = path.join(sourceDir, 'assets');
 
-// Helper function to copy a file if it exists
-function copyFile(src, dest) {
-  try {
-    const destDir = path.dirname(dest);
-    if (!fs.existsSync(destDir)) {
-      fs.mkdirSync(destDir, { recursive: true });
-    }
-    fs.copyFileSync(src, dest);
-    console.log(`Copied ${src} to ${dest}`);
-  } catch (err) {
-    console.error(`Error copying ${src} to ${dest}:`, err);
-  }
-}
-
-// Helper function to recursively copy a directory using fs.cpSync (Node.js 16.7+)
-function copyDirectory(src, dest) {
-  if (!fs.existsSync(src)) {
-    console.warn(`Source directory ${src} does not exist. Skipping.`);
-    return;
-  }
+/**
+ * Helper: Recursively copy a directory from src to dest.
+ */
+function copyDirRecursive(src, dest) {
+  if (!fs.existsSync(src)) return;
+  if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
   
-  try {
-    // dereference: true ensures symlinks are followed and content is copied,
-    // avoiding EISDIR errors with symlinked directories and ensuring self-contained build.
-    fs.cpSync(src, dest, { 
-      recursive: true, 
-      dereference: true,
-      // Filter out node_modules, .next directories, and any potential source maps
-      filter: (source) => !source.includes('node_modules') && !source.includes('.next') && !source.endsWith('.map'),
-    });
-    console.log(`Copied directory ${src} to ${dest} (excluding node_modules, .next & maps)`);
-  } catch (err) {
-    console.error(`Error copying directory ${src} to ${dest}:`, err);
-    // Don't crash immediately, allow other parts to attempt copy, but log error
-  }
-}
-
-// 1. Copy the main worker file
-const workerPath = path.join(sourceDir, 'worker.js');
-if (fs.existsSync(workerPath)) {
-  copyFile(workerPath, path.join(destDir, '_worker.js'));
-} else {
-  // Try alternative path for some OpenNext versions
-  const altWorkerPath = path.join(sourceDir, 'cloudflare/index.mjs');
-  if (fs.existsSync(altWorkerPath)) {
-    copyFile(altWorkerPath, path.join(destDir, '_worker.js'));
-  } else {
-    console.error('CRITICAL: worker.js or cloudflare/index.mjs not found in .open-next');
-  }
-}
-
-// 2. Copy the 'cloudflare' directory (contains images.js, init.js, skew-protection.js, etc.)
-copyDirectory(path.join(sourceDir, 'cloudflare'), path.join(destDir, 'cloudflare'));
-
-// 3. Copy the 'middleware' directory (contains handler.mjs)
-copyDirectory(path.join(sourceDir, 'middleware'), path.join(destDir, 'middleware'));
-
-// 4. Copy the '.build' directory (contains durable objects)
-copyDirectory(path.join(sourceDir, '.build'), path.join(destDir, '.build'));
-
-// 5. Copy the 'server-functions' directory (contains default/handler.mjs)
-copyDirectory(path.join(sourceDir, 'server-functions'), path.join(destDir, 'server-functions'));
-
-// 6. Copy assets from .open-next/assets to ensure everything is in the final destDir
-// OpenNext usually puts static assets here
-const assetsSourceDir = path.join(sourceDir, 'assets');
-if (fs.existsSync(assetsSourceDir)) {
-  console.log(`Copying all assets from ${assetsSourceDir} to ${destDir}`);
-  // Use a custom recursive copy to ensure we don't skip anything
-  function recursiveCopy(src, dest) {
-    const stats = fs.lstatSync(src);
-    if (stats.isDirectory()) {
-      if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
-      fs.readdirSync(src).forEach(child => {
-        recursiveCopy(path.join(src, child), path.join(dest, child));
-      });
+  const entries = fs.readdirSync(src, { withFileTypes: true });
+  for (const entry of entries) {
+    const srcPath = path.join(src, entry.name);
+    const destPath = path.join(dest, entry.name);
+    if (entry.isDirectory()) {
+      copyDirRecursive(srcPath, destPath);
     } else {
-      // If it's a symlink, resolve it
-      const realSrc = stats.isSymbolicLink() ? fs.realpathSync(src) : src;
-      fs.copyFileSync(realSrc, dest);
+      fs.copyFileSync(srcPath, destPath);
     }
   }
-  recursiveCopy(assetsSourceDir, destDir);
-} else {
-  console.warn(`WARNING: assets directory not found at ${assetsSourceDir}`);
 }
 
-// 6.5 Copy Cloudflare Pages special files if present in repo root
+/**
+ * Helper: Copy a single file, creating parent dirs as needed.
+ */
+function copyFile(src, dest) {
+  const dir = path.dirname(dest);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.copyFileSync(src, dest);
+  console.log(`  Copied: ${path.relative(projectRoot, dest)}`);
+}
+
+console.log('--- Preparing Cloudflare Pages Assets ---');
+
+// 1. Copy _headers from root if present
 const headersPath = path.join(projectRoot, '_headers');
 if (fs.existsSync(headersPath)) {
-  copyFile(headersPath, path.join(destDir, '_headers'));
+  copyFile(headersPath, path.join(assetsDir, '_headers'));
 }
 
-// 7. Create _routes.json
+// 2. Copy main worker.js as _worker.js (Pages entry point)
+const workerSrc = path.join(sourceDir, 'worker.js');
+if (fs.existsSync(workerSrc)) {
+  copyFile(workerSrc, path.join(assetsDir, '_worker.js'));
+} else {
+  console.error('CRITICAL: .open-next/worker.js not found! Run npm run build:cf first.');
+  process.exit(1);
+}
+
+// 3. Copy server-functions directory (ESSENTIAL for splitting)
+// These contain chunks that _worker.js imports dynamically.
+const functionsSrc = path.join(sourceDir, 'server-functions');
+if (fs.existsSync(functionsSrc)) {
+  console.log('  Copying server-functions directory for dynamic chunks...');
+  copyDirRecursive(functionsSrc, path.join(assetsDir, 'server-functions'));
+}
+
+// 4. Copy middleware directory if present
+const middlewareSrc = path.join(sourceDir, 'middleware');
+if (fs.existsSync(middlewareSrc)) {
+  console.log('  Copying middleware directory...');
+  copyDirRecursive(middlewareSrc, path.join(assetsDir, 'middleware'));
+}
+
+// 5. Copy cloudflare directory (contains images.js, next-env.mjs, etc.)
+const cloudflareSrc = path.join(sourceDir, 'cloudflare');
+if (fs.existsSync(cloudflareSrc)) {
+  console.log('  Copying cloudflare helpers directory...');
+  copyDirRecursive(cloudflareSrc, path.join(assetsDir, 'cloudflare'));
+}
+
+// 6. Generate _routes.json (Optimized to exclude chunks from static routing)
 const routesConfig = {
   version: 1,
-  include: ["/*"],
+  include: ['/*'],
   exclude: [
-    "/_next/static/*",
-    "/img/*",
-    "/favicon.ico",
-    "/robots.txt",
-    "/site.webmanifest",
-    "/*.png",
-    "/*.jpg",
-    "/*.svg",
-    "/*.css",
-    "/*.js",
-    "/*.txt",
-    "/cloudflare/*",
-    "/middleware/*",
-    "/server-functions/*",
-    "/_worker.js"
-  ]
+    '/_next/static/*',
+    '/server-functions/*', // Chunks are not assets
+    '/middleware/*',       // Middleware is not an asset
+    '/cloudflare/*',       // Helper scripts are not assets
+    '/img/*',
+    '/favicon.ico',
+    '/robots.txt',
+    '/site.webmanifest',
+    '/*.png',
+    '/*.jpg',
+    '/*.svg',
+    '/*.ico',
+    '/*.webp',
+    '/*.txt',
+  ],
 };
-fs.writeFileSync(path.join(destDir, '_routes.json'), JSON.stringify(routesConfig, null, 2));
 
-console.log('Successfully prepared assets for Cloudflare Pages deployment.');
+fs.writeFileSync(
+  path.join(assetsDir, '_routes.json'),
+  JSON.stringify(routesConfig, null, 2),
+);
+console.log('  Written: .open-next/assets/_routes.json');
+
+console.log('\nDeployment assets ready in .open-next/assets/');
