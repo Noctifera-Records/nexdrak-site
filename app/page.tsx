@@ -7,6 +7,7 @@ import {
   Music,
 } from "lucide-react";
 import { getSiteSettings } from "@/lib/site-settings";
+import { getPublicSongs } from "@/app/music/actions";
 
 const LatestReleases = dynamicImport(() => import("@/components/latest-releases"), {
   loading: () => <div className="h-96 w-full animate-pulse bg-gray-900 rounded-lg" />,
@@ -24,6 +25,8 @@ export const dynamic = 'force-static';
 
 export default async function Home() {
   const settings = await getSiteSettings();
+  const { songs } = await getPublicSongs();
+  const latestSongs = songs.slice(0, 4); // Get only the 4 most recent
 
   return (
     <div className="relative min-h-screen flex flex-col">
@@ -41,7 +44,7 @@ export default async function Home() {
             <h2 className="text-3xl md:text-5xl font-bold text-center mb-12 tracking-wider">
               LATEST RELEASES
             </h2>
-            <LatestReleases />
+            <LatestReleases initialSongs={latestSongs} />
             <div className="text-center mt-12">
               <Link href="/music">
                 <Button

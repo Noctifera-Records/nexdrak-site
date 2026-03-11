@@ -148,7 +148,7 @@ export default function AboutPage() {
         </div>
         <div className="relative aspect-video order-1 md:order-2">
           <Image
-            src="img/live_experience.png"
+            src="/img/live_experience.png"
             alt="NexDrak Live Performance"
             fill
             className="object-cover rounded-xl"

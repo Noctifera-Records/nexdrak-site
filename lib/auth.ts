@@ -1,6 +1,8 @@
 import { betterAuth } from "better-auth";
 import { admin, twoFactor } from "better-auth/plugins";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { Resend } from "resend";
+import { getDb } from "./db";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const fromEmail = process.env.EMAIL_FROM!;
@@ -267,10 +269,12 @@ type DbLike = { query: (...args: any[]) => Promise<any> };
 
 export const auth = (() => {
   try {
+    const db = getDb();
+    
     return betterAuth({
-      database: {
-        query: async () => ({ rows: [] }),
-      } as DbLike,
+      database: drizzleAdapter(db, {
+        provider: "pg",
+      }),
       emailAndPassword: {
         enabled: true,
         requireEmailVerification: true,

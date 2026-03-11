@@ -1,6 +1,6 @@
 "use server";
 
-import { db } from "@/lib/db";
+import { createServiceRoleClient } from "@/lib/supabase/service";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
@@ -13,20 +13,24 @@ export async function getDownloads() {
     return null;
   }
 
-  const { rows } = await db.query(`
-    SELECT * FROM downloads 
-    ORDER BY is_featured DESC, created_at DESC
-  `);
+  let supabase;
+  try {
+    supabase = createServiceRoleClient();
+  } catch {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from("downloads")
+    .select("*")
+    .order("is_featured", { ascending: false })
+    .order("created_at", { ascending: false });
   
-  return rows;
+  if (error || !data) return [];
+  return data;
 }
 
 export async function incrementDownloadCount(id: number) {
-  // We can allow incrementing count without strict auth check if we want, 
-  // but since the page is protected, it's fine. 
-  // However, the action might be called from client component.
-  // Ideally, we check auth here too.
-  
   const session = await auth.api.getSession({
     headers: await headers()
   });
@@ -35,11 +39,18 @@ export async function incrementDownloadCount(id: number) {
     throw new Error("Unauthorized");
   }
 
-  await db.query(`
-    UPDATE downloads 
-    SET download_count = download_count + 1 
-    WHERE id = $1
-  `, [id]);
+  let supabase;
+  try {
+    supabase = createServiceRoleClient();
+  } catch {
+    throw new Error("Database unavailable");
+  }
+
+  const { error } = await supabase.rpc("increment_download_count", { download_id: id });
+  
+  if (error) {
+    throw new Error("Failed to increment download count");
+  }
   
   return { success: true };
 }

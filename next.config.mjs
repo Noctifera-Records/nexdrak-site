@@ -28,7 +28,7 @@ const nextConfig = {
   trailingSlash: false,
   reactStrictMode: true, // Enable strict mode for better performance
 
-  serverExternalPackages: [],
+  serverExternalPackages: ["@neondatabase/serverless", "drizzle-orm"],
   experimental: {
     optimizeCss: false,
     optimizePackageImports: [
