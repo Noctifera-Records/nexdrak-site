@@ -23,7 +23,7 @@ const nextConfig = {
   reactStrictMode: true,
 
   // IMPORTANT: Externalize DB and other node-heavy packages
-  serverExternalPackages: ["@neondatabase/serverless", "pg", "pg-native"],
+  serverExternalPackages: ["pg", "pg-native"],
   
   experimental: {
     optimizeCss: false,
