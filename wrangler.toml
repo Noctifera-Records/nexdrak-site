@@ -1,8 +1,12 @@
 name = "nex-website"
-pages_build_output_dir = ".open-next/assets"
+main = ".open-next/worker.js"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 
-# Ensure variables are treated correctly (though they should be set in dashboard)
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+# Environment variables should be set in Cloudflare Dashboard
 [vars]
 # NODE_ENV = "production"

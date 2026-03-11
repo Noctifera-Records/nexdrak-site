@@ -2,7 +2,7 @@ import { defineCloudflareConfig } from "@opennextjs/cloudflare";
 
 export default defineCloudflareConfig({
   build: {
-    minify: false, // Changed to false to avoid "Duplicate key" warnings and improve debugging
+    minify: true, // Required to stay under Cloudflare free plan 3 MiB worker limit
     // Exclude packages that are problematic in Workers
     external: [
       "pg-native", 
