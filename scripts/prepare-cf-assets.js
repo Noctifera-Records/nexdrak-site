@@ -34,9 +34,10 @@ function copyDirectory(src, dest) {
     fs.cpSync(src, dest, { 
       recursive: true, 
       dereference: true,
-      filter: (source) => !source.includes('node_modules'),
+      // Filter out node_modules and .next directories to reduce size and avoid conflicts
+      filter: (source) => !source.includes('node_modules') && !source.includes('.next'),
     });
-    console.log(`Copied directory ${src} to ${dest} (excluding node_modules)`);
+    console.log(`Copied directory ${src} to ${dest} (excluding node_modules & .next)`);
   } catch (err) {
     console.error(`Error copying directory ${src} to ${dest}:`, err);
     // Don't crash immediately, allow other parts to attempt copy, but log error
