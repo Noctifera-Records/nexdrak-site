@@ -4,30 +4,29 @@ import { Button } from "@/components/ui/button";
 import { Play } from "lucide-react";
 import Link from "next/link";
 import OptimizedImage from "@/components/optimized-image";
-import { useSiteSettings } from "@/hooks/use-site-settings";
 import { useState, useEffect } from "react";
+import Image from "next/image";
+import { SiteSettings } from "@/lib/site-settings";
 
-export default function HeroSection() {
-  const { settings, loading } = useSiteSettings();
+export default function HeroSection({ settings }: { settings: SiteSettings }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Solo marcamos como montado
     setMounted(true);
   }, []);
 
   return (
     <div className="h-screen flex flex-col items-center justify-center text-center px-4 relative overflow-hidden" suppressHydrationWarning>
-      {/* Background Image/GIF */}
-      <div 
-        className="absolute inset-0 z-0 transition-all duration-500"
-        style={{
-          backgroundImage: `url(${settings.hero_background_image})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
-      >
+      {/* Background Image - Priority for LCP */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src={settings.hero_background_image}
+          alt="Hero Background"
+          fill
+          priority
+          className="object-cover transition-all duration-500"
+          sizes="100vw"
+        />
         {/* Filtro invertido en modo claro para imágenes oscuras */}
         <div className="absolute inset-0 backdrop-filter dark:backdrop-filter-none invert dark:invert-0 transition-all duration-500" />
       </div>

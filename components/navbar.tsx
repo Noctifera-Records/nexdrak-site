@@ -2,83 +2,49 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X, ChevronRight, Settings } from "lucide-react";
+import { Menu, X, Settings, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-  SheetTitle,
-} from "@/components/ui/sheet";
-import { createClient } from "@/lib/supabase/client";
+import { authClient } from "@/lib/auth-client";
 import { useSiteSettings } from "@/hooks/use-site-settings";
-import LogoutButton from "./logout-button";
 import { ThemeToggle } from "./theme-toggle";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function Navbar() {
   const [isMainMenuOpen, setIsMainMenuOpen] = useState(false);
-  const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false);
-  const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
+  const [mounted, setMounted] = useState(false);
+  const { data: session } = authClient.useSession();
+  const router = useRouter();
+  
   const { settings } = useSiteSettings();
-  const supabase = createClient();
+  const user = session?.user;
+  const isAdmin = user?.role === "admin";
 
   useEffect(() => {
-    // Obtener usuario actual y su perfil
-    const getUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      
-      if (user) {
-        // Obtener el perfil del usuario para verificar su rol
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .single();
-        
-        setProfile(profile);
-      }
-      
-      setUser(user);
-    };
-
-    getUser();
-
-    // Escuchar cambios de autenticación
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user || null);
-      if (!session?.user) {
-        setProfile(null);
-      } else {
-        // Obtener perfil del nuevo usuario
-        getUser();
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [supabase.auth]);
-
-  // Cerrar menús cuando se hace clic fuera o se presiona Escape
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setIsMainMenuOpen(false);
-        setIsAdminMenuOpen(false);
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    setMounted(true);
   }, []);
 
-  // Verificar si el usuario es admin
-  const isAdmin = profile?.role === 'admin';
-
-  const showPlaceholder = false;
+  const handleLogout = async () => {
+      await authClient.signOut({
+          fetchOptions: {
+              onSuccess: () => {
+                  toast.success("Successfully logged out");
+                  router.push("/login");
+                  // Force a full page reload to clear any client-side session state
+                  window.location.href = "/login";
+              },
+          },
+      });
+  };
 
   const navItems = [
     { name: "HOME", href: "/" },
@@ -89,321 +55,242 @@ export default function Navbar() {
     { name: "BIO", href: "/about" },
   ];
 
+  if (!mounted) {
+    return (
+      <header className="fixed top-0 left-0 right-0 z-[100] bg-background border-b border-border h-20">
+        <div className="container mx-auto px-6 h-full flex items-center justify-between">
+            <div className="h-10 w-32 bg-muted/20 animate-pulse rounded" />
+        </div>
+      </header>
+    );
+  }
+
   return (
     <>
-      <header className="fixed top-0 w-full z-50 bg-white/70 dark:bg-black/70 backdrop-blur-md transition-colors duration-300">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-5">
-          <Link href="/" aria-label="Go to homepage">
-              <img
-                src={settings.navbar_logo}
-                alt={`${settings.site_title} logo`}
-                className="h-8 w-auto dark:invert-0 invert transition-all duration-300"
-              />
-          </Link>
-          <span className="h-6 w-px bg-black/20 dark:bg-white/20" aria-hidden="true" />
-          <div className="flex items-center gap-3">
-            <a
-              href="https://www.instagram.com/nexdrak"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Instagram"
-              className="text-black/60 dark:text-white/60 hover:text-black/80 dark:hover:text-white/80 transition-colors"
-              suppressHydrationWarning
-            >
-              <i className="fa-brands fa-instagram text-[14px]" />
-            </a>
-            <a
-              href="https://x.com/nexdrak"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Twitter"
-              className="text-black/60 dark:text-white/60 hover:text-black/80 dark:hover:text-white/80 transition-colors"
-              suppressHydrationWarning
-            >
-              <i className="fa-brands fa-x-twitter text-[14px]" />
-            </a>
-            <a
-              href="https://www.youtube.com/@nexdrak"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="YouTube"
-              className="text-black/60 dark:text-white/60 hover:text-black/80 dark:hover:text-white/80 transition-colors"
-              suppressHydrationWarning
-            >
-              <i className="fa-brands fa-youtube text-[14px]" />
-            </a>
-            <a
-              href="https://open.spotify.com/artist/1DRRpAYf6HmdFkLLPXeMEx"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Spotify"
-              className="text-black/60 dark:text-white/60 hover:text-black/80 dark:hover:text-white/80 transition-colors"
-              suppressHydrationWarning
-            >
-              <i className="fa-brands fa-spotify text-[14px]" />
-            </a>
-          </div>
-        </div>
-
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-8">
-          {navItems.map((item) => (
-            <Link
-              key={item.name}
-              href={item.href}
-              className="text-sm tracking-widest text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white transition-all duration-300 hover:scale-105 relative group"
-              suppressHydrationWarning
-            >
-              {item.name}
-              <span className="absolute -bottom-1 left-0 w-0 h-px bg-black dark:bg-white transition-all duration-300 group-hover:w-full" />
+      <header className="fixed top-0 left-0 right-0 z-[100] bg-background/70 backdrop-blur-md border-b border-border shadow-sm transition-all duration-300">
+        <div className="container mx-auto px-6 h-20 flex items-center justify-between">
+          
+          {/* Left Section: Logo & Socials */}
+          <div className="flex items-center gap-6">
+            <Link href="/" aria-label="Go to homepage" className="flex-shrink-0 flex items-center z-20">
+                {settings?.navbar_logo ? (
+                  <img
+                    src={settings.navbar_logo}
+                    alt={settings.site_title || "Logo"}
+                    className="h-10 w-auto object-contain transition-opacity hover:opacity-80"
+                  />
+                ) : (
+                  <span className="text-2xl font-bold tracking-tighter text-foreground">NEXDRAK</span>
+                )}
             </Link>
-          ))}
 
-          {user ? (
-            <div className="flex items-center space-x-4">
-              {!isAdmin && (
-                <Link
-                  href="/account"
-                  className="text-sm tracking-widest text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white transition-all duration-300 hover:scale-105 relative group"
-                  suppressHydrationWarning
-                >
-                  ACCOUNT
-                  <span className="absolute -bottom-1 left-0 w-0 h-px bg-black dark:bg-white transition-all duration-300 group-hover:w-full" />
-                </Link>
-              )}
-            
-              {isAdmin && (
-                <Link
-                  href="/admin"
-                  className="text-sm tracking-widest text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white transition-all duration-300 hover:scale-105 relative group"
-                  suppressHydrationWarning
-                >
-                  ADMIN
-                  <span className="absolute -bottom-1 left-0 w-0 h-px bg-black dark:bg-white transition-all duration-300 group-hover:w-full" />
-                </Link>
-              )}
-              
-              <LogoutButton
-                variant="outline"
-                size="sm"
-                className="border-black dark:border-white text-black dark:text-white hover:bg-black/10 dark:hover:bg-white/20"
-              />
-              <ThemeToggle />
+            <span className="h-6 w-px bg-border hidden lg:block" />
+
+            <div className="hidden lg:flex items-center gap-4 text-muted-foreground">
+              <a href="https://www.instagram.com/nexdrak" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors hover:scale-110">
+                <i className="fa-brands fa-instagram text-lg" />
+              </a>
+              <a href="https://x.com/nexdrak" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors hover:scale-110">
+                <i className="fa-brands fa-x-twitter text-lg" />
+              </a>
+              <a href="https://www.youtube.com/@nexdrak" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors hover:scale-110">
+                <i className="fa-brands fa-youtube text-lg" />
+              </a>
+              <a href="https://open.spotify.com/artist/1DRRpAYf6HmdFkLLPXeMEx" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors hover:scale-110">
+                <i className="fa-brands fa-spotify text-lg" />
+              </a>
             </div>
-          ) : (
+          </div>
+
+          {/* Right Section: Navigation & Auth */}
+          <div className="hidden lg:flex items-center justify-end gap-8">
+            <nav className="flex items-center gap-6 xl:gap-8">
+              {navItems.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className="text-sm font-medium tracking-widest text-muted-foreground hover:text-primary transition-all duration-200 relative group py-2"
+                >
+                  {item.name}
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
+                </Link>
+              ))}
+            </nav>
+
+            <div className="h-6 w-px bg-border" />
+
             <div className="flex items-center gap-4">
               <ThemeToggle />
-              <Button
-                variant="outline"
-                className="border-black dark:border-white text-black dark:text-white hover:bg-black/10 dark:hover:bg-white/20 rounded-md px-6"
-                asChild
-                suppressHydrationWarning
-              >
-                <Link href="/login">LOGIN</Link>
-              </Button>
+              
+              {user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-9 w-9 rounded-full ml-2 ring-2 ring-transparent hover:ring-primary/20 transition-all">
+                      <Avatar className="h-9 w-9 border border-border">
+                        <AvatarImage src={user.image || ""} alt={user.name || ""} />
+                        <AvatarFallback>{user.name?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56 mt-2" align="end" forceMount>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">{user.name}</p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user.email}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {isAdmin && (
+                      <DropdownMenuItem asChild>
+                        <Link href="/admin" className="cursor-pointer w-full flex items-center">
+                          <Settings className="mr-2 h-4 w-4" />
+                          <span>Admin Dashboard</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuItem asChild>
+                      <Link href="/account" className="cursor-pointer w-full flex items-center">
+                        <User className="mr-2 h-4 w-4" />
+                        <span>My Account</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive focus:text-destructive w-full flex items-center">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Button asChild size="sm" className="px-6 font-semibold tracking-wide ml-2">
+                  <Link href="/login">LOGIN</Link>
+                </Button>
+              )}
             </div>
-          )}
-        </nav>
+          </div>
 
-        {/* Mobile Navigation */}
-        <div className="md:hidden flex items-center gap-2">
-          <ThemeToggle />
-          {user && isAdmin && (
+          {/* Mobile Menu Toggle */}
+          <div className="lg:hidden flex items-center gap-4 z-20">
+            <ThemeToggle />
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setIsAdminMenuOpen(!isAdminMenuOpen)}
-              aria-label="Toggle admin menu"
-              className={`transition-colors ${
-                isAdminMenuOpen
-                  ? "text-blue-600 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/50"
-                  : "text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/30"
-              }`}
-              suppressHydrationWarning
+              onClick={() => setIsMainMenuOpen(true)}
+              aria-label="Open menu"
             >
-              <Settings className="h-5 w-5" />
+              <Menu className="h-7 w-7" />
             </Button>
-          )}
-
-          {/* Main Menu Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsMainMenuOpen(!isMainMenuOpen)}
-            aria-label="Toggle navigation menu"
-            className="text-black dark:text-white hover:bg-black/10 dark:hover:bg-white/10"
-          >
-            {isMainMenuOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
-          </Button>
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
 
-        {/* Main Navigation Menu Overlay - Rendered OUTSIDE header */}
-        {isMainMenuOpen && (
-          <div className="fixed inset-0 z-[100] md:hidden">
-            <div 
-              className="absolute inset-0 bg-white/80 dark:bg-black/80 backdrop-blur-md transition-colors duration-300" 
-            />
-            <div className="relative h-full w-full flex flex-col p-6 animate-in slide-in-from-right-10 fade-in duration-300">
-              <div className="flex justify-end items-center mb-8">
-                <Button
-                  variant="ghost"
-                  size="icon"
+      {/* Spacer */}
+      <div className="h-20" />
+
+      {/* Mobile Menu Overlay */}
+      {isMainMenuOpen && (
+        <div className="fixed inset-0 z-[150] lg:hidden bg-background/80 backdrop-blur-md">
+          <div className="flex flex-col h-full p-6 animate-in slide-in-from-right-10 duration-200">
+            <div className="flex items-center justify-between mb-8">
+              <span className="text-xl font-bold tracking-tight">MENU</span>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsMainMenuOpen(false)}
+                className="h-10 w-10"
+              >
+                <X className="h-8 w-8" />
+              </Button>
+            </div>
+            
+            <nav className="flex flex-col space-y-6 flex-grow overflow-y-auto text-center justify-center">
+              {navItems.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className="text-3xl font-bold tracking-widest hover:text-primary transition-colors py-4 border-b border-border/10"
                   onClick={() => setIsMainMenuOpen(false)}
-                  className="text-black dark:text-white hover:bg-black/10 dark:hover:bg-white/10"
                 >
-                  <X className="h-8 w-8" />
-                </Button>
-              </div>
-              <nav className="flex flex-col items-center justify-center space-y-8 flex-grow">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className="text-2xl font-bold tracking-widest text-black dark:text-white hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
-                    onClick={() => setIsMainMenuOpen(false)}
-                  >
-                    {item.name}
-                  </Link>
-                ))}
+                  {item.name}
+                </Link>
+              ))}
 
-                {user ? (
-                  <div className="border-t border-black/10 dark:border-white/10 pt-8 mt-4 flex flex-col items-center gap-6 w-full max-w-xs">
-                    {!isAdmin && (
-                      <Link
-                        href="/account"
-                        className="text-xl tracking-widest text-black dark:text-white hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
-                        onClick={() => setIsMainMenuOpen(false)}
-                      >
-                        ACCOUNT
-                      </Link>
-                    )}
-                    
-                    {isAdmin && (
-                      <Link
-                        href="/admin"
-                        className="text-xl tracking-widest text-black dark:text-white hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
-                        onClick={() => setIsMainMenuOpen(false)}
-                      >
-                        ADMIN
-                      </Link>
-                    )}
-                    
-                    <LogoutButton
-                      variant="outline"
-                      className="w-full border-black/20 dark:border-white/20 text-black dark:text-white hover:bg-black/10 dark:hover:bg-white/10 text-lg py-6"
-                    />
+              {user ? (
+                <div className="space-y-4 pt-8 w-full max-w-sm mx-auto">
+                  <div className="flex flex-col items-center gap-3 px-2 py-4 bg-muted/30 rounded-lg">
+                    <Avatar className="h-16 w-16 border-2 border-primary/20">
+                      <AvatarImage src={user.image || ""} alt={user.name || ""} />
+                      <AvatarFallback className="text-xl">{user.name?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col text-center">
+                      <p className="font-semibold text-xl">{user.name}</p>
+                      <p className="text-sm text-muted-foreground">{user.email}</p>
+                    </div>
                   </div>
-                ) : (
-                  <div className="pt-8 mt-4 w-full max-w-xs">
-                    <Button
-                      variant="outline"
-                      className="w-full border-black dark:border-white text-black dark:text-white hover:bg-black/10 dark:hover:bg-white/20 text-lg py-6 rounded-none"
-                      asChild
+
+                  {isAdmin && (
+                    <Link
+                      href="/admin"
+                      className="flex items-center justify-center gap-3 p-4 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors text-lg font-medium text-primary"
                       onClick={() => setIsMainMenuOpen(false)}
                     >
-                      <Link href="/login">LOGIN</Link>
-                    </Button>
-                  </div>
-                )}
-              </nav>
-            </div>
-          </div>
-        )}
-
-        {/* Admin Menu Overlay */}
-        {isAdminMenuOpen && user && (
-          <div className="fixed inset-0 z-[60] md:hidden">
-            <div
-              className="fixed inset-0 bg-black/70 backdrop-blur-sm"
-              onClick={() => setIsAdminMenuOpen(false)}
-            />
-            <div className="fixed left-0 top-0 h-full w-[280px] bg-blue-900 border-r border-blue-500/30 p-6 shadow-2xl z-[70]">
-              <div className="flex justify-between items-center mb-8">
-                <h2 className="text-lg font-bold text-blue-100">Admin Panel</h2>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setIsAdminMenuOpen(false)}
-                  className="text-blue-100 hover:bg-blue-800/50"
-                >
-                  <X className="h-6 w-6" />
-                </Button>
-              </div>
-              <nav className="flex flex-col space-y-4">
-                <Link
-                  href="/admin"
-                  className="flex items-center gap-3 text-blue-100 hover:text-white transition-colors p-3 rounded-lg hover:bg-blue-800/50"
-                  onClick={() => setIsAdminMenuOpen(false)}
-                >
-                  <Settings className="h-5 w-5" />
-                  Dashboard
-                </Link>
-                <Link
-                  href="/admin/music"
-                  className="flex items-center gap-3 text-blue-100 hover:text-white transition-colors p-3 rounded-lg hover:bg-blue-800/50"
-                  onClick={() => setIsAdminMenuOpen(false)}
-                >
-                  <span className="text-lg">🎵</span>
-                  Music
-                </Link>
-                <Link
-                  href="/admin/merch"
-                  className="flex items-center gap-3 text-blue-100 hover:text-white transition-colors p-3 rounded-lg hover:bg-blue-800/50"
-                  onClick={() => setIsAdminMenuOpen(false)}
-                >
-                  <span className="text-lg">🛍️</span>
-                  Merchandise
-                </Link>
-                <Link
-                  href="/admin/events"
-                  className="flex items-center gap-3 text-blue-100 hover:text-white transition-colors p-3 rounded-lg hover:bg-blue-800/50"
-                  onClick={() => setIsAdminMenuOpen(false)}
-                >
-                  <span className="text-lg">📅</span>
-                  Events
-                </Link>
-                <Link
-                  href="/admin/users"
-                  className="flex items-center gap-3 text-blue-100 hover:text-white transition-colors p-3 rounded-lg hover:bg-blue-800/50"
-                  onClick={() => setIsAdminMenuOpen(false)}
-                >
-                  <span className="text-lg">👥</span>
-                  Users
-                </Link>
-                <Link
-                  href="/admin/settings"
-                  className="flex items-center gap-3 text-blue-100 hover:text-white transition-colors p-3 rounded-lg hover:bg-blue-800/50"
-                  onClick={() => setIsAdminMenuOpen(false)}
-                >
-                  <span className="text-lg">⚙️</span>
-                  Settings
-                </Link>
-                <Link
-                  href="/admin/account"
-                  className="flex items-center gap-3 text-blue-100 hover:text-white transition-colors p-3 rounded-lg hover:bg-blue-800/50"
-                  onClick={() => setIsAdminMenuOpen(false)}
-                >
-                  <span className="text-lg">👤</span>
-                  Account
-                </Link>
-
-                <div className="border-t border-blue-500/30 pt-4 mt-4">
-                  <LogoutButton
-                    variant="outline"
-                    className="w-full border-blue-300 text-blue-100 hover:bg-blue-800/50 rounded-md"
-                  />
+                      <Settings className="h-6 w-6" />
+                      Admin Dashboard
+                    </Link>
+                  )}
+                  <Link
+                    href="/account"
+                    className="flex items-center justify-center gap-3 p-4 rounded-lg hover:bg-muted/50 transition-colors text-lg font-medium"
+                    onClick={() => setIsMainMenuOpen(false)}
+                  >
+                    <User className="h-6 w-6" />
+                    My Account
+                  </Link>
+                  <Button
+                    variant="destructive"
+                    size="lg"
+                    className="w-full justify-center mt-6 text-lg"
+                    onClick={() => {
+                      handleLogout();
+                      setIsMainMenuOpen(false);
+                    }}
+                  >
+                    <LogOut className="mr-3 h-5 w-5" />
+                    Log out
+                  </Button>
                 </div>
-              </nav>
+              ) : (
+                <Button
+                  size="lg"
+                  className="w-full text-xl py-8 mt-12 font-bold tracking-widest max-w-sm mx-auto"
+                  asChild
+                  onClick={() => setIsMainMenuOpen(false)}
+                >
+                  <Link href="/login">LOGIN</Link>
+                </Button>
+              )}
+            </nav>
+            
+            {/* Mobile Footer */}
+            <div className="flex justify-center gap-10 py-8 mt-auto border-t">
+              <a href="https://www.instagram.com/nexdrak" target="_blank" className="text-muted-foreground hover:text-foreground transition-colors hover:scale-110">
+                <i className="fa-brands fa-instagram text-3xl" />
+              </a>
+              <a href="https://x.com/nexdrak" target="_blank" className="text-muted-foreground hover:text-foreground transition-colors hover:scale-110">
+                <i className="fa-brands fa-x-twitter text-3xl" />
+              </a>
+              <a href="https://www.youtube.com/@nexdrak" target="_blank" className="text-muted-foreground hover:text-foreground transition-colors hover:scale-110">
+                <i className="fa-brands fa-youtube text-3xl" />
+              </a>
+              <a href="https://open.spotify.com/artist/1DRRpAYf6HmdFkLLPXeMEx" target="_blank" className="text-muted-foreground hover:text-foreground transition-colors hover:scale-110">
+                <i className="fa-brands fa-spotify text-3xl" />
+              </a>
             </div>
           </div>
-        )}
+        </div>
+      )}
     </>
   );
 }

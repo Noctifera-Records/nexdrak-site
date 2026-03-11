@@ -8,8 +8,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { createClient } from '@/lib/supabase/client';
 import { AdminImageUpload } from '@/components/image-upload';
+import { createEvent, updateEvent } from './actions';
+import { toast } from 'sonner';
 
 interface Event {
   id: number;
@@ -46,7 +47,6 @@ export function EventForm({ event, onClose }: EventFormProps) {
     is_published: true
   });
   const [loading, setLoading] = useState(false);
-  const supabase = createClient();
 
   useEffect(() => {
     if (event) {
@@ -83,33 +83,20 @@ export function EventForm({ event, onClose }: EventFormProps) {
         is_published: formData.is_published
       };
 
-      let error;
-
       if (event) {
         // Update existing event
-        const result = await supabase
-          .from('events')
-          .update(eventData)
-          .eq('id', event.id);
-        error = result.error;
+        await updateEvent(event.id, eventData);
+        toast.success('Event updated');
       } else {
         // Create new event
-        const result = await supabase
-          .from('events')
-          .insert([eventData]);
-        error = result.error;
-      }
-
-      if (error) {
-        console.error('Error saving event:', error);
-        alert('Error al guardar el evento');
-        return;
+        await createEvent(eventData);
+        toast.success('Event created');
       }
 
       onClose();
-    } catch (error) {
-      console.error('Error:', error);
-      alert('Error al guardar el evento');
+    } catch (error: any) {
+      console.error('Error saving event:', error);
+      toast.error(error.message || 'Error saving event');
     } finally {
       setLoading(false);
     }
@@ -124,7 +111,7 @@ export function EventForm({ event, onClose }: EventFormProps) {
       <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>
-            {event ? 'Editar Evento' : 'Agregar Evento'}
+            {event ? 'Edit Event' : 'Add Event'}
           </CardTitle>
           <Button variant="ghost" size="sm" onClick={onClose}>
             <X className="h-4 w-4" />
@@ -134,30 +121,30 @@ export function EventForm({ event, onClose }: EventFormProps) {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="title">Título del Evento *</Label>
+              <Label htmlFor="title">Event Title *</Label>
               <Input
                 id="title"
                 value={formData.title}
                 onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                placeholder="Nombre del evento"
+                placeholder="Event Name"
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Descripción</Label>
+              <Label htmlFor="description">Description</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Descripción del evento..."
+                placeholder="Event details..."
                 rows={3}
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="date">Fecha *</Label>
+                <Label htmlFor="date">Date *</Label>
                 <Input
                   id="date"
                   type="date"
@@ -168,7 +155,7 @@ export function EventForm({ event, onClose }: EventFormProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="time">Hora</Label>
+                <Label htmlFor="time">Time</Label>
                 <Input
                   id="time"
                   type="time"
@@ -180,28 +167,28 @@ export function EventForm({ event, onClose }: EventFormProps) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="venue">Venue/Local</Label>
+                <Label htmlFor="venue">Venue</Label>
                 <Input
                   id="venue"
                   value={formData.venue}
                   onChange={(e) => setFormData(prev => ({ ...prev, venue: e.target.value }))}
-                  placeholder="Nombre del lugar"
+                  placeholder="Venue Name"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="location">Ubicación</Label>
+                <Label htmlFor="location">Location</Label>
                 <Input
                   id="location"
                   value={formData.location}
                   onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                  placeholder="Ciudad, País"
+                  placeholder="City, Country"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="ticket_url">URL de Tickets</Label>
+              <Label htmlFor="ticket_url">Ticket URL</Label>
               <Input
                 id="ticket_url"
                 type="url"
@@ -210,20 +197,20 @@ export function EventForm({ event, onClose }: EventFormProps) {
                 placeholder="https://tickets.example.com/event"
               />
               <p className="text-sm text-gray-500">
-                Enlace donde los usuarios pueden comprar tickets
+                Link where users can purchase tickets
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="image_url">URL de imagen (opcional)</Label>
+              <Label htmlFor="image_url">Image URL (Optional)</Label>
               <Input
                 id="image_url"
                 type="url"
                 value={formData.image_url}
                 onChange={(e) => setFormData(prev => ({ ...prev, image_url: e.target.value }))}
-                placeholder="https://ejemplo.com/imagen.jpg"
+                placeholder="https://example.com/image.jpg"
               />
-              <Label>Imagen del Evento</Label>
+              <Label>Event Image</Label>
               <AdminImageUpload
                 onImageUpload={handleImageUpload}
                 currentImage={formData.image_url}
@@ -237,7 +224,7 @@ export function EventForm({ event, onClose }: EventFormProps) {
                   checked={formData.is_featured}
                   onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_featured: checked }))}
                 />
-                <Label htmlFor="is_featured">Evento destacado</Label>
+                <Label htmlFor="is_featured">Featured Event</Label>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -246,16 +233,16 @@ export function EventForm({ event, onClose }: EventFormProps) {
                   checked={formData.is_published}
                   onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_published: checked }))}
                 />
-                <Label htmlFor="is_published">Publicar evento</Label>
+                <Label htmlFor="is_published">Publish Event</Label>
               </div>
             </div>
 
             <div className="flex justify-end gap-2 pt-4">
               <Button type="button" variant="outline" onClick={onClose}>
-                Cancelar
+                Cancel
               </Button>
               <Button type="submit" disabled={loading}>
-                {loading ? 'Guardando...' : (event ? 'Actualizar' : 'Crear')}
+                {loading ? 'Saving...' : (event ? 'Update' : 'Create')}
               </Button>
             </div>
           </form>

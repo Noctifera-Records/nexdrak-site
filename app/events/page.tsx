@@ -1,12 +1,10 @@
- 
-
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import { CalendarDays, MapPin, Clock, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { createClient } from '@/lib/supabase/server';
+import { getPublicEvents } from './actions';
 
 export const revalidate = 3600;
 export const metadata: Metadata = {
@@ -31,15 +29,7 @@ interface Event {
 }
 
 export default async function EventsPage() {
-  const supabase = await createClient();
-  const { data: eventsData, error } = await supabase
-    .from('events')
-    .select('*')
-    .eq('is_published', true)
-    .gte('date', new Date().toISOString().split('T')[0])
-    .order('date', { ascending: true });
-
-  const events: Event[] = error ? [] : (eventsData || []);
+  const events = await getPublicEvents();
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -71,7 +61,7 @@ export default async function EventsPage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "ItemList",
-            itemListElement: events.map((e, i) => ({
+            itemListElement: events.map((e: any, i: number) => ({
               "@type": "Event",
               position: i + 1,
               name: e.title,
@@ -96,7 +86,7 @@ export default async function EventsPage() {
 
       {events.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {events.map((event) => (
+          {events.map((event: any) => (
             <Card key={event.id} className="bg-card/50 dark:bg-black/50 backdrop-blur-sm border-border dark:border-white/20 overflow-hidden group hover:border-foreground/40 dark:hover:border-white/40 transition-all shadow-sm dark:shadow-none">
               {/* Imagen del evento */}
               {event.image_url && (

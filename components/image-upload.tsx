@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Upload, X, Image as ImageIcon } from 'lucide-react'
+import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 
 interface ImageUploadProps {
@@ -12,13 +12,14 @@ interface ImageUploadProps {
   onChange: (value: string | null) => void
   label?: string
   accept?: string
-  maxSize?: number // en MB
+  maxSizeMB?: number // en MB
   className?: string
 }
 
 interface ImageUploadFormProps {
   onImageUpload: (imageUrl: string) => void
   currentImage?: string
+  maxSizeMB?: number
 }
 
 export default function ImageUpload({
@@ -26,7 +27,7 @@ export default function ImageUpload({
   onChange,
   label = "Image",
   accept = "image/*",
-  maxSize = 5,
+  maxSizeMB = 5,
   className = ""
 }: ImageUploadProps) {
   const [preview, setPreview] = useState<string | null>(value || null)
@@ -51,8 +52,8 @@ export default function ImageUpload({
       }
 
       const fileSizeMB = file.size / (1024 * 1024)
-      if (fileSizeMB > maxSize) {
-        throw new Error(`File is too large. Maximum ${maxSize}MB allowed`)
+      if (fileSizeMB > maxSizeMB) {
+        throw new Error(`File is too large. Maximum ${maxSizeMB}MB allowed`)
       }
 
       const reader = new FileReader()
@@ -87,7 +88,7 @@ export default function ImageUpload({
 
   return (
     <div className={`space-y-3 ${className}`}>
-      <Label className="text-white">{label}</Label>
+      <Label className="text-foreground">{label}</Label>
       
       <div className="space-y-3">
         {preview && (
@@ -108,7 +109,7 @@ export default function ImageUpload({
                   className="bg-red-600 hover:bg-red-700"
                 >
                   <X className="h-4 w-4 mr-1" />
-                  Eliminar
+                  Remove
                 </Button>
               </div>
             </div>
@@ -121,17 +122,17 @@ export default function ImageUpload({
             variant="outline"
             onClick={handleClick}
             disabled={loading}
-            className="border-gray-600 text-white hover:bg-gray-700 w-full max-w-xs"
+            className="w-full max-w-xs"
           >
             {loading ? (
               <div className="flex items-center">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                Procesando...
+                <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                Processing...
               </div>
             ) : (
               <div className="flex items-center">
                 {preview ? <ImageIcon className="h-4 w-4 mr-2" /> : <Upload className="h-4 w-4 mr-2" />}
-                {preview ? 'Cambiar imagen' : 'Subir imagen'}
+                {preview ? 'Change image' : 'Upload image'}
               </div>
             )}
           </Button>
@@ -144,14 +145,14 @@ export default function ImageUpload({
             className="hidden"
           />
 
-          <div className="text-xs text-gray-400 max-w-xs">
+          <div className="text-xs text-muted-foreground max-w-xs">
             <p>Supported formats: JPG, PNG, GIF, WebP</p>
-            <p>Maximum size: {maxSize}MB</p>
+            <p>Maximum size: {maxSizeMB}MB</p>
           </div>
         </div>
 
         {error && (
-          <div className="text-red-400 text-sm bg-red-900/20 p-2 rounded border border-red-500/30 max-w-xs">
+          <div className="text-red-500 text-sm bg-red-500/10 p-2 rounded border border-red-500/20 max-w-xs">
             {error}
           </div>
         )}
@@ -160,7 +161,7 @@ export default function ImageUpload({
   )
 }
 
-export function AdminImageUpload({ onImageUpload, currentImage }: ImageUploadFormProps) {
+export function AdminImageUpload({ onImageUpload, currentImage, maxSizeMB = 5 }: ImageUploadFormProps) {
   const [preview, setPreview] = useState<string | null>(currentImage || null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -184,8 +185,8 @@ export function AdminImageUpload({ onImageUpload, currentImage }: ImageUploadFor
       }
 
       const fileSizeMB = file.size / (1024 * 1024)
-      if (fileSizeMB > 5) {
-        throw new Error('File is too large. Maximum 5MB allowed')
+      if (fileSizeMB > maxSizeMB) {
+        throw new Error(`File is too large. Maximum ${maxSizeMB}MB allowed`)
       }
 
       const reader = new FileReader()
@@ -253,12 +254,12 @@ export function AdminImageUpload({ onImageUpload, currentImage }: ImageUploadFor
             variant="outline"
             onClick={handleClick}
             disabled={loading}
-            className="border-gray-600 text-white hover:bg-gray-700 w-full max-w-xs"
+            className="w-full max-w-xs"
           >
             {loading ? (
               <div className="flex items-center">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                Procesing...
+                <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                Processing...
               </div>
             ) : (
               <div className="flex items-center">
@@ -276,15 +277,15 @@ export function AdminImageUpload({ onImageUpload, currentImage }: ImageUploadFor
             className="hidden"
           />
 
-          <div className="text-xs text-gray-400 max-w-xs">
+          <div className="text-xs text-muted-foreground max-w-xs">
             <p>Supported formats: JPG, PNG, GIF, WebP</p>
-            <p>Maximum size: 5MB</p>
+            <p>Maximum size: {maxSizeMB}MB</p>
           </div>
         </div>
 
         {/* Error */}
         {error && (
-          <div className="text-red-400 text-sm bg-red-900/20 p-2 rounded border border-red-500/30 max-w-xs">
+          <div className="text-red-500 text-sm bg-red-500/10 p-2 rounded border border-red-500/20 max-w-xs">
             {error}
           </div>
         )}

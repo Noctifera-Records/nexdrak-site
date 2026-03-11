@@ -1,351 +1,248 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { createClient } from "@/lib/supabase/client";
-import { useNotifications } from "@/components/notification-system";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { authClient } from "@/lib/auth-client";
+import { toast } from "sonner";
+import { Loader2, Trash2, AlertTriangle } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import ImageUpload from "@/components/image-upload";
 
 export default function AccountForm() {
-  const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
+  const { data: session } = authClient.useSession();
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    email: "",
-    username: "",
+    name: session?.user?.name || "",
+    image: session?.user?.image || "",
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
-  const [loading, setLoading] = useState(false);
-  const [loadingProfile, setLoadingProfile] = useState(true);
   const router = useRouter();
-  const supabase = createClient();
-  const { showNotification } = useNotifications();
 
-  useEffect(() => {
-    const getUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        router.push("/login");
-        return;
-      }
-
-      setUser(user);
-
-      // Obtener perfil
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-
-      if (profileError) {
-        console.error("Error fetching profile:", profileError);
-      }
-
-      if (profile) {
-        console.log("Profile loaded:", profile);
-        setProfile(profile);
-        setFormData((prev: typeof formData) => ({
-          ...prev,
-          email: user.email || "",
-          username: profile.username || "",
-        }));
-      }
-
-      setLoadingProfile(false);
-    };
-
-    getUser();
-  }, [router, supabase]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev: typeof formData) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
-
-  const updateProfile = async () => {
+  const handleUpdateProfile = async () => {
     setLoading(true);
-
-    try {
-      // Verificar si el username ya existe (si cambió)
-      if (formData.username !== profile.username) {
-        const { data: existingUsername } = await supabase
-          .from("profiles")
-          .select("username")
-          .eq("username", formData.username)
-          .neq("id", user.id)
-          .single();
-
-        if (existingUsername) {
-          showNotification({
-            type: "error",
-            title: "Nombre de usuario no disponible",
-            message: "Este nombre de usuario ya está en uso",
-          });
-          setLoading(false);
-          return;
-        }
+    await authClient.updateUser({
+      name: formData.name,
+      image: formData.image,
+    }, {
+      onSuccess: () => {
+        toast.success("Profile updated successfully");
+      },
+      onError: (ctx) => {
+        toast.error(ctx.error.message || "Failed to update profile");
       }
-
-      // Actualizar perfil
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .update({
-          username: formData.username,
-        })
-        .eq("id", user.id);
-
-      if (profileError) {
-        showNotification({
-          type: "error",
-          title: "Error al actualizar perfil",
-          message: profileError.message,
-        });
-        return;
-      }
-
-      // Actualizar email si cambió
-      if (formData.email !== user.email) {
-        const { error: emailError } = await supabase.auth.updateUser({
-          email: formData.email,
-        });
-
-        if (emailError) {
-          showNotification({
-            type: "error",
-            title: "Error al actualizar email",
-            message: emailError.message,
-          });
-          return;
-        }
-
-        showNotification({
-          type: "info",
-          title: "Email actualizado",
-          message: "Revisa tu nuevo email para confirmar el cambio",
-        });
-      }
-
-      showNotification({
-        type: "success",
-        title: "Perfil actualizado",
-        message: "Tu información ha sido actualizada exitosamente",
-      });
-
-      // Actualizar estado local
-      setProfile((prev: any) => ({
-        ...prev,
-        username: formData.username,
-        email: formData.email,
-      }));
-    } catch (error) {
-      showNotification({
-        type: "error",
-        title: "Error inesperado",
-        message: "Ocurrió un error al actualizar el perfil",
-      });
-    } finally {
-      setLoading(false);
-    }
+    });
+    setLoading(false);
   };
 
-  const updatePassword = async () => {
-    if (!formData.newPassword || !formData.confirmPassword) {
-      showNotification({
-        type: "error",
-        title: "Error de validación",
-        message: "Completa todos los campos de contraseña",
-      });
+  const handleChangePassword = async () => {
+    if (!formData.currentPassword || !formData.newPassword || !formData.confirmPassword) {
+      toast.error("Please fill in all password fields");
       return;
     }
 
     if (formData.newPassword !== formData.confirmPassword) {
-      showNotification({
-        type: "error",
-        title: "Error de validación",
-        message: "Las contraseñas no coinciden",
-      });
-      return;
-    }
-
-    if (formData.newPassword.length < 6) {
-      showNotification({
-        type: "error",
-        title: "Error de validación",
-        message: "La contraseña debe tener al menos 6 caracteres",
-      });
+      toast.error("Passwords do not match");
       return;
     }
 
     setLoading(true);
-
-    try {
-      const { error } = await supabase.auth.updateUser({
-        password: formData.newPassword,
-      });
-
-      if (error) {
-        showNotification({
-          type: "error",
-          title: "Error al cambiar contraseña",
-          message: error.message,
-        });
-        return;
+    await authClient.changePassword({
+      currentPassword: formData.currentPassword,
+      newPassword: formData.newPassword,
+      revokeOtherSessions: true,
+    }, {
+      onSuccess: () => {
+        toast.success("Password changed successfully");
+        setFormData(prev => ({ ...prev, currentPassword: "", newPassword: "", confirmPassword: "" }));
+      },
+      onError: (ctx) => {
+        toast.error(ctx.error.message || "Failed to change password");
       }
-
-      showNotification({
-        type: "success",
-        title: "Contraseña actualizada",
-        message: "Tu contraseña ha sido cambiada exitosamente",
-      });
-
-      // Limpiar campos de contraseña
-      setFormData((prev: typeof formData) => ({
-        ...prev,
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      }));
-    } catch (error) {
-      showNotification({
-        type: "error",
-        title: "Error inesperado",
-        message: "Ocurrió un error al cambiar la contraseña",
-      });
-    } finally {
-      setLoading(false);
-    }
+    });
+    setLoading(false);
   };
 
-  if (loadingProfile) {
+  const handleDeleteAccount = async () => {
+    setLoading(true);
+    await authClient.deleteUser({
+        callbackURL: "/"
+    }, {
+      onSuccess: () => {
+        toast.success("Account deleted successfully");
+        router.push("/");
+      },
+      onError: (ctx) => {
+        toast.error(ctx.error.message || "Failed to delete account");
+        setLoading(false);
+      }
+    });
+  };
+
+  if (!session) {
     return (
-      <div className="text-center py-8">
-        <p className="text-white">Cargando información...</p>
-      </div>
+        <div className="flex justify-center py-10">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
     );
   }
 
   return (
-    <div className="space-y-8">
-      {/* Información del Perfil */}
-      <Card className="bg-gray-700 border-gray-600">
+    <div className="space-y-8 max-w-2xl mx-auto">
+      
+      {/* Profile Section */}
+      <Card>
         <CardHeader>
-          <CardTitle className="text-white">Personal Information</CardTitle>
+          <CardTitle>Profile Information</CardTitle>
+          <CardDescription>Update your personal details</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="email" className="text-white">
-              Email
-            </Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="bg-gray-600 border-gray-500 text-white"
-            />
+          <div className="space-y-2">
+            <Label>Profile Picture</Label>
+            <div className="flex items-center gap-4">
+                {formData.image && (
+                    <img 
+                        src={formData.image} 
+                        alt="Profile" 
+                        className="h-16 w-16 rounded-full object-cover border"
+                    />
+                )}
+                <div className="flex-1">
+                    <ImageUpload 
+                        value={formData.image} 
+                        onChange={(url) => setFormData(prev => ({ ...prev, image: url || "" }))}
+                        label="Upload new picture"
+                        maxSizeMB={2}
+                    />
+                    <p className="text-xs text-muted-foreground mt-2">Max size: 2MB. Formats: JPG, PNG, WEBP.</p>
+                </div>
+            </div>
           </div>
 
-          <div>
-            <Label htmlFor="username" className="text-white">
-              Username
-            </Label>
-            <Input
-              id="username"
-              name="username"
-              type="text"
-              value={formData.username}
-              onChange={handleChange}
-              className="bg-gray-600 border-gray-500 text-white"
-            />
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" value={session.user.email} disabled className="bg-muted" />
+            <p className="text-xs text-muted-foreground">Email cannot be changed directly.</p>
           </div>
 
-          <Button
-            onClick={updateProfile}
-            disabled={loading}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-          >
-            {loading ? "Updating..." : "Update Profile"}
-          </Button>
+          <div className="space-y-2">
+            <Label htmlFor="name">Name</Label>
+            <Input 
+              id="name" 
+              value={formData.name} 
+              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+            />
+          </div>
         </CardContent>
+        <CardFooter>
+          <Button onClick={handleUpdateProfile} disabled={loading}>
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Save Changes
+          </Button>
+        </CardFooter>
       </Card>
 
-      {/* Cambiar Contraseña */}
-      <Card className="bg-gray-700 border-gray-600">
+      {/* Password Section */}
+      <Card>
         <CardHeader>
-          <CardTitle className="text-white">Change Password</CardTitle>
+          <CardTitle>Change Password</CardTitle>
+          <CardDescription>Ensure your account is using a strong password</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="newPassword" className="text-white">
-              New Password
-            </Label>
-            <Input
-              id="newPassword"
-              name="newPassword"
+          <div className="space-y-2">
+            <Label htmlFor="currentPassword">Current Password</Label>
+            <Input 
+              id="currentPassword" 
               type="password"
-              value={formData.newPassword}
-              onChange={handleChange}
-              placeholder="••••••••"
-              className="bg-gray-600 border-gray-500 text-white"
+              value={formData.currentPassword} 
+              onChange={(e) => setFormData(prev => ({ ...prev, currentPassword: e.target.value }))}
             />
           </div>
-
-          <div>
-            <Label htmlFor="confirmPassword" className="text-white">
-              Confirm New Password
-            </Label>
-            <Input
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              placeholder="••••••••"
-              className="bg-gray-600 border-gray-500 text-white"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+                <Label htmlFor="newPassword">New Password</Label>
+                <Input 
+                id="newPassword" 
+                type="password"
+                value={formData.newPassword} 
+                onChange={(e) => setFormData(prev => ({ ...prev, newPassword: e.target.value }))}
+                />
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                <Input 
+                id="confirmPassword" 
+                type="password"
+                value={formData.confirmPassword} 
+                onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                />
+            </div>
           </div>
-
-          <Button
-            onClick={updatePassword}
-            disabled={loading}
-            className="bg-red-600 hover:bg-red-700 text-white"
-          >
-            {loading ? "Changing..." : "Change Password"}
-          </Button>
         </CardContent>
+        <CardFooter>
+          <Button onClick={handleChangePassword} disabled={loading} variant="outline">
+            Update Password
+          </Button>
+        </CardFooter>
       </Card>
 
-      {/* Información de la Cuenta */}
-      <Card className="bg-gray-700 border-gray-600">
+      {/* Delete Account Section */}
+      <Card className="border-destructive/50">
         <CardHeader>
-          <CardTitle className="text-white">Account Information</CardTitle>
+          <CardTitle className="text-destructive">Danger Zone</CardTitle>
+          <CardDescription>Irreversible actions</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2 text-sm">
-            <p className="text-gray-300">
-              <span className="font-semibold">Type of account:</span>{" "}
-              {profile?.role === "admin" ? "Administrador" : "Usuario"}
-            </p>
-            <p className="text-gray-300">
-              <span className="font-semibold">Member since:</span>{" "}
-              {new Date(user?.created_at).toLocaleDateString("es-ES")}
-            </p>
-            <p className="text-gray-300">
-              <span className="font-semibold">User ID:</span> {user?.id}
-            </p>
-          </div>
+            <div className="bg-destructive/10 p-4 rounded-lg flex items-start gap-4">
+                <AlertTriangle className="h-5 w-5 text-destructive mt-0.5" />
+                <div>
+                    <h4 className="font-semibold text-destructive">Delete Account</h4>
+                    <p className="text-sm text-muted-foreground mt-1">
+                        Once you delete your account, there is no going back. Please be certain.
+                    </p>
+                </div>
+            </div>
         </CardContent>
+        <CardFooter>
+            <AlertDialog>
+                <AlertDialogTrigger asChild>
+                    <Button variant="destructive" className="w-full sm:w-auto">
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete Account
+                    </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete your account
+                            and remove your data from our servers.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeleteAccount} className="bg-destructive hover:bg-destructive/90">
+                            Delete Account
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </CardFooter>
       </Card>
     </div>
   );

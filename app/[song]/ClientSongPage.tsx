@@ -1,7 +1,7 @@
- 'use client';
- 
- import { useState, useEffect, Suspense, lazy, useMemo } from "react";
- import { notFound } from "next/navigation";
+'use client';
+
+import { useState, useEffect, Suspense, lazy, useMemo } from "react";
+import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import Music from "lucide-react/dist/esm/icons/music";
 import Play from "lucide-react/dist/esm/icons/play";
-import { createClient } from "@/lib/supabase/client";
 
 const YouTubePlayer = lazy(() => import('@/components/youtube-player'));
 
@@ -43,6 +42,13 @@ interface StreamingLink {
   is_primary: boolean;
   created_at: string;
   updated_at: string;
+}
+
+interface ClientSongPageProps {
+  song: Song;
+  streamingLinks: StreamingLink[];
+  isAlbumView: boolean;
+  albumSongs: Song[];
 }
 
 const BrandIcon = ({ name, ...props }: { name: string } & React.HTMLAttributes<HTMLElement>) => {
@@ -97,20 +103,9 @@ const getPlatformInfo = (platform: string) => {
   };
 };
 
-export default function ClientSongPage({ slug }: { slug: string }) {
-  const [song, setSong] = useState<Song | null>(null);
-  const [streamingLinks, setStreamingLinks] = useState<StreamingLink[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [notFoundError, setNotFoundError] = useState(false);
+export default function ClientSongPage({ song, streamingLinks, isAlbumView, albumSongs }: ClientSongPageProps) {
   const [dominantColor, setDominantColor] = useState<string>('#ff0080');
-  const [isAlbumView, setIsAlbumView] = useState(false);
-  const [albumSongs, setAlbumSongs] = useState<Song[]>([]);
-  const supabase = createClient();
 
-  if (notFoundError) {
-    notFound();
-  }
- 
   const getContrastColor = (hex: string) => {
     try {
       const clean = hex.replace('#', '').slice(0, 6);
@@ -123,180 +118,60 @@ export default function ClientSongPage({ slug }: { slug: string }) {
       return '#fff';
     }
   };
-   useEffect(() => {
-     const fetchSong = async () => {
-       try {
-         const slugParam = slug.toLowerCase();
- 
-         let songData: Song | null = null;
-         let error: any = null;
- 
-         try {
-           const { data, error: slugError } = await supabase
-             .from('songs')
-             .select('*')
-             .eq('slug', slugParam)
-             .single();
- 
-           if (!slugError && data) {
-             songData = data as Song;
-           }
-         } catch {}
- 
-         if (!songData) {
-           const searchTerm = slug
-             .replace(/([a-z])([A-Z])/g, '$1 $2')
-             .replace(/-/g, ' ')
-             .toLowerCase()
-             .split(' ')
-             .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-             .join(' ');
- 
-           const { data, error: titleError } = await supabase
-             .from('songs')
-             .select('*')
-             .ilike('title', searchTerm)
-             .single();
- 
-           songData = (data as Song) || null;
-           error = titleError;
- 
-           if (error || !songData) {
-             const { data: albumSongsData, error: albumError } = await supabase
-               .from('songs')
-               .select('*')
-               .ilike('album_name', searchTerm)
-               .order('track_number', { ascending: true });
- 
-             if (albumSongsData && albumSongsData.length > 0 && !albumError) {
-               songData = albumSongsData[0] as Song;
-               error = null;
-               setIsAlbumView(true);
-               setAlbumSongs(albumSongsData as Song[]);
-             }
-           } else {
-             setIsAlbumView(false);
-             setAlbumSongs([]);
-           }
-         } else {
-           setIsAlbumView(false);
-           setAlbumSongs([]);
-         }
- 
-         if (error || !songData) {
-          setNotFoundError(true);
-          return;
-        }
 
-        setSong(songData);
-
-        const { data: linksData, error: linksError } = await supabase
-          .from('streaming_links')
-          .select('*')
-          .eq('song_id', songData.id)
-          .order('is_primary', { ascending: false })
-          .order('platform');
-
-        if (linksData && !linksError) {
-          setStreamingLinks(linksData);
-        }
-      } catch {
-        setNotFoundError(true);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSong();
-  }, [slug, supabase]);
- 
-   const formatDate = (dateString: string) => {
-     return new Date(dateString).toLocaleDateString('en-US', {
-       year: 'numeric',
-       month: 'long',
-       day: 'numeric'
-     });
-   };
- 
-   const getPrimaryLink = () => {
-     return streamingLinks.find(link => link.is_primary) || streamingLinks[0];
-   };
- 
-   const getPlatformInfo = (platform: string) => {
-    const platforms = {
-      spotify: { name: 'Spotify', color: '#1ed35e', icon: (props?: any) => <BrandIcon name="spotify" {...props} /> },
-      youtube: { name: 'YouTube Music', color: '#ff0000', icon: (props?: any) => <BrandIcon name="youtube" {...props} /> },
-      apple_music: { name: 'Apple Music', color: '#fd118f', icon: (props?: any) => <BrandIcon name="apple_music" {...props} /> },
-      soundcloud: { name: 'SoundCloud', color: '#ff5500', icon: (props?: any) => <BrandIcon name="soundcloud" {...props} /> },
-      bandcamp: { name: 'Bandcamp', color: '#629aa0', icon: (props?: any) => <BrandIcon name="bandcamp" {...props} /> },
-      deezer: { name: 'Deezer', color: '#f6ff00', icon: (props?: any) => <BrandIcon name="deezer" {...props} /> },
-      tidal: { name: 'Tidal', color: '#f2f2f2', icon: (props?: any) => <BrandIcon name="tidal" {...props} /> },
-      amazon_music: { name: 'Amazon Music', color: '#00b7ff', icon: (props?: any) => <Music {...props} /> }
-    };
-    
-    return platforms[platform as keyof typeof platforms] || { 
-      name: platform.charAt(0).toUpperCase() + platform.slice(1), 
-      color: '#6b7280', 
-      icon: ExternalLink 
-    };
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
   };
- 
-   const extractDominantColor = (imageUrl: string) => {
-     if (!imageUrl) return;
-     const img = new (window as any).Image();
-     img.crossOrigin = 'anonymous';
-     img.onload = () => {
-       try {
-         const canvas = document.createElement('canvas');
-         const ctx = canvas.getContext('2d');
-         if (!ctx) return;
-         canvas.width = img.width;
-         canvas.height = img.height;
-         ctx.drawImage(img, 0, 0);
-         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-         const data = imageData.data;
-         const colorCounts: { [key: string]: number } = {};
-         const step = 4;
-         for (let i = 0; i < data.length; i += step * 4) {
-           const r = data[i];
-           const g = data[i + 1];
-           const b = data[i + 2];
-           const alpha = data[i + 3];
-           if (alpha < 128) continue;
-           const rGroup = Math.floor(r / 32) * 32;
-           const gGroup = Math.floor(g / 32) * 32;
-           const bGroup = Math.floor(b / 32) * 32;
-           const key = `${rGroup},${gGroup},${bGroup}`;
-           colorCounts[key] = (colorCounts[key] || 0) + 1;
-         }
-         let dominant = '#6b7280';
-         let maxCount = 0;
-         for (const key in colorCounts) {
-           if (colorCounts[key] > maxCount) {
-             maxCount = colorCounts[key];
-             const [r, g, b] = key.split(',').map(Number);
-             dominant = `#${[r, g, b].map(v => v.toString(16).padStart(2, '0')).join('')}`;
-           }
-         }
-         setDominantColor(dominant);
-       } catch {}
-     };
-     img.src = imageUrl;
-   };
- 
-  const adjustColor = (hex: string, amt: number) => {
-    try {
-      const clean = hex.replace('#', '').slice(0, 6);
-      let r = parseInt(clean.substr(0, 2), 16);
-      let g = parseInt(clean.substr(2, 2), 16);
-      let b = parseInt(clean.substr(4, 2), 16);
-      r = Math.max(0, Math.min(255, r + amt));
-      g = Math.max(0, Math.min(255, g + amt));
-      b = Math.max(0, Math.min(255, b + amt));
-      return `#${[r, g, b].map(v => v.toString(16).padStart(2, '0')).join('')}`;
-    } catch {
-      return hex;
-    }
+
+  const getPrimaryLink = () => {
+    return streamingLinks.find(link => link.is_primary) || streamingLinks[0];
+  };
+
+  const extractDominantColor = (imageUrl: string) => {
+    if (!imageUrl) return;
+    const img = new (window as any).Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+        const colorCounts: { [key: string]: number } = {};
+        const step = 4;
+        for (let i = 0; i < data.length; i += step * 4) {
+          const r = data[i];
+          const g = data[i + 1];
+          const b = data[i + 2];
+          const alpha = data[i + 3];
+          if (alpha < 128) continue;
+          const rGroup = Math.floor(r / 32) * 32;
+          const gGroup = Math.floor(g / 32) * 32;
+          const bGroup = Math.floor(b / 32) * 32;
+          const key = `${rGroup},${gGroup},${bGroup}`;
+          colorCounts[key] = (colorCounts[key] || 0) + 1;
+        }
+        let dominant = '#6b7280';
+        let maxCount = 0;
+        for (const key in colorCounts) {
+          if (colorCounts[key] > maxCount) {
+            maxCount = colorCounts[key];
+            const [r, g, b] = key.split(',').map(Number);
+            dominant = `#${[r, g, b].map(v => v.toString(16).padStart(2, '0')).join('')}`;
+          }
+        }
+        setDominantColor(dominant);
+      } catch {}
+    };
+    img.src = imageUrl;
   };
 
   // Deterministic PRNG to avoid hydration mismatches
@@ -317,114 +192,69 @@ export default function ClientSongPage({ slug }: { slug: string }) {
     };
   };
   const pixelPoints = useMemo(() => {
-    const seed = hashSeed(slug || 'default');
+    const seed = hashSeed(song.slug || song.title || 'default');
     const rnd = mulberry32(seed);
     return Array.from({ length: 100 }).map(() => ({
       left: rnd() * 100,
       top: rnd() * 100,
       delay: rnd() * 2 + 0.1,
     }));
-  }, [slug]);
+  }, [song.slug, song.title]);
 
-  const hexToRgba = (hex: string, alpha: number) => {
-    try {
-      const clean = hex.replace('#', '').slice(0, 6);
-      const r = parseInt(clean.substr(0, 2), 16);
-      const g = parseInt(clean.substr(2, 2), 16);
-      const b = parseInt(clean.substr(4, 2), 16);
-      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-    } catch {
-      return `rgba(255, 255, 255, ${alpha})`;
+  useEffect(() => {
+    if (song?.cover_image_url) {
+      extractDominantColor(song.cover_image_url);
     }
+  }, [song?.cover_image_url]);
+
+  const extractYouTubeId = (url: string): string | null => {
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+      /youtube\.com\/v\/([^&\n?#]+)/,
+      /youtube\.com\/watch\?.*v=([^&\n?#]+)/
+    ];
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match) {
+        return match[1];
+      }
+    }
+    return null;
   };
 
-   useEffect(() => {
-     if (song?.cover_image_url) {
-       extractDominantColor(song.cover_image_url);
-     }
-   }, [song?.cover_image_url]);
- 
-   const generateGradientColors = (baseColor: string) => {
-     const hex = baseColor.replace('#', '');
-     const r = parseInt(hex.substr(0, 2), 16);
-     const g = parseInt(hex.substr(2, 2), 16);
-     const b = parseInt(hex.substr(4, 2), 16);
-     const colors = [
-       `rgba(${Math.max(0, r - 40)}, ${Math.max(0, g - 40)}, ${Math.max(0, b - 40)}, 0.3)`,
-       `rgba(${255 - r}, ${255 - g}, ${255 - b}, 0.2)`,
-       `rgba(${Math.min(255, r + 30)}, ${Math.max(0, g - 20)}, ${Math.min(255, b + 20)}, 0.25)`,
-       `rgba(${Math.max(0, r - 20)}, ${Math.min(255, g + 30)}, ${Math.max(0, b - 30)}, 0.2)`,
-       'rgba(0, 0, 0, 0.7)'
-     ];
-     return colors;
-   };
- 
-   const extractYouTubeId = (url: string): string | null => {
-     const patterns = [
-       /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
-       /youtube\.com\/v\/([^&\n?#]+)/,
-       /youtube\.com\/watch\?.*v=([^&\n?#]+)/
-     ];
-     for (const pattern of patterns) {
-       const match = url.match(pattern);
-       if (match) {
-         return match[1];
-       }
-     }
-     return null;
-   };
- 
-   const getYouTubeEmbedId = (): string | null => {
-     if (song?.youtube_embed_id) {
-       return song.youtube_embed_id;
-     }
-     const youtubeLink = streamingLinks.find(link => link.platform === 'youtube');
-     if (youtubeLink) {
-       return extractYouTubeId(youtubeLink.url);
-     }
-     if (song?.stream_url) {
-       return extractYouTubeId(song.stream_url);
-     }
-     return null;
-   };
- 
-   const handleShare = async () => {
-     if (!song) return;
-     if (navigator.share) {
-       try {
-         await navigator.share({
-           title: `${song.title} by ${song.artist}`,
-           text: `Listen to ${song.title} by ${song.artist}`,
-           url: window.location.href,
-         });
-       } catch {}
-     } else {
-       try {
-         await navigator.clipboard.writeText(window.location.href);
-         alert("Link copied to clipboard");
-       } catch {
-         alert("Could not share the link");
-       }
-     }
-   };
- 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background text-foreground pt-24 pb-8 px-4">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="w-[300px] h-[300px] bg-muted rounded-xl mx-auto mb-6 flex items-center justify-center">
-            <Music className="w-16 h-16 text-muted-foreground" />
-          </div>
-          <div className="h-8 bg-muted rounded-lg mb-4 w-3/4 mx-auto animate-pulse" />
-          <div className="h-5 bg-muted rounded-lg w-1/2 mx-auto animate-pulse" />
-        </div>
-      </div>
-    );
-  }
+  const getYouTubeEmbedId = (): string | null => {
+    if (song?.youtube_embed_id) {
+      return song.youtube_embed_id;
+    }
+    const youtubeLink = streamingLinks.find(link => link.platform === 'youtube');
+    if (youtubeLink) {
+      return extractYouTubeId(youtubeLink.url);
+    }
+    if (song?.stream_url) {
+      return extractYouTubeId(song.stream_url);
+    }
+    return null;
+  };
 
-  if (!song) {
-    notFound();
-  }
+  const handleShare = async () => {
+    if (!song) return;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${song.title} by ${song.artist}`,
+          text: `Listen to ${song.title} by ${song.artist}`,
+          url: window.location.href,
+        });
+      } catch {}
+    } else {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        alert("Link copied to clipboard");
+      } catch {
+        alert("Could not share the link");
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground relative overflow-hidden">

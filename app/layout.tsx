@@ -13,6 +13,7 @@ import StructuredData from "./structured-data"
 // import ResourcePreloader from "@/components/resource-preloader"
 // import WebVitals from "@/components/web-vitals"
 import { Toaster } from "@/components/ui/toaster"
+import { Toaster as SonnerToaster } from "@/components/ui/sonner"
 import FooterBar from "@/components/footer-bar"
 import GlobalBackground from "@/components/global-background"
 
@@ -60,7 +61,7 @@ export const metadata: Metadata = {
       'max-video-preview': -1,
       'max-image-preview': 'large',
       'max-snippet': -1,
-    },
+      },
   },
   alternates: {
     canonical: 'https://nexdrak.com',
@@ -117,6 +118,7 @@ export default function RootLayout({
                 </main>
                 <FooterBar />
                 <Toaster />
+                <SonnerToaster />
               {/* </HydrationFix> */}
             </NotificationProvider>
           </ThemeProvider>

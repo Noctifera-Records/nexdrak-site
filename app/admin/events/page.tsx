@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { createClient } from '@/lib/supabase/client';
 import { EventsTable } from './events-table';
 import { EventForm } from './event-form';
+import { getEvents, deleteEvent } from './actions';
+import { toast } from 'sonner';
 
 interface Event {
   id: number;
@@ -28,7 +29,6 @@ export default function AdminEventsPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
-  const supabase = createClient();
 
   useEffect(() => {
     fetchEvents();
@@ -36,19 +36,16 @@ export default function AdminEventsPage() {
 
   const fetchEvents = async () => {
     try {
-      const { data, error } = await supabase
-        .from('events')
-        .select('*')
-        .order('date', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching events:', error);
-        return;
-      }
-
-      setEvents(data || []);
+      const data = await getEvents();
+      // Ensure dates are strings for the frontend
+      const formattedData = data.map((event: any) => ({
+          ...event,
+          date: new Date(event.date).toISOString().split('T')[0] // Simple YYYY-MM-DD format
+      }));
+      setEvents(formattedData);
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error fetching events:', error);
+      toast.error('Failed to load events');
     } finally {
       setLoading(false);
     }
@@ -60,26 +57,17 @@ export default function AdminEventsPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('¿Estás seguro de que quieres eliminar este evento?')) {
+    if (!confirm('Are you sure you want to delete this event?')) {
       return;
     }
 
     try {
-      const { error } = await supabase
-        .from('events')
-        .delete()
-        .eq('id', id);
-
-      if (error) {
-        console.error('Error deleting event:', error);
-        alert('Error al eliminar el evento');
-        return;
-      }
-
+      await deleteEvent(id);
       setEvents(prev => prev.filter(event => event.id !== id));
+      toast.success('Event deleted');
     } catch (error) {
       console.error('Error:', error);
-      alert('Error al eliminar el evento');
+      toast.error('Failed to delete event');
     }
   };
 
@@ -93,10 +81,10 @@ export default function AdminEventsPage() {
     return (
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Eventos</h1>
+          <h1 className="text-2xl font-bold">Events</h1>
         </div>
         <div className="text-center py-8">
-          <p>Cargando eventos...</p>
+          <p>Loading events...</p>
         </div>
       </div>
     );
@@ -105,10 +93,10 @@ export default function AdminEventsPage() {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Eventos</h1>
+        <h1 className="text-2xl font-bold">Events</h1>
         <Button onClick={() => setShowForm(true)}>
           <Plus className="h-4 w-4 mr-2" />
-          Agregar Evento
+          Add Event
         </Button>
       </div>
 

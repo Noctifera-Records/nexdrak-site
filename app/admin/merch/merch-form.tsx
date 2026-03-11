@@ -9,8 +9,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { createClient } from '@/lib/supabase/client';
 import { AdminImageUpload } from '@/components/image-upload';
+import { createMerch, updateMerch } from './actions';
+import { toast } from 'sonner';
 
 interface MerchItem {
   id: number;
@@ -50,7 +51,6 @@ export function MerchForm({ item, onClose }: MerchFormProps) {
     is_available: true
   });
   const [loading, setLoading] = useState(false);
-  const supabase = createClient();
 
   useEffect(() => {
     if (item) {
@@ -73,7 +73,7 @@ export function MerchForm({ item, onClose }: MerchFormProps) {
     try {
       const price = parseFloat(formData.price);
       if (isNaN(price) || price < 0) {
-        alert('Por favor ingresa un precio válido');
+        toast.error('Please enter a valid price');
         setLoading(false);
         return;
       }
@@ -88,33 +88,20 @@ export function MerchForm({ item, onClose }: MerchFormProps) {
         is_available: formData.is_available
       };
 
-      let error;
-
       if (item) {
         // Update existing item
-        const result = await supabase
-          .from('merch')
-          .update(merchData)
-          .eq('id', item.id);
-        error = result.error;
+        await updateMerch(item.id, merchData);
+        toast.success('Product updated');
       } else {
         // Create new item
-        const result = await supabase
-          .from('merch')
-          .insert([merchData]);
-        error = result.error;
-      }
-
-      if (error) {
-        console.error('Error saving merch:', error);
-        alert('Error al guardar el producto');
-        return;
+        await createMerch(merchData);
+        toast.success('Product created');
       }
 
       onClose();
-    } catch (error) {
-      console.error('Error:', error);
-      alert('Error al guardar el producto');
+    } catch (error: any) {
+      console.error('Error saving merch:', error);
+      toast.error(error.message || 'Error saving product');
     } finally {
       setLoading(false);
     }
@@ -129,7 +116,7 @@ export function MerchForm({ item, onClose }: MerchFormProps) {
       <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>
-            {item ? 'Editar Producto' : 'Agregar Producto'}
+            {item ? 'Edit Product' : 'Add Product'}
           </CardTitle>
           <Button variant="ghost" size="sm" onClick={onClose}>
             <X className="h-4 w-4" />
@@ -139,30 +126,30 @@ export function MerchForm({ item, onClose }: MerchFormProps) {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="name">Nombre del Producto *</Label>
+              <Label htmlFor="name">Product Name *</Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="Ej: Camiseta Logo NexDrak"
+                placeholder="e.g. NexDrak T-Shirt"
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Descripción</Label>
+              <Label htmlFor="description">Description</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Descripción del producto..."
+                placeholder="Product details..."
                 rows={3}
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="price">Precio (USD) *</Label>
+                <Label htmlFor="price">Price (USD) *</Label>
                 <Input
                   id="price"
                   type="number"
@@ -176,13 +163,13 @@ export function MerchForm({ item, onClose }: MerchFormProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="category">Categoría *</Label>
+                <Label htmlFor="category">Category *</Label>
                 <Select 
                   value={formData.category} 
                   onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecciona una categoría" />
+                    <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map(category => (
@@ -196,7 +183,7 @@ export function MerchForm({ item, onClose }: MerchFormProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="purchase_url">URL de Compra *</Label>
+              <Label htmlFor="purchase_url">Purchase URL *</Label>
               <Input
                 id="purchase_url"
                 type="url"
@@ -206,20 +193,20 @@ export function MerchForm({ item, onClose }: MerchFormProps) {
                 required
               />
               <p className="text-sm text-gray-500">
-                Enlace donde los usuarios pueden comprar este producto (ej: Shopify, Etsy, etc.)
+                Link where users can buy this product (e.g. Shopify, Etsy, etc.)
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="image_url">URL de imagen (opcional)</Label>
+              <Label htmlFor="image_url">Image URL (Optional)</Label>
               <Input
                 id="image_url"
                 type="url"
                 value={formData.image_url}
                 onChange={(e) => setFormData(prev => ({ ...prev, image_url: e.target.value }))}
-                placeholder="https://ejemplo.com/imagen.jpg"
+                placeholder="https://example.com/image.jpg"
               />
-              <Label>Imagen del Producto</Label>
+              <Label>Product Image</Label>
               <AdminImageUpload
                 onImageUpload={handleImageUpload}
                 currentImage={formData.image_url}
@@ -232,15 +219,15 @@ export function MerchForm({ item, onClose }: MerchFormProps) {
                 checked={formData.is_available}
                 onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_available: checked }))}
               />
-              <Label htmlFor="is_available">Producto disponible</Label>
+              <Label htmlFor="is_available">Product Available</Label>
             </div>
 
             <div className="flex justify-end gap-2 pt-4">
               <Button type="button" variant="outline" onClick={onClose}>
-                Cancelar
+                Cancel
               </Button>
               <Button type="submit" disabled={loading}>
-                {loading ? 'Guardando...' : (item ? 'Actualizar' : 'Crear')}
+                {loading ? 'Saving...' : (item ? 'Update' : 'Create')}
               </Button>
             </div>
           </form>

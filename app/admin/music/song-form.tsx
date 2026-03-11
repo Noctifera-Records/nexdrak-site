@@ -7,9 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { SongsService } from '@/lib/supabase/songs-operations';
+import { createSong, updateSong, getSongs } from './actions';
+import { toast } from 'sonner';
 import { AdminImageUpload } from '@/components/image-upload';
-import { RLSErrorHelp } from '@/components/rls-error-help';
 
 interface Song {
   id: number;
@@ -46,8 +46,6 @@ export function SongForm({ song, onClose }: SongFormProps) {
   });
   const [loading, setLoading] = useState(false);
   const [existingAlbums, setExistingAlbums] = useState<string[]>([]);
-  const [error, setError] = useState<string>('');
-  const songsService = new SongsService();
 
   useEffect(() => {
     fetchExistingAlbums();
@@ -70,17 +68,21 @@ export function SongForm({ song, onClose }: SongFormProps) {
 
   const fetchExistingAlbums = async () => {
     try {
-      const albums = await songsService.getExistingAlbums();
-      setExistingAlbums(albums);
+      const songs = await getSongs();
+      const albums = Array.from(new Set(songs.filter((s: any) => s.type === 'album' && s.album_name).map((s: any) => s.album_name)));
+      setExistingAlbums(albums as string[]);
     } catch (error) {
       console.error('Error fetching albums:', error);
     }
   };
 
+  const handleImageUpload = (imageUrl: string) => {
+    setFormData(prev => ({ ...prev, cover_image_url: imageUrl }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
 
     try {
       const songData = {
@@ -92,28 +94,25 @@ export function SongForm({ song, onClose }: SongFormProps) {
         album_name: formData.album_name || null,
         track_number: formData.track_number ? parseInt(formData.track_number) : null,
         release_date: formData.release_date || null,
-        youtube_embed_id: formData.youtube_embed_id || null
+        youtube_embed_id: formData.youtube_embed_id || null,
+        slug: formData.slug || null
       };
 
       if (song) {
-        // Update existing song
-        await songsService.updateSong(song.id, songData);
+        await updateSong(song.id, songData);
+        toast.success('Song updated');
       } else {
-        // Create new song
-        await songsService.createSong(songData);
+        await createSong(songData);
+        toast.success('Song created');
       }
 
       onClose();
     } catch (error: any) {
       console.error('Error saving song:', error);
-      setError(error.message || 'Error al guardar la canción');
+      toast.error(error.message || 'Error saving song');
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleImageUpload = (imageUrl: string) => {
-    setFormData(prev => ({ ...prev, cover_image_url: imageUrl }));
   };
 
   return (
@@ -121,7 +120,7 @@ export function SongForm({ song, onClose }: SongFormProps) {
       <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>
-            {song ? 'Editar Canción' : 'Agregar Canción'}
+            {song ? 'Edit Song' : 'Add Song'}
           </CardTitle>
           <Button variant="ghost" size="sm" onClick={onClose}>
             <X className="h-4 w-4" />
@@ -132,30 +131,30 @@ export function SongForm({ song, onClose }: SongFormProps) {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="title">Título *</Label>
+                <Label htmlFor="title">Title *</Label>
                 <Input
                   id="title"
                   value={formData.title}
                   onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                  placeholder="Nombre de la canción"
+                  placeholder="Song Title"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="artist">Artista *</Label>
+                <Label htmlFor="artist">Artist *</Label>
                 <Input
                   id="artist"
                   value={formData.artist}
                   onChange={(e) => setFormData(prev => ({ ...prev, artist: e.target.value }))}
-                  placeholder="Nombre del artista"
+                  placeholder="Artist Name"
                   required
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="stream_url">URL de Streaming *</Label>
+              <Label htmlFor="stream_url">Streaming URL *</Label>
               <Input
                 id="stream_url"
                 type="url"
@@ -167,17 +166,17 @@ export function SongForm({ song, onClose }: SongFormProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="type">Tipo *</Label>
+              <Label htmlFor="type">Type *</Label>
               <Select 
                 value={formData.type} 
                 onValueChange={(value: 'album' | 'single') => setFormData(prev => ({ ...prev, type: value }))}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecciona el tipo" />
+                  <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="single">Single</SelectItem>
-                  <SelectItem value="album">Álbum</SelectItem>
+                  <SelectItem value="album">Album</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -185,12 +184,12 @@ export function SongForm({ song, onClose }: SongFormProps) {
             {formData.type === 'album' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="album_name">Nombre del Álbum</Label>
+                  <Label htmlFor="album_name">Album Name</Label>
                   <Input
                     id="album_name"
                     value={formData.album_name}
                     onChange={(e) => setFormData(prev => ({ ...prev, album_name: e.target.value }))}
-                    placeholder="Nombre del álbum"
+                    placeholder="Album Name"
                     list="existing-albums"
                   />
                   <datalist id="existing-albums">
@@ -201,7 +200,7 @@ export function SongForm({ song, onClose }: SongFormProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="track_number">Número de Track</Label>
+                  <Label htmlFor="track_number">Track Number</Label>
                   <Input
                     id="track_number"
                     type="number"
@@ -215,7 +214,7 @@ export function SongForm({ song, onClose }: SongFormProps) {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="release_date">Fecha de Lanzamiento</Label>
+              <Label htmlFor="release_date">Release Date</Label>
               <Input
                 id="release_date"
                 type="date"
@@ -230,11 +229,11 @@ export function SongForm({ song, onClose }: SongFormProps) {
                 id="youtube_embed_id"
                 value={formData.youtube_embed_id}
                 onChange={(e) => setFormData(prev => ({ ...prev, youtube_embed_id: e.target.value }))}
-                placeholder="dQw4w9WgXcQ (solo el ID del video)"
+                placeholder="dQw4w9WgXcQ (only the video ID)"
               />
               <p className="text-xs text-gray-500">
-                Opcional: ID del video de YouTube para mostrar el reproductor embebido. 
-                Ejemplo: para https://www.youtube.com/watch?v=dQw4w9WgXcQ usar solo "dQw4w9WgXcQ"
+                Optional: YouTube video ID for embedded player.
+                Example: for https://www.youtube.com/watch?v=dQw4w9WgXcQ use "dQw4w9WgXcQ"
               </p>
             </div>
 
@@ -244,15 +243,15 @@ export function SongForm({ song, onClose }: SongFormProps) {
                 id="slug"
                 value={formData.slug}
                 onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/--+/g, "-") }))}
-                placeholder="ej: the-cathedral, x-z-am0u-r"
+                placeholder="e.g.: the-cathedral"
               />
               <p className="text-xs text-muted-foreground">
-                Opcional: Identificador único para la URL. Solo letras minúsculas, números y guiones.
+                Optional: Unique identifier for the URL. Lowercase letters, numbers, and hyphens only.
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label>Imagen de Portada</Label>
+              <Label>Cover Image</Label>
               <div className="space-y-4 p-4 border rounded-lg bg-card">
                 <AdminImageUpload
                   onImageUpload={handleImageUpload}
@@ -264,40 +263,28 @@ export function SongForm({ song, onClose }: SongFormProps) {
                     <span className="w-full border-t" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-card px-2 text-muted-foreground">O usa una URL</span>
+                    <span className="bg-card px-2 text-muted-foreground">Or use URL</span>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="cover_url" className="text-xs">URL de la Imagen</Label>
+                  <Label htmlFor="cover_url" className="text-xs">Image URL</Label>
                   <Input 
                     id="cover_url"
                     value={formData.cover_image_url || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, cover_image_url: e.target.value }))}
-                    placeholder="https://ejemplo.com/imagen.jpg"
+                    placeholder="https://example.com/image.jpg"
                   />
                 </div>
               </div>
             </div>
 
-            {error && (
-              <div className="space-y-3">
-                <div className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded">
-                  {error}
-                </div>
-                <RLSErrorHelp 
-                  error={error} 
-                  operation={song ? 'actualizar canción' : 'crear canción'} 
-                />
-              </div>
-            )}
-
             <div className="flex justify-end gap-2 pt-4">
               <Button type="button" variant="outline" onClick={onClose}>
-                Cancelar
+                Cancel
               </Button>
               <Button type="submit" disabled={loading}>
-                {loading ? 'Guardando...' : (song ? 'Actualizar' : 'Crear')}
+                {loading ? 'Saving...' : (song ? 'Update' : 'Create')}
               </Button>
             </div>
           </form>

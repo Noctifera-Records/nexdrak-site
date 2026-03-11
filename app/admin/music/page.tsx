@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { SongsService } from '@/lib/supabase/songs-operations';
 import { SongsTable } from './songs-table';
 import { SongForm } from './song-form';
 import { StreamingLinksManager } from './streaming-links-manager';
+import { getSongs, deleteSong } from './actions';
+import { toast } from 'sonner';
 
 interface Song {
   id: number;
@@ -20,6 +21,7 @@ interface Song {
   release_date?: string;
   created_at: string;
   youtube_embed_id?: string;
+  streaming_links?: any[];
 }
 
 interface StreamingLink {
@@ -39,42 +41,26 @@ export default function AdminMusicPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingSong, setEditingSong] = useState<Song | null>(null);
   const [managingLinks, setManagingLinks] = useState<Song | null>(null);
-  const songsService = new SongsService();
 
   useEffect(() => {
-    fetchSongs();
+    loadData();
   }, []);
 
-  const fetchSongs = async () => {
+  const loadData = async () => {
     try {
-      const data = await songsService.getAllSongs();
+      const data = await getSongs();
       setSongs(data);
-      
-      // Fetch streaming links
-      await fetchStreamingLinks();
+      // Extract links from songs data for compatibility with existing components
+      const allLinks = data.flatMap((s: Song) => s.streaming_links || []).map((l: any) => ({
+          ...l,
+          song_id: data.find((s: Song) => s.streaming_links?.some((sl: any) => sl.id === l.id))?.id
+      }));
+      setStreamingLinks(allLinks);
     } catch (error) {
       console.error('Error:', error);
+      toast.error('Error loading music');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchStreamingLinks = async () => {
-    try {
-      const { createClient } = await import('@/lib/supabase/client');
-      const supabase = createClient();
-      
-      const { data, error } = await supabase
-        .from('streaming_links')
-        .select('*')
-        .order('song_id')
-        .order('is_primary', { ascending: false });
-
-      if (data && !error) {
-        setStreamingLinks(data);
-      }
-    } catch (error) {
-      console.error('Error fetching streaming links:', error);
     }
   };
 
@@ -84,23 +70,24 @@ export default function AdminMusicPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('¿Estás seguro de que quieres eliminar esta canción?')) {
+    if (!confirm('Are you sure you want to delete this song?')) {
       return;
     }
 
     try {
-      await songsService.deleteSong(id);
+      await deleteSong(id);
       setSongs(prev => prev.filter(song => song.id !== id));
+      toast.success('Song deleted');
     } catch (error) {
       console.error('Error:', error);
-      alert('Error al eliminar la canción');
+      toast.error('Error deleting song');
     }
   };
 
   const handleFormClose = () => {
     setShowForm(false);
     setEditingSong(null);
-    fetchSongs(); // Refresh the list
+    loadData(); // Refresh the list
   };
 
   const handleManageLinks = (song: Song) => {
@@ -109,17 +96,17 @@ export default function AdminMusicPage() {
 
   const handleLinksClose = () => {
     setManagingLinks(null);
-    fetchStreamingLinks(); // Refresh streaming links
+    loadData(); // Refresh streaming links
   };
 
   if (loading) {
     return (
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Música</h1>
+          <h1 className="text-2xl font-bold">Music</h1>
         </div>
         <div className="text-center py-8">
-          <p>Loading songs...</p>
+          <p>Loading music...</p>
         </div>
       </div>
     );
@@ -128,10 +115,10 @@ export default function AdminMusicPage() {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Música</h1>
+        <h1 className="text-2xl font-bold">Music</h1>
         <Button onClick={() => setShowForm(true)}>
           <Plus className="h-4 w-4 mr-2" />
-          Agregar Canción
+          Add Song
         </Button>
       </div>
 

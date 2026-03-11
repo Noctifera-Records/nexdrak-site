@@ -168,9 +168,9 @@ export default function Anti429System() {
       <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[9999]">
         <div className="text-center text-white p-8">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <h2 className="text-xl font-bold mb-2">Optimizando carga...</h2>
+          <h2 className="text-xl font-bold mb-2">Optimizing Load...</h2>
           <p className="text-gray-300">
-            Detectamos problemas de red. Recargando la página para una mejor experiencia.
+            We detected network issues. Reloading the page for a better experience.
           </p>
         </div>
       </div>

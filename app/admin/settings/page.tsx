@@ -7,8 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AdminService } from '@/lib/supabase/admin-operations';
+import { getSiteSettings, updateSiteSettings } from './actions';
 import { AdminImageUpload } from '@/components/image-upload';
+import { toast } from 'sonner';
 
 interface Setting {
   id: number;
@@ -25,9 +26,6 @@ export default function AdminSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<Record<string, string>>({});
-  const [error, setError] = useState<string>('');
-  const [success, setSuccess] = useState<string>('');
-  const adminService = new AdminService();
 
   useEffect(() => {
     fetchSettings();
@@ -35,9 +33,8 @@ export default function AdminSettingsPage() {
 
   const fetchSettings = async () => {
     setLoading(true);
-    setError('');
     try {
-      const data = await adminService.getSiteSettings();
+      const data = await getSiteSettings();
       
       // Define all required keys to ensure they appear even if missing in DB
       const requiredKeys = [
@@ -56,7 +53,7 @@ export default function AdminSettingsPage() {
 
       // Merge DB data with required keys
       const mergedSettings = requiredKeys.map((key, index) => {
-        const existing = data.find(item => item.key === key);
+        const existing = data.find((item: any) => item.key === key);
         return {
           id: index + 1,
           key: key,
@@ -78,7 +75,7 @@ export default function AdminSettingsPage() {
       setFormData(initialData);
     } catch (error: any) {
       console.error('Error fetching settings:', error);
-      setError(error.message || 'Error al cargar las configuraciones');
+      toast.error('Error loading settings');
     } finally {
       setLoading(false);
     }
@@ -87,17 +84,17 @@ export default function AdminSettingsPage() {
   // Helper functions to get setting metadata
   const getSettingDescription = (key: string): string => {
     const descriptions: Record<string, string> = {
-      'hero_album_link': 'Enlace del álbum principal en la página de inicio',
-      'hero_background_image': 'Imagen de fondo de la sección hero',
-      'hero_release_image': 'Imagen pequeña que aparece junto al texto del lanzamiento',
-      'hero_release_text': 'Texto que aparece en la sección hero junto a la imagen',
-      'site_logo': 'Logo principal del sitio',
-      'site_logo_mobile': 'Logo para dispositivos móviles',
-      'navbar_logo': 'Logo que aparece en la barra de navegación',
-      'site_title': 'Título del sitio',
-      'site_description': 'Descripción del sitio',
-      'contact_email': 'Email de contacto',
-      'booking_email': 'Email para bookings'
+      'hero_album_link': 'Main album link on the home page',
+      'hero_background_image': 'Background image for the hero section',
+      'hero_release_image': 'Small image that appears next to the release text',
+      'hero_release_text': 'Text that appears in the hero section next to the image',
+      'site_logo': 'Main site logo',
+      'site_logo_mobile': 'Mobile site logo',
+      'navbar_logo': 'Logo that appears in the navigation bar',
+      'site_title': 'Site title',
+      'site_description': 'Site description',
+      'contact_email': 'Contact email',
+      'booking_email': 'Booking email'
     };
     return descriptions[key] || key;
   };
@@ -133,17 +130,14 @@ export default function AdminSettingsPage() {
 
   const handleSave = async () => {
     setSaving(true);
-    setError('');
-    setSuccess('');
     
     try {
-      await adminService.updateSiteSettings(formData);
-      setSuccess('Configuraciones guardadas exitosamente');
+      await updateSiteSettings(formData);
+      toast.success('Configuraciones guardadas exitosamente');
       fetchSettings(); // Refrescar los datos
     } catch (error: any) {
       console.error('Error saving settings:', error);
-      const errorMessage = error.message || 'Error al guardar las configuraciones';
-      setError(errorMessage);
+      toast.error('Error saving settings');
     } finally {
       setSaving(false);
     }
@@ -216,10 +210,10 @@ export default function AdminSettingsPage() {
     return (
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Configuraciones del Sitio</h1>
+          <h1 className="text-2xl font-bold">Site Settings</h1>
         </div>
         <div className="text-center py-8">
-          <p>Cargando configuraciones...</p>
+          <p>Loading site settings...</p>
         </div>
       </div>
     );
@@ -228,7 +222,7 @@ export default function AdminSettingsPage() {
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Configuraciones del Sitio</h1>
+        <h1 className="text-2xl font-bold">Site Settings</h1>
         <div className="flex gap-2">
           <Button
             variant="outline"
@@ -236,37 +230,22 @@ export default function AdminSettingsPage() {
             disabled={saving}
           >
             <RefreshCw className="h-4 w-4 mr-2" />
-            Refrescar
+            Refresh
           </Button>
           <Button
             onClick={handleSave}
             disabled={saving}
           >
             <Save className="h-4 w-4 mr-2" />
-            {saving ? 'Guardando...' : 'Guardar Cambios'}
+            {saving ? 'Saving...' : 'Save Changes'}
           </Button>
         </div>
       </div>
 
-      {/* Mensajes de error y éxito */}
-      {error && (
-        <div className="bg-red-900/20 border border-red-500 text-red-200 px-4 py-3 rounded mb-4 flex items-center">
-          <AlertCircle className="h-5 w-5 mr-2" />
-          {error}
-        </div>
-      )}
-      
-      {success && (
-        <div className="bg-green-900/20 border border-green-500 text-green-200 px-4 py-3 rounded mb-4">
-          {success}
-        </div>
-      )}
-
       <div className="space-y-6">
-        {/* Configuraciones de la página principal */}
         <Card>
           <CardHeader>
-            <CardTitle>Página Principal - Sección Hero</CardTitle>
+            <CardTitle>Home Page - Hero Section</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {settings
@@ -279,10 +258,9 @@ export default function AdminSettingsPage() {
           </CardContent>
         </Card>
 
-        {/* Configuraciones del logo */}
         <Card>
           <CardHeader>
-            <CardTitle>Logos y Branding</CardTitle>
+            <CardTitle>Logos and Branding</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {settings
@@ -295,10 +273,9 @@ export default function AdminSettingsPage() {
           </CardContent>
         </Card>
 
-        {/* Configuraciones generales */}
         <Card>
           <CardHeader>
-            <CardTitle>Información General</CardTitle>
+            <CardTitle>General Settings</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {settings
@@ -312,20 +289,19 @@ export default function AdminSettingsPage() {
         </Card>
       </div>
 
-      {/* Información adicional */}
       <Card className="mt-6">
         <CardHeader>
-          <CardTitle>Información</CardTitle>
+          <CardTitle>Information</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-sm text-gray-600 space-y-2">
-            <p>• Los cambios se aplicarán inmediatamente después de guardar.</p>
-            <p>• Para las imágenes, puedes subir archivos o usar URLs externas.</p>
-            <p>• <strong>Logo principal:</strong> Se usa en la página de inicio (desktop y móvil).</p>
-            <p>• <strong>Logo navbar:</strong> Se usa en la barra de navegación superior.</p>
-            <p>• <strong>Imagen de lanzamiento:</strong> Imagen pequeña que aparece junto al texto en la página principal.</p>
-            <p>• <strong>Texto de lanzamiento:</strong> Texto que aparece junto a la imagen (ej: "NEW RELEASE", "NUEVO SINGLE").</p>
-            <p>• <strong>Imagen de fondo:</strong> Fondo de la sección principal de la página de inicio.</p>
+            <p>• Changes will be applied immediately after saving.</p>
+            <p>• For images, you can upload files or use external URLs.</p>
+            <p>• <strong>Main Logo:</strong> Used on the home page (desktop and mobile).</p>
+            <p>• <strong>Navbar Logo:</strong> Used in the top navigation bar.</p>
+            <p>• <strong>Hero release image:</strong> Small image that appears next to the release text on the home page.</p>
+            <p>• <strong>Hero release text:</strong> Text that appears next to the release image (e.g., "NEW RELEASE", "NUEVO SINGLE").</p>
+            <p>• <strong>Hero background image:</strong> Background image for the hero section on the home page.</p>
           </div>
         </CardContent>
       </Card>

@@ -6,6 +6,7 @@ import {
   ShoppingBag,
   Music,
 } from "lucide-react";
+import { getSiteSettings } from "@/lib/site-settings";
 
 const LatestReleases = dynamicImport(() => import("@/components/latest-releases"), {
   loading: () => <div className="h-96 w-full animate-pulse bg-gray-900 rounded-lg" />,
@@ -21,14 +22,16 @@ import CookieBanner from "@/components/cookie-banner";
 
 export const dynamic = 'force-static';
 
-export default function Home() {
+export default async function Home() {
+  const settings = await getSiteSettings();
+
   return (
     <div className="relative min-h-screen flex flex-col">
       {/* Hero section with logo fix */}
       <CookieBanner />
 
       {/* Hero Section with New Single */}
-      <HeroSection />
+      <HeroSection settings={settings} />
 
       {/* Content Below Red Line */}
       <div className="bg-background text-foreground transition-colors duration-300">

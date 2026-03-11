@@ -1,37 +1,37 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { auth } from "@/lib/auth"
+import { headers } from "next/headers"
 import DownloadsGrid from './downloads-grid'
-
-
+import { getDownloads } from './actions'
 
 export default async function DownloadsPage() {
-  const supabase = await createClient()
+  const session = await auth.api.getSession({
+    headers: await headers()
+  });
   
-  // Verificar si el usuario está autenticado
-  const { data: { user } } = await supabase.auth.getUser()
-  
-  if (!user) {
-    redirect('/login?')
+  if (!session) {
+    redirect('/login')
   }
 
   // Obtener descargas
-  const { data: downloads, error } = await supabase
-    .from('downloads')
-    .select('*')
-    .order('is_featured', { ascending: false })
-    .order('created_at', { ascending: false })
+  const downloads = await getDownloads();
 
-  if (error) {
-    console.error('Error fetching downloads:', error)
+  if (!downloads) {
     return (
       <div className="container mx-auto px-4 py-24 mt-10 text-foreground">
         <h1 className="text-4xl font-bold mb-6 text-center text-foreground dark:text-white">DOWNLOADS</h1>
         <div className="bg-destructive/10 border border-destructive rounded-lg p-4 max-w-md mx-auto">
-          <p className="text-destructive text-center">Error loading downloads</p>
+          <p className="text-destructive text-center">Error loading downloads or unauthorized</p>
         </div>
       </div>
     )
   }
+
+  // Serialize dates
+  const formattedDownloads = downloads.map((d: any) => ({
+    ...d,
+    created_at: d.created_at.toISOString()
+  }));
 
   return (
     <div className="container mx-auto px-4 py-24 mt-10 text-foreground">
@@ -46,7 +46,7 @@ export default async function DownloadsPage() {
           </p>
         </div>
 
-        <DownloadsGrid downloads={downloads || []} />
+        <DownloadsGrid downloads={formattedDownloads} />
       </div>
     </div>
   )

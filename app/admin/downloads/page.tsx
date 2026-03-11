@@ -1,48 +1,64 @@
-import type { Metadata } from 'next'
-import { createClient } from '@/lib/supabase/server'
-import DownloadsTable from './downloads-table'
+'use client';
 
-export const metadata: Metadata = {
-  title: 'Admin - Downloads',
-  robots: { index: false, follow: false },
-  alternates: { canonical: '/admin/downloads' }
-}
+import { useState, useEffect } from 'react';
+import { Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import DownloadsTable from './downloads-table';
+import { getDownloads } from './actions';
+import { toast } from 'sonner';
 
-export default async function AdminDownloadsPage() {
-  const supabase = await createClient()
-  // Obtener todas las descargas (incluyendo inactivas para admin)
-  const { data: downloads, error } = await supabase
-    .from('downloads')
-    .select('*')
-    .order('created_at', { ascending: false })
+export default function AdminDownloadsPage() {
+  const [downloads, setDownloads] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  if (error) {
-    console.error('Error fetching downloads:', error)
+  useEffect(() => {
+    fetchDownloads();
+  }, []);
+
+  const fetchDownloads = async () => {
+    try {
+      const data = await getDownloads();
+      setDownloads(data);
+    } catch (error) {
+      console.error('Error fetching downloads:', error);
+      toast.error('Failed to load downloads');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRefresh = () => {
+    fetchDownloads();
+  };
+
+  if (loading) {
     return (
       <div className="p-6">
-        <h1 className="text-2xl font-bold mb-6">Gestión de Descargas</h1>
-        <div className="bg-red-900/20 border border-red-500 rounded-lg p-4">
-          <p className="text-red-400">Error al cargar descargas: {error.message}</p>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">Downloads</h1>
+        </div>
+        <div className="text-center py-8">
+          <p>Loading downloads...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold">Gestión de Descargas</h1>
+          <h1 className="text-2xl font-bold">Downloads Management</h1>
           <p className="text-gray-400 text-sm mt-1">
-            Contenido exclusivo para usuarios registrados
+            Exclusive content for registered users
           </p>
         </div>
         <div className="text-sm text-gray-400">
-          Total: {downloads?.length || 0} descargas
+          Total: {downloads.length} items
         </div>
       </div>
       
-      <DownloadsTable downloads={downloads || []} />
+      <DownloadsTable downloads={downloads} onRefresh={handleRefresh} />
     </div>
-  )
+  );
 }

@@ -31,11 +31,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { updateUserProfile } from './actions'
+import { updateUserProfile, deleteUser } from './actions'
+import { toast } from 'sonner'
 
-interface User {
+interface UserData {
   id: string
   email: string
   username: string | null
@@ -45,17 +45,16 @@ interface User {
 }
 
 interface UsersTableProps {
-  users: User[]
+  users: UserData[]
 }
 
 export default function UsersTable({ users: initialUsers }: UsersTableProps) {
   const [users, setUsers] = useState(initialUsers)
   const [searchTerm, setSearchTerm] = useState('')
-  const [editingUser, setEditingUser] = useState<User | null>(null)
+  const [editingUser, setEditingUser] = useState<UserData | null>(null)
   const [loading, setLoading] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
   
-  const supabase = createClient()
   const router = useRouter()
 
   // Filtrar usuarios por término de búsqueda
@@ -68,7 +67,6 @@ export default function UsersTable({ users: initialUsers }: UsersTableProps) {
   const handleUpdateUser = async (userId: string, updates: { username?: string, role?: string }) => {
     setLoading(true)
     try {
-      // Use server action for all updates to bypass RLS restrictions on other users' profiles
       const result = await updateUserProfile(userId, updates)
       
       if (result.error) {
@@ -80,11 +78,12 @@ export default function UsersTable({ users: initialUsers }: UsersTableProps) {
         user.id === userId ? { ...user, ...updates } : user
       ))
       
+      toast.success('Usuario actualizado')
       setEditingUser(null)
       router.refresh()
     } catch (error: any) {
       console.error('Error updating user:', error)
-      alert(`Error al actualizar usuario: ${error.message || 'Error desconocido'}`)
+      toast.error(`Error al actualizar usuario: ${error.message || 'Error desconocido'}`)
     } finally {
       setLoading(false)
     }
@@ -93,29 +92,20 @@ export default function UsersTable({ users: initialUsers }: UsersTableProps) {
   const handleDeleteUser = async (userId: string) => {
     setLoading(true)
     try {
-      // Primero eliminar el perfil
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .delete()
-        .eq('id', userId)
-
-      if (profileError) throw profileError
-
-      // Luego eliminar el usuario de auth (requiere permisos de admin)
-      const { error: authError } = await supabase.auth.admin.deleteUser(userId)
+      const result = await deleteUser(userId)
       
-      if (authError) {
-        console.warn('Could not delete auth user:', authError)
-        // Continuar aunque no se pueda eliminar de auth
+      if (result.error) {
+        throw new Error(result.error)
       }
 
       // Actualizar estado local
       setUsers(users.filter(user => user.id !== userId))
       setDeleteConfirm(null)
+      toast.success('Usuario eliminado')
       router.refresh()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting user:', error)
-      alert('Error al eliminar usuario')
+      toast.error(`Error al eliminar usuario: ${error.message}`)
     } finally {
       setLoading(false)
     }
@@ -334,7 +324,7 @@ function EditUserForm({
   onSave, 
   loading 
 }: { 
-  user: User
+  user: UserData
   onSave: (userId: string, updates: { username?: string, role?: string }) => void
   loading: boolean 
 }) {

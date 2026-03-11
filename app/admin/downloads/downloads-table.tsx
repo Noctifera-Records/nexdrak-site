@@ -34,8 +34,8 @@ import {
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
-import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
+import { createDownload, updateDownload, deleteDownload } from './actions'
+import { toast } from 'sonner'
 import ImageUpload from '@/components/image-upload'
 import Image from 'next/image'
 
@@ -45,28 +45,31 @@ interface Download {
   description: string | null
   category: string
   file_url: string
-  thumbnail_url: string | null
+  cover_image_url: string | null
   file_size: string | null
-  file_format: string | null
+  file_type: string | null
   is_featured: boolean
-  download_count: number
+  is_public: boolean
   created_at: string
 }
 
 interface DownloadsTableProps {
   downloads: Download[]
+  onRefresh: () => void
 }
 
-export default function DownloadsTable({ downloads: initialDownloads }: DownloadsTableProps) {
+export default function DownloadsTable({ downloads: initialDownloads, onRefresh }: DownloadsTableProps) {
   const [downloads, setDownloads] = useState(initialDownloads)
   const [searchTerm, setSearchTerm] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [editingDownload, setEditingDownload] = useState<Download | null>(null)
   const [loading, setLoading] = useState(false)
   const [showAddDialog, setShowAddDialog] = useState(false)
-  
-  const supabase = createClient()
-  const router = useRouter()
+
+  // Update local state when props change
+  useEffect(() => {
+      setDownloads(initialDownloads);
+  }, [initialDownloads]);
 
   // Filtrar descargas
   const filteredDownloads = downloads.filter(download => {
@@ -76,86 +79,66 @@ export default function DownloadsTable({ downloads: initialDownloads }: Download
     return matchesSearch && matchesCategory
   })
 
-  const handleAddDownload = async (downloadData: Omit<Download, 'id' | 'created_at' | 'download_count'>) => {
+  const handleAddDownload = async (downloadData: any) => {
     setLoading(true)
     try {
-      const { data, error } = await supabase
-        .from('downloads')
-        .insert([{ ...downloadData, download_count: 0 }])
-        .select()
-        .single()
-
-      if (error) {
-        console.error('Supabase error:', error)
-        throw new Error(`Error de base de datos: ${error.message}`)
-      }
-
-      setDownloads([data, ...downloads])
+      await createDownload({
+          ...downloadData,
+          is_public: true // Default to public
+      });
+      toast.success('Download created');
       setShowAddDialog(false)
-      router.refresh()
+      onRefresh();
     } catch (error) {
       console.error('Error adding download:', error)
-      const errorMessage = error instanceof Error ? error.message : 'Error desconocido'
-      alert(`Error al agregar descarga: ${errorMessage}`)
+      toast.error('Failed to create download');
     } finally {
       setLoading(false)
     }
   }
 
-  const handleUpdateDownload = async (downloadId: number, updates: Partial<Download>) => {
+  const handleUpdateDownload = async (downloadId: number, updates: any) => {
     setLoading(true)
     try {
-      const { error } = await supabase
-        .from('downloads')
-        .update(updates)
-        .eq('id', downloadId)
-
-      if (error) {
-        console.error('Supabase error:', error)
-        throw new Error(`Error de base de datos: ${error.message}`)
-      }
-
-      setDownloads(downloads.map(download => 
-        download.id === downloadId ? { ...download, ...updates } : download
-      ))
-      
+      await updateDownload(downloadId, updates);
+      toast.success('Download updated');
       setEditingDownload(null)
-      router.refresh()
+      onRefresh();
     } catch (error) {
       console.error('Error updating download:', error)
-      const errorMessage = error instanceof Error ? error.message : 'Error desconocido'
-      alert(`Error al actualizar descarga: ${errorMessage}`)
+      toast.error('Failed to update download');
     } finally {
       setLoading(false)
     }
   }
 
   const handleDeleteDownload = async (downloadId: number) => {
+    if (!confirm('Are you sure you want to delete this download?')) return;
+    
     setLoading(true)
     try {
-      const { error } = await supabase
-        .from('downloads')
-        .delete()
-        .eq('id', downloadId)
-
-      if (error) {
-        console.error('Supabase error:', error)
-        throw new Error(`Error de base de datos: ${error.message}`)
-      }
-
-      setDownloads(downloads.filter(download => download.id !== downloadId))
-      router.refresh()
+      await deleteDownload(downloadId);
+      toast.success('Download deleted');
+      onRefresh();
     } catch (error) {
       console.error('Error deleting download:', error)
-      const errorMessage = error instanceof Error ? error.message : 'Error desconocido'
-      alert(`Error al eliminar descarga: ${errorMessage}`)
+      toast.error('Failed to delete download');
     } finally {
       setLoading(false)
     }
   }
 
   const toggleFeatured = async (downloadId: number, isFeatured: boolean) => {
-    await handleUpdateDownload(downloadId, { is_featured: isFeatured })
+    // Optimistic update
+    setDownloads(downloads.map(d => d.id === downloadId ? { ...d, is_featured: isFeatured } : d));
+    
+    try {
+        await updateDownload(downloadId, { is_featured: isFeatured });
+        toast.success('Status updated');
+    } catch (error) {
+        toast.error('Failed to update status');
+        onRefresh(); // Revert on error
+    }
   }
 
   const getCategoryIcon = (category: string) => {
@@ -181,7 +164,7 @@ export default function DownloadsTable({ downloads: initialDownloads }: Download
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-ES', {
+    return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
@@ -196,7 +179,7 @@ export default function DownloadsTable({ downloads: initialDownloads }: Download
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Buscar descargas..."
+              placeholder="Search downloads..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -208,10 +191,10 @@ export default function DownloadsTable({ downloads: initialDownloads }: Download
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todas las categorías</SelectItem>
+              <SelectItem value="all">All Categories</SelectItem>
               <SelectItem value="wallpaper">Wallpapers</SelectItem>
               <SelectItem value="mp3">Audio</SelectItem>
-              <SelectItem value="other">Otros</SelectItem>
+              <SelectItem value="other">Other</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -220,14 +203,14 @@ export default function DownloadsTable({ downloads: initialDownloads }: Download
           <DialogTrigger asChild>
             <Button>
               <Plus className="h-4 w-4 mr-2" />
-              Agregar Descarga
+              Add Download
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Nueva Descarga</DialogTitle>
+              <DialogTitle>New Download</DialogTitle>
               <DialogDescription>
-                Agrega nuevo contenido para descargar
+                Add new content for users to download
               </DialogDescription>
             </DialogHeader>
             <DownloadForm
@@ -244,9 +227,9 @@ export default function DownloadsTable({ downloads: initialDownloads }: Download
           <div key={download.id} className="bg-card rounded-lg border border-border overflow-hidden group hover:border-primary/50 transition-all">
             {/* Thumbnail */}
             <div className="relative aspect-video bg-muted">
-              {download.thumbnail_url ? (
+              {download.cover_image_url ? (
                 <Image
-                  src={download.thumbnail_url}
+                  src={download.cover_image_url}
                   alt={download.title}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform"
@@ -262,7 +245,7 @@ export default function DownloadsTable({ downloads: initialDownloads }: Download
                 {download.is_featured && (
                   <Badge className="bg-yellow-500/20 text-yellow-500 border-yellow-500/30">
                     <Star className="h-3 w-3 mr-1" />
-                    Destacado
+                    Featured
                   </Badge>
                 )}
                 <Badge className={`${getCategoryColor(download.category)} border`}>
@@ -286,15 +269,11 @@ export default function DownloadsTable({ downloads: initialDownloads }: Download
                 <div className="flex items-center justify-between text-xs text-muted-foreground mt-2">
                   <div className="flex items-center space-x-2">
                     {download.file_size && <span>{download.file_size}</span>}
-                    {download.file_format && (
+                    {download.file_type && (
                       <span className="bg-muted px-2 py-1 rounded">
-                        {download.file_format}
+                        {download.file_type}
                       </span>
                     )}
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <Download className="h-3 w-3" />
-                    <span>{download.download_count}</span>
                   </div>
                 </div>
                 <div className="text-xs text-muted-foreground mt-1">
@@ -309,7 +288,7 @@ export default function DownloadsTable({ downloads: initialDownloads }: Download
                     checked={download.is_featured}
                     onCheckedChange={(checked) => toggleFeatured(download.id, checked)}
                   />
-                  <span className="text-xs text-muted-foreground">Destacado</span>
+                  <span className="text-xs text-muted-foreground">Featured</span>
                 </div>
 
                 <div className="flex items-center space-x-2">
@@ -326,9 +305,9 @@ export default function DownloadsTable({ downloads: initialDownloads }: Download
                     </DialogTrigger>
                     <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
                       <DialogHeader>
-                        <DialogTitle>Editar Descarga</DialogTitle>
+                        <DialogTitle>Edit Download</DialogTitle>
                         <DialogDescription>
-                          Modifica la información de la descarga
+                          Modify download information
                         </DialogDescription>
                       </DialogHeader>
                       {editingDownload && (
@@ -342,38 +321,15 @@ export default function DownloadsTable({ downloads: initialDownloads }: Download
                   </Dialog>
 
                   {/* Botón Eliminar */}
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Eliminar Descarga</DialogTitle>
-                        <DialogDescription>
-                          ¿Estás seguro de que quieres eliminar "{download.title}"?
-                          Esta acción no se puede deshacer.
-                        </DialogDescription>
-                      </DialogHeader>
-                      <DialogFooter>
-                        <Button variant="outline">
-                          Cancelar
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          onClick={() => handleDeleteDownload(download.id)}
-                          disabled={loading}
-                        >
-                          {loading ? 'Eliminando...' : 'Eliminar'}
-                        </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                    onClick={() => handleDeleteDownload(download.id)}
+                    disabled={loading}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             </div>
@@ -385,16 +341,18 @@ export default function DownloadsTable({ downloads: initialDownloads }: Download
         <div className="text-center py-12">
           <Download className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
           <p className="text-muted-foreground text-lg mb-2">
-            {searchTerm || categoryFilter !== 'all' ? 'No se encontraron descargas' : 'No hay descargas'}
+            {searchTerm || categoryFilter !== 'all' ? 'No downloads found' : 'No downloads yet'}
           </p>
           <p className="text-muted-foreground text-sm">
-            {!searchTerm && categoryFilter === 'all' && 'Agrega tu primera descarga para comenzar'}
+            {!searchTerm && categoryFilter === 'all' && 'Add your first download to get started'}
           </p>
         </div>
       )}
     </div>
   )
 }
+
+import { useEffect } from 'react';
 
 function DownloadForm({ 
   download, 
@@ -409,9 +367,9 @@ function DownloadForm({
   const [description, setDescription] = useState(download?.description || '')
   const [category, setCategory] = useState(download?.category || 'wallpaper')
   const [fileUrl, setFileUrl] = useState(download?.file_url || '')
-  const [thumbnailUrl, setThumbnailUrl] = useState(download?.thumbnail_url || '')
+  const [coverImageUrl, setCoverImageUrl] = useState(download?.cover_image_url || '')
   const [fileSize, setFileSize] = useState(download?.file_size || '')
-  const [fileFormat, setFileFormat] = useState(download?.file_format || '')
+  const [fileType, setFileType] = useState(download?.file_type || '')
   const [isFeatured, setIsFeatured] = useState(download?.is_featured || false)
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -421,9 +379,9 @@ function DownloadForm({
       description: description || null,
       category,
       file_url: fileUrl,
-      thumbnail_url: thumbnailUrl || null,
+      cover_image_url: coverImageUrl || null,
       file_size: fileSize || null,
-      file_format: fileFormat || null,
+      file_type: fileType || null,
       is_featured: isFeatured,
     })
   }
@@ -433,20 +391,20 @@ function DownloadForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label htmlFor="title">
-            Título *
+            Title *
           </Label>
           <Input
             id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Nombre de la descarga"
+            placeholder="Download Name"
             required
           />
         </div>
 
         <div>
           <Label htmlFor="category">
-            Categoría *
+            Category *
           </Label>
           <Select value={category} onValueChange={setCategory}>
             <SelectTrigger>
@@ -455,7 +413,7 @@ function DownloadForm({
             <SelectContent>
               <SelectItem value="wallpaper">Wallpaper</SelectItem>
               <SelectItem value="mp3">Audio</SelectItem>
-              <SelectItem value="other">Otro</SelectItem>
+              <SelectItem value="other">Other</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -463,51 +421,51 @@ function DownloadForm({
 
       <div>
         <Label htmlFor="description">
-          Descripción
+          Description
         </Label>
         <Textarea
           id="description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="Descripción de la descarga"
+          placeholder="Download description..."
           rows={3}
         />
       </div>
 
       <div>
         <Label htmlFor="fileUrl">
-          URL del Archivo *
+          File URL *
         </Label>
         <Input
           id="fileUrl"
           value={fileUrl}
           onChange={(e) => setFileUrl(e.target.value)}
-          placeholder="https://ejemplo.com/archivo.zip"
+          placeholder="https://example.com/file.zip"
           required
         />
         <p className="text-xs text-muted-foreground mt-1">
-          Enlace directo al archivo alojado en otra plataforma
+          Direct link to the file hosted externally
         </p>
       </div>
 
       <div>
         <Label>
-          Imagen de Vista Previa
+          Preview Image
         </Label>
         <div className="space-y-3">
           <ImageUpload
-            value={thumbnailUrl}
-            onChange={(url) => setThumbnailUrl(url || '')}
+            value={coverImageUrl}
+            onChange={(url) => setCoverImageUrl(url || '')}
             label=""
-            maxSize={2}
+            maxSizeMB={2}
           />
           <div className="text-xs text-muted-foreground">
-            O ingresa una URL directamente:
+            Or enter URL directly:
           </div>
           <Input
-            value={thumbnailUrl}
-            onChange={(e) => setThumbnailUrl(e.target.value)}
-            placeholder="https://ejemplo.com/preview.jpg"
+            value={coverImageUrl}
+            onChange={(e) => setCoverImageUrl(e.target.value)}
+            placeholder="https://example.com/preview.jpg"
           />
         </div>
       </div>
@@ -515,7 +473,7 @@ function DownloadForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label htmlFor="fileSize">
-            Tamaño del Archivo
+            File Size
           </Label>
           <Input
             id="fileSize"
@@ -526,13 +484,13 @@ function DownloadForm({
         </div>
 
         <div>
-          <Label htmlFor="fileFormat">
-            Formato
+          <Label htmlFor="fileType">
+            Format
           </Label>
           <Input
-            id="fileFormat"
-            value={fileFormat}
-            onChange={(e) => setFileFormat(e.target.value)}
+            id="fileType"
+            value={fileType}
+            onChange={(e) => setFileType(e.target.value)}
             placeholder="ZIP, MP3, JPG, etc."
           />
         </div>
@@ -540,10 +498,11 @@ function DownloadForm({
 
       <div className="flex items-center space-x-2">
         <Switch
+          id="is-featured"
           checked={isFeatured}
           onCheckedChange={setIsFeatured}
         />
-        <Label>Destacado</Label>
+        <Label htmlFor="is-featured">Featured</Label>
       </div>
 
       <DialogFooter>
@@ -551,7 +510,7 @@ function DownloadForm({
           type="submit"
           disabled={loading || !title || !fileUrl}
         >
-          {loading ? 'Guardando...' : (download ? 'Actualizar' : 'Crear')}
+          {loading ? 'Saving...' : (download ? 'Update' : 'Create')}
         </Button>
       </DialogFooter>
     </form>

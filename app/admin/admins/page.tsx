@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { AdminService, AdminProfile } from "@/lib/supabase/admin-operations";
+import { getAdmins, createAdmin, deleteAdmin, AdminProfile } from "./actions";
 
 export default function AdminAdminsPage() {
   const [admins, setAdmins] = useState<AdminProfile[]>([]);
@@ -17,13 +17,12 @@ export default function AdminAdminsPage() {
   const [newAdminPassword, setNewAdminPassword] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [error, setError] = useState<string>('');
-  const adminService = new AdminService();
 
   const fetchAdmins = async () => {
     setLoading(true);
     setError('');
     try {
-      const adminsList = await adminService.getAdmins();
+      const adminsList = await getAdmins();
       setAdmins(adminsList);
     } catch (error: any) {
       console.error('Error fetching admins:', error);
@@ -41,7 +40,7 @@ export default function AdminAdminsPage() {
   const handleAddAdmin = async () => {
     setError('');
     try {
-      await adminService.createAdmin(newAdminEmail, newAdminPassword);
+      await createAdmin(newAdminEmail, newAdminPassword);
       toast.success("Administrador agregado exitosamente.");
       setNewAdminEmail("");
       setNewAdminPassword("");
@@ -58,7 +57,7 @@ export default function AdminAdminsPage() {
   const handleDeleteAdmin = async (adminId: string) => {
     setError('');
     try {
-      await adminService.deleteAdmin(adminId);
+      await deleteAdmin(adminId);
       toast.success("Administrador eliminado exitosamente.");
       fetchAdmins();
     } catch (error: any) {

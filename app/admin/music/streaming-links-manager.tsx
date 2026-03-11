@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { createClient } from '@/lib/supabase/client';
+import { addStreamingLink, deleteStreamingLink, setPrimaryStreamingLink } from './actions';
 
 interface Song {
   id: number;
@@ -55,7 +56,6 @@ export function StreamingLinksManager({ song, streamingLinks, onClose }: Streami
   const [newLink, setNewLink] = useState({ platform: '', url: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const supabase = createClient();
 
   const handleAddLink = async () => {
     if (!newLink.platform || !newLink.url) {
@@ -73,18 +73,11 @@ export function StreamingLinksManager({ song, streamingLinks, onClose }: Streami
     setError('');
 
     try {
-      const { data, error } = await supabase
-        .from('streaming_links')
-        .insert({
-          song_id: song.id,
-          platform: newLink.platform,
-          url: newLink.url,
-          is_primary: links.length === 0 // First link is primary by default
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
+      const data = await addStreamingLink(song.id, {
+        platform: newLink.platform,
+        url: newLink.url,
+        is_primary: links.length === 0
+      });
 
       setLinks(prev => [...prev, data]);
       setNewLink({ platform: '', url: '' });
@@ -102,13 +95,7 @@ export function StreamingLinksManager({ song, streamingLinks, onClose }: Streami
 
     setLoading(true);
     try {
-      const { error } = await supabase
-        .from('streaming_links')
-        .delete()
-        .eq('id', linkId);
-
-      if (error) throw error;
-
+      await deleteStreamingLink(linkId);
       setLinks(prev => prev.filter(link => link.id !== linkId));
     } catch (error: any) {
       setError(error.message || 'Error deleting streaming link');
@@ -120,19 +107,7 @@ export function StreamingLinksManager({ song, streamingLinks, onClose }: Streami
   const handleSetPrimary = async (linkId: number) => {
     setLoading(true);
     try {
-      // First, set all links for this song to non-primary
-      await supabase
-        .from('streaming_links')
-        .update({ is_primary: false })
-        .eq('song_id', song.id);
-
-      // Then set the selected link as primary
-      const { error } = await supabase
-        .from('streaming_links')
-        .update({ is_primary: true })
-        .eq('id', linkId);
-
-      if (error) throw error;
+      await setPrimaryStreamingLink(linkId, song.id);
 
       setLinks(prev => prev.map(link => ({
         ...link,

@@ -7,7 +7,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    unoptimized: true, // Disable optimization to save Worker CPU
+    unoptimized: false, // Enable optimization
     formats: ["image/webp", "image/avif"],
     remotePatterns: [
       {
@@ -36,14 +36,6 @@ const nextConfig = {
     optimizeCss: false,
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
     webpackBuildWorker: false,
-  },
-  turbopack: {
-    rules: {
-      '*.svg': {
-        loaders: ['@svgr/webpack'],
-        as: '*.js',
-      },
-    },
   },
   
   webpack: (config, { isServer, dev }) => {
@@ -179,14 +171,6 @@ const nextConfig = {
             value: "public, max-age=31536000, immutable",
           },
         ],
-      },
-    ];
-  },
-  async rewrites() {
-    return [
-      {
-        source: "/@vite/client",
-        destination: "/api/vite-client",
       },
     ];
   },

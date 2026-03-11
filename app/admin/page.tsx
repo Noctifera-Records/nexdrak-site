@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { Users, Music, ShoppingBag, Download, Calendar, Package } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { createClient } from '@/lib/supabase/client';
+import { getAdminStats } from './actions';
+import { toast } from 'sonner';
 
 interface Stats {
   users: number;
@@ -24,7 +25,6 @@ export default function AdminDashboard() {
     releases: 0
   });
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
 
   useEffect(() => {
     fetchStats();
@@ -32,32 +32,11 @@ export default function AdminDashboard() {
 
   const fetchStats = async () => {
     try {
-      const [
-        usersResult,
-        songsResult,
-        merchResult,
-        downloadsResult,
-        eventsResult,
-        releasesResult
-      ] = await Promise.all([
-        supabase.from('profiles').select('id', { count: 'exact', head: true }),
-        supabase.from('songs').select('id', { count: 'exact', head: true }),
-        supabase.from('merch').select('id', { count: 'exact', head: true }),
-        supabase.from('downloads').select('id', { count: 'exact', head: true }),
-        supabase.from('events').select('id', { count: 'exact', head: true }),
-        supabase.from('releases').select('id', { count: 'exact', head: true })
-      ]);
-
-      setStats({
-        users: usersResult.count || 0,
-        songs: songsResult.count || 0,
-        merch: merchResult.count || 0,
-        downloads: downloadsResult.count || 0,
-        events: eventsResult.count || 0,
-        releases: releasesResult.count || 0
-      });
+      const data = await getAdminStats();
+      setStats(data);
     } catch (error) {
       console.error('Error fetching stats:', error);
+      toast.error("Failed to load dashboard stats");
     } finally {
       setLoading(false);
     }
@@ -110,7 +89,7 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 p-6">
         <div>
           <h1 className="text-3xl font-bold mb-2 text-foreground">Dashboard</h1>
           <p className="text-muted-foreground">Welcome to the admin panel</p>
@@ -133,7 +112,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6">
       <div>
         <h1 className="text-3xl font-bold mb-2 text-foreground">Dashboard</h1>
         <p className="text-muted-foreground">Overview of your content and users</p>

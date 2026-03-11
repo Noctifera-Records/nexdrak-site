@@ -11,7 +11,7 @@ export default function NotFound() {
   const [badgeGlitch, setBadgeGlitch] = useState(true)
 
   useEffect(() => {
-    document.title = "Not Found | NexDrak"
+    document.title = "Not Found"
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.altKey && e.key === "Delete") {
         window.location.reload()

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -22,8 +22,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
+import { createRelease, updateRelease, deleteRelease } from './actions'
+import { toast } from 'sonner'
 import ImageUpload from '@/components/image-upload'
 
 interface Release {
@@ -37,91 +37,74 @@ interface Release {
 
 interface ReleasesTableProps {
   releases: Release[]
+  onRefresh: () => void
 }
 
-export default function ReleasesTable({ releases: initialReleases }: ReleasesTableProps) {
+export default function ReleasesTable({ releases: initialReleases, onRefresh }: ReleasesTableProps) {
   const [releases, setReleases] = useState(initialReleases)
   const [searchTerm, setSearchTerm] = useState('')
   const [editingRelease, setEditingRelease] = useState<Release | null>(null)
   const [loading, setLoading] = useState(false)
   const [showAddDialog, setShowAddDialog] = useState(false)
-  
-  const supabase = createClient()
-  const router = useRouter()
+
+  // Update local state when props change
+  useEffect(() => {
+      setReleases(initialReleases);
+  }, [initialReleases]);
 
   // Filtrar releases por término de búsqueda
   const filteredReleases = releases.filter(release => 
     release.title.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const handleAddRelease = async (releaseData: Omit<Release, 'id' | 'created_at'>) => {
+  const handleAddRelease = async (releaseData: any) => {
     setLoading(true)
     try {
-      const { data, error } = await supabase
-        .from('releases')
-        .insert([releaseData])
-        .select()
-        .single()
-
-      if (error) throw error
-
-      setReleases([data, ...releases])
+      await createRelease(releaseData);
+      toast.success('Release created');
       setShowAddDialog(false)
-      router.refresh()
+      onRefresh();
     } catch (error) {
       console.error('Error adding release:', error)
-      alert('Error al agregar lanzamiento')
+      toast.error('Failed to create release');
     } finally {
       setLoading(false)
     }
   }
 
-  const handleUpdateRelease = async (releaseId: number, updates: Partial<Release>) => {
+  const handleUpdateRelease = async (releaseId: number, updates: any) => {
     setLoading(true)
     try {
-      const { error } = await supabase
-        .from('releases')
-        .update(updates)
-        .eq('id', releaseId)
-
-      if (error) throw error
-
-      setReleases(releases.map(release => 
-        release.id === releaseId ? { ...release, ...updates } : release
-      ))
-      
+      await updateRelease(releaseId, updates);
+      toast.success('Release updated');
       setEditingRelease(null)
-      router.refresh()
+      onRefresh();
     } catch (error) {
       console.error('Error updating release:', error)
-      alert('Error al actualizar lanzamiento')
+      toast.error('Failed to update release');
     } finally {
       setLoading(false)
     }
   }
 
   const handleDeleteRelease = async (releaseId: number) => {
+    if (!confirm('Are you sure you want to delete this release?')) return;
+    
     setLoading(true)
     try {
-      const { error } = await supabase
-        .from('releases')
-        .delete()
-        .eq('id', releaseId)
-
-      if (error) throw error
-
-      setReleases(releases.filter(release => release.id !== releaseId))
-      router.refresh()
+      await deleteRelease(releaseId);
+      toast.success('Release deleted');
+      onRefresh();
     } catch (error) {
       console.error('Error deleting release:', error)
-      alert('Error al eliminar lanzamiento')
+      toast.error('Failed to delete release');
     } finally {
       setLoading(false)
     }
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-ES', {
+    return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
@@ -133,27 +116,27 @@ export default function ReleasesTable({ releases: initialReleases }: ReleasesTab
       {/* Barra de búsqueda y botón agregar */}
       <div className="flex items-center justify-between">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Buscar lanzamientos..."
+            placeholder="Search releases..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-gray-900 border-gray-700 text-white"
+            className="pl-10"
           />
         </div>
         
         <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
           <DialogTrigger asChild>
-            <Button className="bg-white text-black hover:bg-gray-200">
+            <Button>
               <Plus className="h-4 w-4 mr-2" />
-              Agregar Lanzamiento
+              Add Release
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-gray-900 border-gray-700">
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-white">Nuevo Lanzamiento</DialogTitle>
-              <DialogDescription className="text-gray-400">
-                Agrega un nuevo lanzamiento musical
+              <DialogTitle>New Release</DialogTitle>
+              <DialogDescription>
+                Add a new music release to your discography
               </DialogDescription>
             </DialogHeader>
             <ReleaseForm
@@ -167,9 +150,9 @@ export default function ReleasesTable({ releases: initialReleases }: ReleasesTab
       {/* Grid de releases */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredReleases.map((release) => (
-          <div key={release.id} className="bg-gray-900 rounded-lg border border-gray-700 overflow-hidden">
+          <div key={release.id} className="bg-card rounded-lg border border-border overflow-hidden">
             {/* Imagen de portada */}
-            <div className="aspect-square bg-gray-800 flex items-center justify-center">
+            <div className="aspect-square bg-muted flex items-center justify-center relative">
               {release.cover_image_url ? (
                 <img
                   src={release.cover_image_url}
@@ -177,17 +160,17 @@ export default function ReleasesTable({ releases: initialReleases }: ReleasesTab
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <Music className="h-16 w-16 text-gray-600" />
+                <Music className="h-16 w-16 text-muted-foreground" />
               )}
             </div>
             
             {/* Información */}
             <div className="p-4 space-y-3">
               <div>
-                <h3 className="text-lg font-semibold text-white truncate">
+                <h3 className="text-lg font-semibold text-foreground truncate">
                   {release.title}
                 </h3>
-                <div className="flex items-center text-sm text-gray-400 mt-1">
+                <div className="flex items-center text-sm text-muted-foreground mt-1">
                   <Calendar className="h-3 w-3 mr-1" />
                   {formatDate(release.release_date)}
                 </div>
@@ -199,15 +182,15 @@ export default function ReleasesTable({ releases: initialReleases }: ReleasesTab
                   href={release.stream_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center text-sm text-blue-400 hover:text-blue-300"
+                  className="inline-flex items-center text-sm text-blue-500 hover:text-blue-600"
                 >
                   <ExternalLink className="h-3 w-3 mr-1" />
-                  Escuchar
+                  Listen
                 </a>
               )}
 
               {/* Acciones */}
-              <div className="flex items-center justify-end space-x-2 pt-2 border-t border-gray-700">
+              <div className="flex items-center justify-end space-x-2 pt-2 border-t border-border">
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button
@@ -218,11 +201,11 @@ export default function ReleasesTable({ releases: initialReleases }: ReleasesTab
                       <Edit className="h-4 w-4" />
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="bg-gray-900 border-gray-700">
+                  <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                      <DialogTitle className="text-white">Editar Lanzamiento</DialogTitle>
-                      <DialogDescription className="text-gray-400">
-                        Modifica la información del lanzamiento
+                      <DialogTitle>Edit Release</DialogTitle>
+                      <DialogDescription>
+                        Modify release information
                       </DialogDescription>
                     </DialogHeader>
                     {editingRelease && (
@@ -235,38 +218,15 @@ export default function ReleasesTable({ releases: initialReleases }: ReleasesTab
                   </DialogContent>
                 </Dialog>
 
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="bg-gray-900 border-gray-700">
-                    <DialogHeader>
-                      <DialogTitle className="text-white">Eliminar Lanzamiento</DialogTitle>
-                      <DialogDescription className="text-gray-400">
-                        ¿Estás seguro de que quieres eliminar "{release.title}"?
-                        Esta acción no se puede deshacer.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                      <Button variant="outline" className="border-gray-600 text-gray-300">
-                        Cancelar
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        onClick={() => handleDeleteRelease(release.id)}
-                        disabled={loading}
-                      >
-                        {loading ? 'Eliminando...' : 'Eliminar'}
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                  onClick={() => handleDeleteRelease(release.id)}
+                  disabled={loading}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               </div>
             </div>
           </div>
@@ -275,12 +235,12 @@ export default function ReleasesTable({ releases: initialReleases }: ReleasesTab
 
       {filteredReleases.length === 0 && (
         <div className="text-center py-12">
-          <Music className="h-16 w-16 text-gray-600 mx-auto mb-4" />
-          <p className="text-gray-400 text-lg mb-2">
-            {searchTerm ? 'No se encontraron lanzamientos' : 'No hay lanzamientos'}
+          <Music className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+          <p className="text-muted-foreground text-lg mb-2">
+            {searchTerm ? 'No releases found' : 'No releases yet'}
           </p>
-          <p className="text-gray-500 text-sm">
-            {!searchTerm && 'Agrega tu primer lanzamiento para comenzar'}
+          <p className="text-muted-foreground text-sm">
+            {!searchTerm && 'Add your first release to get started'}
           </p>
         </div>
       )}
@@ -317,66 +277,62 @@ function ReleaseForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <Label htmlFor="title" className="text-white">
-          Título *
+        <Label htmlFor="title">
+          Title *
         </Label>
         <Input
           id="title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="bg-gray-800 border-gray-600 text-white"
-          placeholder="Nombre del lanzamiento"
+          placeholder="Release Name"
           required
         />
       </div>
 
       <div>
-        <Label htmlFor="releaseDate" className="text-white">
-          Fecha de Lanzamiento *
+        <Label htmlFor="releaseDate">
+          Release Date *
         </Label>
         <Input
           id="releaseDate"
           type="date"
           value={releaseDate}
           onChange={(e) => setReleaseDate(e.target.value)}
-          className="bg-gray-800 border-gray-600 text-white"
           required
         />
       </div>
 
       <div>
-        <Label htmlFor="coverImageUrl" className="text-white">
-          Imagen de Portada
+        <Label htmlFor="coverImageUrl">
+          Cover Image
         </Label>
         <div className="space-y-2">
           <ImageUpload
             value={coverImageUrl}
-            onChange={setCoverImageUrl}
+            onChange={(url) => setCoverImageUrl(url || '')}
             label=""
-            maxSize={2}
+            maxSizeMB={2}
           />
-          <div className="text-xs text-gray-400">
-            O ingresa una URL directamente:
+          <div className="text-xs text-muted-foreground">
+            Or enter URL directly:
           </div>
           <Input
             id="coverImageUrl"
             value={coverImageUrl}
             onChange={(e) => setCoverImageUrl(e.target.value)}
-            className="bg-gray-800 border-gray-600 text-white"
-            placeholder="https://ejemplo.com/imagen.jpg"
+            placeholder="https://example.com/image.jpg"
           />
         </div>
       </div>
 
       <div>
-        <Label htmlFor="streamUrl" className="text-white">
-          URL de Streaming
+        <Label htmlFor="streamUrl">
+          Streaming URL
         </Label>
         <Input
           id="streamUrl"
           value={streamUrl}
           onChange={(e) => setStreamUrl(e.target.value)}
-          className="bg-gray-800 border-gray-600 text-white"
           placeholder="https://spotify.com/track/..."
         />
       </div>
@@ -385,9 +341,8 @@ function ReleaseForm({
         <Button
           type="submit"
           disabled={loading || !title || !releaseDate}
-          className="bg-white text-black hover:bg-gray-200"
         >
-          {loading ? 'Guardando...' : (release ? 'Actualizar' : 'Crear')}
+          {loading ? 'Saving...' : (release ? 'Update' : 'Create')}
         </Button>
       </DialogFooter>
     </form>

@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { createClient } from '@/lib/supabase/client';
 import { MerchTable } from './merch-table';
 import { MerchForm } from './merch-form';
+import { getMerch, deleteMerch } from './actions';
+import { toast } from 'sonner';
 
 interface MerchItem {
   id: number;
@@ -25,7 +26,6 @@ export default function AdminMerchPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingItem, setEditingItem] = useState<MerchItem | null>(null);
-  const supabase = createClient();
 
   useEffect(() => {
     fetchMerch();
@@ -33,19 +33,11 @@ export default function AdminMerchPage() {
 
   const fetchMerch = async () => {
     try {
-      const { data, error } = await supabase
-        .from('merch')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching merch:', error);
-        return;
-      }
-
-      setMerchItems(data || []);
+      const data = await getMerch();
+      setMerchItems(data);
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error fetching merch:', error);
+      toast.error('Failed to load merchandise');
     } finally {
       setLoading(false);
     }
@@ -57,26 +49,17 @@ export default function AdminMerchPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+    if (!confirm('Are you sure you want to delete this product?')) {
       return;
     }
 
     try {
-      const { error } = await supabase
-        .from('merch')
-        .delete()
-        .eq('id', id);
-
-      if (error) {
-        console.error('Error deleting merch:', error);
-        alert('Error al eliminar el producto');
-        return;
-      }
-
+      await deleteMerch(id);
       setMerchItems(prev => prev.filter(item => item.id !== id));
+      toast.success('Product deleted');
     } catch (error) {
       console.error('Error:', error);
-      alert('Error al eliminar el producto');
+      toast.error('Failed to delete product');
     }
   };
 
@@ -93,7 +76,7 @@ export default function AdminMerchPage() {
           <h1 className="text-2xl font-bold">Merchandise</h1>
         </div>
         <div className="text-center py-8">
-          <p>Cargando productos...</p>
+          <p>Loading products...</p>
         </div>
       </div>
     );
@@ -105,7 +88,7 @@ export default function AdminMerchPage() {
         <h1 className="text-2xl font-bold">Merchandise</h1>
         <Button onClick={() => setShowForm(true)}>
           <Plus className="h-4 w-4 mr-2" />
-          Agregar Producto
+          Add Product
         </Button>
       </div>
 

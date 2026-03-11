@@ -22,10 +22,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { createClient } from '@/lib/supabase/client'
 import { useNotifications } from '@/components/notification-system'
+import { incrementDownloadCount } from './actions'
 
-interface Download {
+interface DownloadItem {
   id: number
   title: string
   description: string | null
@@ -40,7 +40,7 @@ interface Download {
 }
 
 interface DownloadsGridProps {
-  downloads: Download[]
+  downloads: DownloadItem[]
 }
 
 export default function DownloadsGrid({ downloads: initialDownloads }: DownloadsGridProps) {
@@ -49,13 +49,12 @@ export default function DownloadsGrid({ downloads: initialDownloads }: Downloads
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [downloading, setDownloading] = useState<number | null>(null)
   
-  const supabase = createClient()
   const { showNotification } = useNotifications()
 
   // Filtrar descargas
   const filteredDownloads = downloads.filter(download => {
     const matchesSearch = download.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         download.description?.toLowerCase().includes(searchTerm.toLowerCase())
+                         (download.description?.toLowerCase() || '').includes(searchTerm.toLowerCase())
     const matchesCategory = categoryFilter === 'all' || download.category === categoryFilter
     return matchesSearch && matchesCategory
   })
@@ -64,15 +63,12 @@ export default function DownloadsGrid({ downloads: initialDownloads }: Downloads
   const featuredDownloads = filteredDownloads.filter(d => d.is_featured)
   const regularDownloads = filteredDownloads.filter(d => !d.is_featured)
 
-  const handleDownload = async (download: Download) => {
+  const handleDownload = async (download: DownloadItem) => {
     setDownloading(download.id)
     
     try {
       // Incrementar contador de descargas
-      await supabase
-        .from('downloads')
-        .update({ download_count: download.download_count + 1 })
-        .eq('id', download.id)
+      await incrementDownloadCount(download.id)
 
       // Actualizar estado local
       setDownloads(downloads.map(d => 
@@ -82,8 +78,8 @@ export default function DownloadsGrid({ downloads: initialDownloads }: Downloads
       // Mostrar notificación de éxito
       showNotification({
         type: 'success',
-        title: 'Descarga iniciada',
-        message: `Descargando "${download.title}"`
+        title: 'Download started',
+        message: `Downloading "${download.title}"`
       })
 
       // Abrir enlace de descarga
@@ -94,8 +90,8 @@ export default function DownloadsGrid({ downloads: initialDownloads }: Downloads
       // Mostrar notificación de error
       showNotification({
         type: 'error',
-        title: 'Error en la descarga',
-        message: 'No se pudo procesar la descarga correctamente'
+        title: 'Error in download',
+        message: 'Could not process download correctly'
       })
       
       // Aún así abrir el enlace
@@ -153,7 +149,7 @@ export default function DownloadsGrid({ downloads: initialDownloads }: Downloads
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Buscar descargas..."
+            placeholder="Search downloads..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10 bg-background/80 border-input text-foreground backdrop-blur-sm"
@@ -167,10 +163,10 @@ export default function DownloadsGrid({ downloads: initialDownloads }: Downloads
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todas</SelectItem>
+              <SelectItem value="all">All</SelectItem>
               <SelectItem value="wallpaper">Wallpapers</SelectItem>
               <SelectItem value="mp3">Audio</SelectItem>
-              <SelectItem value="other">Otros</SelectItem>
+              <SelectItem value="other">Other</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -206,7 +202,7 @@ export default function DownloadsGrid({ downloads: initialDownloads }: Downloads
       {regularDownloads.length > 0 && (
         <div>
           <h2 className="text-2xl font-bold text-foreground dark:text-white mb-6">
-            Todas las Descargas
+            All Downloads
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -232,12 +228,12 @@ export default function DownloadsGrid({ downloads: initialDownloads }: Downloads
           <Package className="h-16 w-16 text-muted-foreground dark:text-gray-600 mx-auto mb-4" />
           <p className="text-muted-foreground dark:text-gray-400 text-lg mb-2">
             {searchTerm || categoryFilter !== 'all' 
-              ? 'No se encontraron descargas' 
-              : 'No hay descargas disponibles'
+              ? 'No downloads found' 
+              : 'No downloads available'
             }
           </p>
           <p className="text-muted-foreground/80 dark:text-gray-500 text-sm">
-            {!searchTerm && categoryFilter === 'all' && 'Las descargas aparecerán aquí cuando se agreguen'}
+            {!searchTerm && categoryFilter === 'all' && 'Downloads will appear here when added'}
           </p>
         </div>
       )}
@@ -255,8 +251,8 @@ function DownloadCard({
   formatDate,
   featured = false 
 }: {
-  download: Download
-  onDownload: (download: Download) => void
+  download: DownloadItem
+  onDownload: (download: DownloadItem) => void
   downloading: boolean
   getCategoryIcon: (category: string) => React.ReactNode
   getCategoryLabel: (category: string) => string
@@ -288,7 +284,7 @@ function DownloadCard({
           {featured && (
             <Badge className="bg-yellow-500/20 text-yellow-600 dark:text-yellow-300 border-yellow-500/30">
               <Star className="h-3 w-3 mr-1" />
-              Destacado
+              Featured
             </Badge>
           )}
           <Badge className={`${getCategoryColor(download.category)} border`}>
@@ -306,13 +302,13 @@ function DownloadCard({
           >
             {downloading ? (
               <div className="flex items-center">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black mr-2"></div>
-                Descargando...
+                <div className="animate-spin rounded-full h-4 w-4 border-black border-b-2 mr-2"></div>
+                Downloading...
               </div>
             ) : (
               <div className="flex items-center">
                 <Download className="h-4 w-4 mr-2" />
-                Descargar
+                Download
               </div>
             )}
           </Button>
@@ -354,24 +350,26 @@ function DownloadCard({
           {formatDate(download.created_at)}
         </div>
 
-        {/* Botón de descarga */}
-        <Button
-          onClick={() => onDownload(download)}
-          disabled={downloading}
-          className="w-full bg-foreground text-background hover:bg-foreground/90 dark:bg-white dark:text-black dark:hover:bg-gray-200 transition-colors"
-        >
-          {downloading ? (
-            <div className="flex items-center">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
-              Descargando...
-            </div>
-          ) : (
-            <div className="flex items-center">
-              <Download className="h-4 w-4 mr-2" />
-              Descargar {download.file_format}
-            </div>
-          )}
-        </Button>
+        {/* Botón de descarga móvil */}
+        <div className="block sm:hidden mt-2">
+            <Button
+            onClick={() => onDownload(download)}
+            disabled={downloading}
+            className="w-full bg-foreground text-background hover:bg-foreground/90 dark:bg-white dark:text-black dark:hover:bg-gray-200 transition-colors"
+            >
+            {downloading ? (
+                <div className="flex items-center">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
+                Downloading...
+                </div>
+            ) : (
+                <div className="flex items-center">
+                <Download className="h-4 w-4 mr-2" />
+                Download
+                </div>
+            )}
+            </Button>
+        </div>
       </CardContent>
     </Card>
   )
