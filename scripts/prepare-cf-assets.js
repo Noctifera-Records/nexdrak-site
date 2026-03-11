@@ -34,10 +34,10 @@ function copyDirectory(src, dest) {
     fs.cpSync(src, dest, { 
       recursive: true, 
       dereference: true,
-      // Filter out node_modules and .next directories to reduce size and avoid conflicts
-      filter: (source) => !source.includes('node_modules') && !source.includes('.next'),
+      // Filter out node_modules, .next directories, and any potential source maps
+      filter: (source) => !source.includes('node_modules') && !source.includes('.next') && !source.endsWith('.map'),
     });
-    console.log(`Copied directory ${src} to ${dest} (excluding node_modules & .next)`);
+    console.log(`Copied directory ${src} to ${dest} (excluding node_modules, .next & maps)`);
   } catch (err) {
     console.error(`Error copying directory ${src} to ${dest}:`, err);
     // Don't crash immediately, allow other parts to attempt copy, but log error

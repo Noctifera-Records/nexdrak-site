@@ -17,5 +17,10 @@ export default defineCloudflareConfig({
   // Ensure middleware is handled correctly
   middleware: {
     external: true,
-  }
+    // Ensure middleware is compatible with Edge Runtime
+    override: {
+      wrapper: "cloudflare-edge",
+      converter: "edge",
+    },
+  },
 });
