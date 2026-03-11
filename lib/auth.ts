@@ -268,6 +268,8 @@ export const auth = betterAuth({
   database: new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : undefined,
+    max: process.env.NODE_ENV === "production" ? 1 : 10,
+    connectionTimeoutMillis: 5000,
   }),
   emailAndPassword: {
     enabled: true,
