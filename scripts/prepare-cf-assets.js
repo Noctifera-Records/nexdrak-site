@@ -31,8 +31,12 @@ function copyDirectory(src, dest) {
   try {
     // dereference: true ensures symlinks are followed and content is copied,
     // avoiding EISDIR errors with symlinked directories and ensuring self-contained build.
-    fs.cpSync(src, dest, { recursive: true, dereference: true });
-    console.log(`Copied directory ${src} to ${dest}`);
+    fs.cpSync(src, dest, { 
+      recursive: true, 
+      dereference: true,
+      filter: (source) => !source.includes('node_modules'),
+    });
+    console.log(`Copied directory ${src} to ${dest} (excluding node_modules)`);
   } catch (err) {
     console.error(`Error copying directory ${src} to ${dest}:`, err);
     // Don't crash immediately, allow other parts to attempt copy, but log error
