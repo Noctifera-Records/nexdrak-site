@@ -18,7 +18,7 @@ const UpcomingEvents = dynamicImport(() => import("@/components/upcoming-events"
 });
 const Newsletter = dynamicImport(() => import("@/components/newsletter"));
 
-export const runtime = 'edge';
+// export const runtime = 'edge';
 
 export default async function Home() {
   const settings = await getSiteSettings();
