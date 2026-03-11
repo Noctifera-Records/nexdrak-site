@@ -550,7 +550,7 @@ function SongForm({
             value={coverImageUrl}
             onChange={(value) => setCoverImageUrl(value || "")}
             label=""
-            maxSize={3}
+            maxSizeMB={3}
           />
           <div className="text-xs text-muted-foreground">
             O ingresa una URL directamente:

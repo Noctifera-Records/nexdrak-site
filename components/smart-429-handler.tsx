@@ -17,7 +17,12 @@ export default function Smart429Handler() {
         
         // Only handle 429 errors for static resources, not navigation
         if (response.status === 429) {
-          const url = typeof input === 'string' ? input : input.url;
+          const url =
+            typeof input === 'string'
+              ? input
+              : input instanceof URL
+                ? input.toString()
+                : input.url;
           
           // Only handle static resources, not page navigation
           if (url.includes('/_next/static/') || url.includes('/api/')) {
@@ -62,9 +67,9 @@ export default function Smart429Handler() {
 
     // Handle script and CSS loading errors
     const handleResourceError = (event: Event) => {
-      const target = event.target as HTMLScriptElement | HTMLLinkElement;
-      
-      if (target?.tagName === 'SCRIPT' && target.src?.includes('/_next/static/chunks/')) {
+      const target = event.target;
+
+      if (target instanceof HTMLScriptElement && target.src?.includes('/_next/static/chunks/')) {
         console.warn('Chunk loading failed, but continuing:', target.src);
         // Remove the failed script but don't reload the page
         target.remove();
@@ -72,7 +77,7 @@ export default function Smart429Handler() {
         event.stopPropagation();
       }
       
-      if (target?.tagName === 'LINK' && target.href?.includes('/_next/static/css/')) {
+      if (target instanceof HTMLLinkElement && target.href?.includes('/_next/static/css/')) {
         console.warn('CSS loading failed, but continuing:', target.href);
         // Remove the failed CSS link but don't reload the page
         target.remove();
@@ -102,7 +107,7 @@ export default function Smart429Handler() {
         const script = element as HTMLScriptElement;
         const originalOnError = script.onerror;
         
-        script.onerror = function(event) {
+        script.onerror = function(event: Event | string) {
           // Check if this script is actually trying to load CSS
           if (script.src && script.src.includes('.css')) {
             console.warn('Script trying to load CSS file, converting to link:', script.src);
@@ -118,7 +123,9 @@ export default function Smart429Handler() {
               script.parentNode.replaceChild(link, script);
             }
             
-            event.preventDefault();
+            if (typeof event !== 'string') {
+              event.preventDefault();
+            }
             return false;
           }
           

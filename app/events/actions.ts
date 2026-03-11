@@ -1,14 +1,23 @@
 "use server";
 
-import { db } from "@/lib/db";
+import { createServiceRoleClient } from "@/lib/supabase/service";
 
 export async function getPublicEvents() {
-    const res = await db.query(`
-        SELECT * FROM events 
-        WHERE is_published = true 
-        AND date >= CURRENT_DATE
-        ORDER BY date ASC
-    `);
-    
-    return res.rows;
+  let supabase;
+  try {
+    supabase = createServiceRoleClient();
+  } catch {
+    return [];
+  }
+  const today = new Date().toISOString().split("T")[0];
+
+  const { data, error } = await supabase
+    .from("events")
+    .select("*")
+    .eq("is_published", true)
+    .gte("date", today)
+    .order("date", { ascending: true });
+
+  if (error || !data) return [];
+  return data;
 }

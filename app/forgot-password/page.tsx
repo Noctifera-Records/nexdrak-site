@@ -19,7 +19,7 @@ export default function ForgotPasswordPage() {
     e.preventDefault();
     setLoading(true);
     
-    await authClient.forgetPassword({
+    await authClient.requestPasswordReset({
       email,
       redirectTo: "/reset-password",
     }, {
@@ -27,7 +27,7 @@ export default function ForgotPasswordPage() {
         setSubmitted(true);
         toast.success("Reset link sent to your email");
       },
-      onError: (ctx) => {
+      onError: (ctx: { error: { message?: string } }) => {
         toast.error(ctx.error.message || "Failed to send reset link");
       }
     });

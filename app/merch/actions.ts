@@ -1,13 +1,21 @@
 "use server";
 
-import { db } from "@/lib/db";
+import { createServiceRoleClient } from "@/lib/supabase/service";
 
 export async function getPublicMerch() {
-  const { rows } = await db.query(`
-    SELECT * FROM merch 
-    WHERE is_available = true 
-    ORDER BY created_at DESC
-  `);
-  
-  return rows;
+  let supabase;
+  try {
+    supabase = createServiceRoleClient();
+  } catch {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from("merch")
+    .select("*")
+    .eq("is_available", true)
+    .order("created_at", { ascending: false });
+
+  if (error || !data) return [];
+  return data;
 }

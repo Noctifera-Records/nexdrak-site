@@ -1,4 +1,4 @@
-import { db } from "@/lib/db";
+import { createServiceRoleClient } from "@/lib/supabase/service";
 
 export interface SiteSettings {
   hero_album_link: string;
@@ -30,14 +30,15 @@ const defaultSettings: SiteSettings = {
 
 export async function getSiteSettings(): Promise<SiteSettings> {
   try {
-    const { rows } = await db.query("SELECT key, value FROM site_settings");
-    
-    if (rows.length === 0) {
+    const supabase = createServiceRoleClient();
+    const { data, error } = await supabase.from("site_settings").select("key,value");
+
+    if (error || !data || data.length === 0) {
       return defaultSettings;
     }
 
     const settingsMap: Partial<SiteSettings> = {};
-    rows.forEach((item: { key: string; value: string }) => {
+    data.forEach((item: { key: string; value: string }) => {
       if (item.key in defaultSettings) {
         (settingsMap as any)[item.key] = item.value || (defaultSettings as any)[item.key];
       }

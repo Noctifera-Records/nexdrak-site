@@ -36,7 +36,12 @@ export default function Anti429System() {
     // Override fetch to queue requests and handle 429s
     const originalFetch = window.fetch;
     window.fetch = async function(input, init) {
-      const url = typeof input === 'string' ? input : input.url;
+      const url =
+        typeof input === 'string'
+          ? input
+          : input instanceof URL
+            ? input.toString()
+            : input.url;
       
       // If this is a chunk request that previously failed, skip it
       if (url.includes('/_next/static/chunks/') && failedRequests.has(url)) {

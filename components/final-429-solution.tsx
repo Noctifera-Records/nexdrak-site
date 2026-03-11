@@ -35,7 +35,12 @@ export default function Final429Solution() {
     // Override fetch with comprehensive 429 handling
     const originalFetch = window.fetch;
     window.fetch = async function(input, init) {
-      const url = typeof input === 'string' ? input : input.url;
+      const url =
+        typeof input === 'string'
+          ? input
+          : input instanceof URL
+            ? input.toString()
+            : input.url;
       
       try {
         const response = await originalFetch.call(this, input, init);
@@ -120,14 +125,21 @@ export default function Final429Solution() {
 
     // Monitor network requests for 429s
     const originalXHROpen = XMLHttpRequest.prototype.open;
-    XMLHttpRequest.prototype.open = function(method, url, ...args) {
+    XMLHttpRequest.prototype.open = function(
+      this: XMLHttpRequest,
+      method: string,
+      url: string | URL,
+      async?: boolean,
+      username?: string | null,
+      password?: string | null
+    ) {
       this.addEventListener('readystatechange', function() {
         if (this.readyState === 4 && this.status === 429) {
           handle429Error(url.toString(), 'xhr');
         }
       });
-      return originalXHROpen.call(this, method, url, ...args);
-    };
+      return originalXHROpen.call(this, method, url, async ?? true, username ?? null, password ?? null);
+    } as any;
 
     // Cleanup function
     return () => {

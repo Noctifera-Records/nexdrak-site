@@ -1,16 +1,24 @@
 "use server";
 
-import { db } from "@/lib/db";
+import { createServiceRoleClient } from "@/lib/supabase/service";
 
 export async function getSongBySlug(slug: string) {
+  let supabase;
+  try {
+    supabase = createServiceRoleClient();
+  } catch {
+    return null;
+  }
   const slugParam = slug.toLowerCase();
   
   // 1. Try to find by slug
-  let { rows } = await db.query(`
-    SELECT * FROM songs WHERE slug = $1 LIMIT 1
-  `, [slugParam]);
-  
-  let songData = rows[0];
+  const { data: bySlug, error: bySlugError } = await supabase
+    .from("songs")
+    .select("*")
+    .eq("slug", slugParam)
+    .limit(1);
+
+  let songData = !bySlugError && bySlug && bySlug.length > 0 ? bySlug[0] : null;
   let isAlbumView = false;
   let albumSongs = [];
 
@@ -25,22 +33,24 @@ export async function getSongBySlug(slug: string) {
       .join(' ');
       
     // Use ILIKE for case-insensitive search
-    const { rows: titleRows } = await db.query(`
-      SELECT * FROM songs WHERE title ILIKE $1 LIMIT 1
-    `, [searchTerm]);
-    
-    songData = titleRows[0];
+    const { data: titleRows, error: titleError } = await supabase
+      .from("songs")
+      .select("*")
+      .ilike("title", searchTerm)
+      .limit(1);
+
+    songData = !titleError && titleRows && titleRows.length > 0 ? titleRows[0] : null;
     
     // 3. If still not found, try by album name
     if (!songData) {
-      const { rows: albumRows } = await db.query(`
-        SELECT * FROM songs 
-        WHERE album_name ILIKE $1 
-        ORDER BY title ASC
-      `, [searchTerm]);
-      
-      if (albumRows.length > 0) {
-        songData = albumRows[0];
+      const { data: albumRows, error: albumError } = await supabase
+        .from("songs")
+        .select("*")
+        .ilike("album_name", searchTerm)
+        .order("title", { ascending: true });
+
+      if (!albumError && albumRows && albumRows.length > 0) {
+        songData = albumRows[0] as any;
         isAlbumView = true;
         albumSongs = albumRows;
       }
@@ -52,15 +62,16 @@ export async function getSongBySlug(slug: string) {
   }
   
   // Fetch streaming links
-  const { rows: links } = await db.query(`
-    SELECT * FROM streaming_links 
-    WHERE song_id = $1 
-    ORDER BY is_primary DESC, platform ASC
-  `, [songData.id]);
+  const { data: links, error: linksError } = await supabase
+    .from("streaming_links")
+    .select("*")
+    .eq("song_id", songData.id)
+    .order("is_primary", { ascending: false })
+    .order("platform", { ascending: true });
   
   return {
     song: songData,
-    streamingLinks: links,
+    streamingLinks: linksError || !links ? [] : links,
     isAlbumView,
     albumSongs
   };

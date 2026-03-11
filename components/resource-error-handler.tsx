@@ -49,12 +49,14 @@ export default function ResourceErrorHandler() {
         const script = element as HTMLScriptElement;
         const originalOnError = script.onerror;
         
-        script.onerror = function(event) {
+        script.onerror = function(event: Event | string) {
           console.warn('Script error intercepted:', script.src);
           
           // If it's a Next.js chunk error, don't let it crash the app
           if (script.src && script.src.includes('/_next/static/chunks/')) {
-            event.preventDefault();
+            if (typeof event !== 'string') {
+              event.preventDefault();
+            }
             return false;
           }
           
@@ -69,16 +71,17 @@ export default function ResourceErrorHandler() {
     };
 
     // Handle chunk loading failures
-    const handleChunkLoadFailed = (event: CustomEvent) => {
-      console.log('Chunk load failed, but app continues:', event.detail.src);
+    const handleChunkLoadFailed = (event: Event) => {
+      const customEvent = event as CustomEvent<{ src?: string }>;
+      console.log('Chunk load failed, but app continues:', customEvent.detail?.src);
     };
 
-    window.addEventListener('chunk-load-failed', handleChunkLoadFailed);
+    window.addEventListener('chunk-load-failed' as any, handleChunkLoadFailed as EventListener);
 
     return () => {
       document.removeEventListener('error', handleScriptError, true);
       document.removeEventListener('error', handleLinkError, true);
-      window.removeEventListener('chunk-load-failed', handleChunkLoadFailed);
+      window.removeEventListener('chunk-load-failed' as any, handleChunkLoadFailed as EventListener);
       document.createElement = originalCreateElement;
     };
   }, []);

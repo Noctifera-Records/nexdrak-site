@@ -11,7 +11,7 @@ export default function MimeTypeFixer() {
       tagName: K,
       options?: ElementCreationOptions
     ): HTMLElementTagNameMap[K] {
-      const element = originalCreateElement.call(this, tagName, options);
+      const element = originalCreateElement.call(this, tagName, options) as HTMLElementTagNameMap[K];
       
       if (tagName.toLowerCase() === 'script') {
         const script = element as HTMLScriptElement;
@@ -50,12 +50,14 @@ export default function MimeTypeFixer() {
         
         // Also override onerror to handle any remaining issues
         const originalOnError = script.onerror;
-        script.onerror = function(event) {
+        script.onerror = function(event: Event | string) {
           const src = script.src;
           if (src && src.includes('.css')) {
             console.warn('CSS MIME type error prevented for:', src);
-            event.preventDefault();
-            event.stopPropagation();
+            if (typeof event !== 'string') {
+              event.preventDefault();
+              event.stopPropagation();
+            }
             return false;
           }
           

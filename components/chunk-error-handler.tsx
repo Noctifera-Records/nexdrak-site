@@ -47,7 +47,7 @@ export default function ChunkErrorHandler() {
 
       // Call original handler for other rejections
       if (originalOnUnhandledRejection) {
-        return originalOnUnhandledRejection.call(this, event);
+        return originalOnUnhandledRejection.call(window, event);
       }
     };
 

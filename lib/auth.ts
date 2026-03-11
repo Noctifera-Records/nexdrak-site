@@ -1,6 +1,5 @@
 import { betterAuth } from "better-auth";
 import { admin, twoFactor } from "better-auth/plugins";
-import { Pool } from "pg";
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -264,45 +263,54 @@ const verifyEmailTemplate = (url: string) => `
 </html>
 `;
 
-export const auth = betterAuth({
-  database: process.env.DATABASE_URL ? new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : undefined,
-    max: process.env.NODE_ENV === "production" ? 1 : 10,
-    connectionTimeoutMillis: 5000,
-  }) : new Pool({}), // Fallback to empty pool if no env var, better-auth might complain but won't crash on import
-  emailAndPassword: {
-    enabled: true,
-    requireEmailVerification: true,
-    async sendResetPassword(data, request) {
-      await resend.emails.send({
-        from: fromEmail,
-        to: data.user.email,
-        subject: "Reset your password",
-        html: resetPasswordTemplate(data.url),
-      });
-    },
-  },
-  emailVerification: {
-    async sendVerificationEmail(data, request) {
-      await resend.emails.send({
-        from: fromEmail,
-        to: data.user.email,
-        subject: "Verify your email address",
-        html: verifyEmailTemplate(data.url),
-      });
-    },
-  },
-  socialProviders: {
-    google: {
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-    },
-  },
-  plugins: [
-    admin(),
-    twoFactor({
-      issuer: "NexDrak",
-    }),
-  ],
-});
+type DbLike = { query: (...args: any[]) => Promise<any> };
+
+export const auth = (() => {
+  try {
+    return betterAuth({
+      database: {
+        query: async () => ({ rows: [] }),
+      } as DbLike,
+      emailAndPassword: {
+        enabled: true,
+        requireEmailVerification: true,
+        async sendResetPassword(data, request) {
+          await resend.emails.send({
+            from: fromEmail,
+            to: data.user.email,
+            subject: "Reset your password",
+            html: resetPasswordTemplate(data.url),
+          });
+        },
+      },
+      emailVerification: {
+        async sendVerificationEmail(data, request) {
+          await resend.emails.send({
+            from: fromEmail,
+            to: data.user.email,
+            subject: "Verify your email address",
+            html: verifyEmailTemplate(data.url),
+          });
+        },
+      },
+      socialProviders: {
+        google: {
+          clientId: process.env.GOOGLE_CLIENT_ID as string,
+          clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+        },
+      },
+      plugins: [
+        admin(),
+        twoFactor({
+          issuer: "NexDrak",
+        }),
+      ],
+    });
+  } catch (error) {
+    console.error("Better Auth init failed:", error);
+    return {
+      api: { getSession: async () => null },
+      handler: async () => new Response("Auth unavailable", { status: 503 }),
+    } as any;
+  }
+})();

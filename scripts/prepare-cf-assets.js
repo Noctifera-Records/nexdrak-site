@@ -72,21 +72,32 @@ copyDirectory(path.join(sourceDir, 'server-functions'), path.join(destDir, 'serv
 
 // 6. Copy assets from .open-next/assets to ensure everything is in the final destDir
 // OpenNext usually puts static assets here
-const assetsDir = path.join(sourceDir, 'assets');
-const nextAssetsDir = path.join(assetsDir, '_next');
-
-if (fs.existsSync(nextAssetsDir)) {
-  console.log(`Found _next assets at ${nextAssetsDir}`);
-  // Ensure it's not a symlink that Wrangler might ignore
-  const stats = fs.lstatSync(nextAssetsDir);
-  if (stats.isSymbolicLink()) {
-    console.log('Resolving _next symlink...');
-    const realPath = fs.realpathSync(nextAssetsDir);
-    fs.unlinkSync(nextAssetsDir);
-    copyDirectory(realPath, nextAssetsDir);
+const assetsSourceDir = path.join(sourceDir, 'assets');
+if (fs.existsSync(assetsSourceDir)) {
+  console.log(`Copying all assets from ${assetsSourceDir} to ${destDir}`);
+  // Use a custom recursive copy to ensure we don't skip anything
+  function recursiveCopy(src, dest) {
+    const stats = fs.lstatSync(src);
+    if (stats.isDirectory()) {
+      if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
+      fs.readdirSync(src).forEach(child => {
+        recursiveCopy(path.join(src, child), path.join(dest, child));
+      });
+    } else {
+      // If it's a symlink, resolve it
+      const realSrc = stats.isSymbolicLink() ? fs.realpathSync(src) : src;
+      fs.copyFileSync(realSrc, dest);
+    }
   }
+  recursiveCopy(assetsSourceDir, destDir);
 } else {
-  console.warn(`WARNING: _next assets not found at ${nextAssetsDir}`);
+  console.warn(`WARNING: assets directory not found at ${assetsSourceDir}`);
+}
+
+// 6.5 Copy Cloudflare Pages special files if present in repo root
+const headersPath = path.join(projectRoot, '_headers');
+if (fs.existsSync(headersPath)) {
+  copyFile(headersPath, path.join(destDir, '_headers'));
 }
 
 // 7. Create _routes.json

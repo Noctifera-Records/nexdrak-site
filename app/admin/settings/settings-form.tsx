@@ -235,7 +235,7 @@ export default function SettingsForm({ settings: initialSettings }: SettingsForm
                       value={settings[field.key] || ''}
                       onChange={(value) => handleInputChange(field.key, value || '')}
                       label={field.label}
-                      maxSize={3}
+                      maxSizeMB={3}
                     />
                     <div className="text-xs text-gray-400">
                       O ingresa una URL directamente:

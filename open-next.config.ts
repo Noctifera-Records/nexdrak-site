@@ -23,4 +23,4 @@ export default defineCloudflareConfig({
       converter: "edge",
     },
   },
-});
+} as any);

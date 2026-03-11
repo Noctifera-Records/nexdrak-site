@@ -85,7 +85,7 @@ export async function retrySupabaseOperation<T>(
   for (let i = 0; i < maxRetries; i++) {
     try {
       return await operation();
-    } catch (error) {
+    } catch (error: any) {
       lastError = error;
       
       // Don't retry on authentication errors
