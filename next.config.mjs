@@ -1,8 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -35,9 +32,10 @@ const nextConfig = {
   experimental: {
     optimizeCss: false,
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
-    webpackBuildWorker: false,
   },
   
+  turbopack: {},
+
   webpack: (config, { isServer, dev }) => {
     // Optimize bundle splitting
     if (!isServer && !dev) {
