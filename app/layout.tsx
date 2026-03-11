@@ -17,6 +17,8 @@ import { Toaster as SonnerToaster } from "@/components/ui/sonner"
 import FooterBar from "@/components/footer-bar"
 import GlobalBackground from "@/components/global-background"
 
+export const runtime = 'edge'
+
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
