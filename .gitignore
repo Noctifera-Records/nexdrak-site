@@ -7,7 +7,7 @@
 # next.js
 /.next/
 /out/
-# /.open-next/ (Commented out to ensure Wrangler uploads assets)
+/.open-next/
 /.wrangler/
 
 # production
