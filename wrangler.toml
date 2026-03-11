@@ -6,6 +6,6 @@ compatibility_flags = ["nodejs_compat"]
 # No usamos [assets] con binding "ASSETS" porque Pages lo reserva
 # Eliminado [site] porque no es compatible con Cloudflare Pages
 
-[[services]]
-binding = "WORKER_SELF_REFERENCE"
-service = "nex-website"
+# [[services]]
+# binding = "WORKER_SELF_REFERENCE"
+# service = "nex-website"
