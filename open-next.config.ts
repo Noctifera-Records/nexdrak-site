@@ -14,4 +14,8 @@ export default defineCloudflareConfig({
       "@vscode/sqlite3"
     ],
   },
+  // Ensure middleware is handled correctly
+  middleware: {
+    external: true,
+  }
 });
