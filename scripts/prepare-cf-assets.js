@@ -73,8 +73,20 @@ copyDirectory(path.join(sourceDir, 'server-functions'), path.join(destDir, 'serv
 // 6. Copy assets from .open-next/assets to ensure everything is in the final destDir
 // OpenNext usually puts static assets here
 const assetsDir = path.join(sourceDir, 'assets');
-if (fs.existsSync(assetsDir) && assetsDir !== destDir) {
-  copyDirectory(assetsDir, destDir);
+const nextAssetsDir = path.join(assetsDir, '_next');
+
+if (fs.existsSync(nextAssetsDir)) {
+  console.log(`Found _next assets at ${nextAssetsDir}`);
+  // Ensure it's not a symlink that Wrangler might ignore
+  const stats = fs.lstatSync(nextAssetsDir);
+  if (stats.isSymbolicLink()) {
+    console.log('Resolving _next symlink...');
+    const realPath = fs.realpathSync(nextAssetsDir);
+    fs.unlinkSync(nextAssetsDir);
+    copyDirectory(realPath, nextAssetsDir);
+  }
+} else {
+  console.warn(`WARNING: _next assets not found at ${nextAssetsDir}`);
 }
 
 // 7. Create _routes.json

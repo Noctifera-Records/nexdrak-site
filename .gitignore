@@ -7,7 +7,7 @@
 # next.js
 /.next/
 /out/
-/.open-next/
+# /.open-next/ (Commented out to ensure Wrangler uploads assets)
 /.wrangler/
 
 # production
@@ -15,7 +15,6 @@
 build/bin
 build/other_templetes
 example_images
-frontend/dist
 frontend/node_modules
 dist
 test
@@ -25,7 +24,6 @@ Docs
 1Docs
 *.local
 /docs
-/.open-next
 
 # debug
 npm-debug.log*
@@ -50,18 +48,11 @@ next-env.d.ts
 # Logs
 logs
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea
-.next
-.open-next
 .bolt
 .gemini
 .DS_Store
