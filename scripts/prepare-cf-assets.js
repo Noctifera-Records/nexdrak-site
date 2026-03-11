@@ -6,6 +6,25 @@ const sourceDir = path.join(projectRoot, '.open-next');
 const assetsDir = path.join(sourceDir, 'assets');
 
 /**
+ * Helper: Recursively copy a directory from src to dest.
+ */
+function copyDirRecursive(src, dest) {
+  if (!fs.existsSync(src)) return;
+  if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
+  
+  const entries = fs.readdirSync(src, { withFileTypes: true });
+  for (const entry of entries) {
+    const srcPath = path.join(src, entry.name);
+    const destPath = path.join(dest, entry.name);
+    if (entry.isDirectory()) {
+      copyDirRecursive(srcPath, destPath);
+    } else {
+      fs.copyFileSync(srcPath, destPath);
+    }
+  }
+}
+
+/**
  * Helper: Copy a single file, creating parent dirs as needed.
  */
 function copyFile(src, dest) {
@@ -17,19 +36,21 @@ function copyFile(src, dest) {
 
 console.log('--- Preparing Cloudflare Pages Assets ---');
 
+// Clean start for assets (optional but recommended)
+// if (fs.existsSync(assetsDir)) fs.rmSync(assetsDir, { recursive: true, force: true });
+
 // 1. Copy _headers from root if present
 const headersPath = path.join(projectRoot, '_headers');
 if (fs.existsSync(headersPath)) {
   copyFile(headersPath, path.join(assetsDir, '_headers'));
 }
 
-// 2. Copy worker.js as _worker.js (Single entry point, no splitting)
-// This file includes all server logic bundled but with Node.js built-ins externalized.
+// 2. Copy main worker.js as _worker.js (Pages entry point)
 const workerSrc = path.join(sourceDir, 'worker.js');
 if (fs.existsSync(workerSrc)) {
   copyFile(workerSrc, path.join(assetsDir, '_worker.js'));
 } else {
-  // If not in root, try inside cloudflare/ (depends on OpenNext version)
+  // If not in root, try inside cloudflare/ (some OpenNext versions)
   const workerCfSrc = path.join(sourceDir, 'cloudflare', '_worker.js');
   if (fs.existsSync(workerCfSrc)) {
     copyFile(workerCfSrc, path.join(assetsDir, '_worker.js'));
@@ -39,12 +60,29 @@ if (fs.existsSync(workerSrc)) {
   }
 }
 
-// 3. Write _routes.json (Standard Next.js asset exclusion)
+// 3. Copy ALL essential directories to assets root
+// When splitting is enabled, _worker.js uses relative imports. 
+// These folders MUST be in the same directory as _worker.js.
+const essentialDirs = ['.build', 'server-functions', 'middleware', 'cloudflare'];
+
+for (const dirName of essentialDirs) {
+  const src = path.join(sourceDir, dirName);
+  if (fs.existsSync(src)) {
+    console.log(`  Copying ${dirName} directory...`);
+    copyDirRecursive(src, path.join(assetsDir, dirName));
+  }
+}
+
+// 4. Generate _routes.json
 const routesConfig = {
   version: 1,
   include: ['/*'],
   exclude: [
     '/_next/static/*',
+    '/.build/*',
+    '/server-functions/*',
+    '/middleware/*',
+    '/cloudflare/*',
     '/img/*',
     '/favicon.ico',
     '/robots.txt',
