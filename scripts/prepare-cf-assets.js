@@ -21,28 +21,21 @@ function copyFile(src, dest) {
   }
 }
 
-// Helper function to recursively copy a directory
+// Helper function to recursively copy a directory using fs.cpSync (Node.js 16.7+)
 function copyDirectory(src, dest) {
   if (!fs.existsSync(src)) {
     console.warn(`Source directory ${src} does not exist. Skipping.`);
     return;
   }
   
-  if (!fs.existsSync(dest)) {
-    fs.mkdirSync(dest, { recursive: true });
-  }
-
-  const entries = fs.readdirSync(src, { withFileTypes: true });
-
-  for (const entry of entries) {
-    const srcPath = path.join(src, entry.name);
-    const destPath = path.join(dest, entry.name);
-
-    if (entry.isDirectory()) {
-      copyDirectory(srcPath, destPath);
-    } else {
-      fs.copyFileSync(srcPath, destPath);
-    }
+  try {
+    // dereference: true ensures symlinks are followed and content is copied,
+    // avoiding EISDIR errors with symlinked directories and ensuring self-contained build.
+    fs.cpSync(src, dest, { recursive: true, dereference: true });
+    console.log(`Copied directory ${src} to ${dest}`);
+  } catch (err) {
+    console.error(`Error copying directory ${src} to ${dest}:`, err);
+    // Don't crash immediately, allow other parts to attempt copy, but log error
   }
 }
 
