@@ -3,11 +3,28 @@ import { defineCloudflareConfig } from "@opennextjs/cloudflare";
 export default defineCloudflareConfig({
   build: {
     minify: true,
-    // Externalize packages not needed in the Cloudflare Worker runtime.
-    // The project uses @neondatabase/serverless (Neon HTTP) for DB — NOT pg.
-    // Externalizing these reduces the compressed Worker size significantly.
+    // Externalize EVERYTHING that Cloudflare provides via nodejs_compat.
+    // This reduces the bundle size significantly because the code isn't copied.
     external: [
-      // Native / OS-level DB drivers — never work in Workers
+      // Node.js built-ins (Cloudflare handles these with nodejs_compat)
+      "async_hooks",
+      "buffer",
+      "crypto",
+      "events",
+      "fs",
+      "http",
+      "https",
+      "os",
+      "path",
+      "stream",
+      "util",
+      "vm",
+      "url",
+      "zlib",
+      "string_decoder",
+      "tls",
+      "net",
+      // Native / OS-level DB drivers (Never work in Workers)
       "pg-native",
       "better-sqlite3",
       "mysql2",
@@ -20,18 +37,15 @@ export default defineCloudflareConfig({
       "pg-pool",
       "pg-protocol",
       "pg-types",
-      // Legacy / unused Supabase auth packages (dead code per AGENTS.md)
-      "@supabase/auth-helpers-nextjs",
-      "@supabase/auth-ui-react",
-      "@supabase/auth-ui-shared",
-      // Vercel-specific packages — not needed on Cloudflare
+      // Vercel-specific packages
       "@vercel/node",
       "@vercel/remix-builder",
-      // undici: Cloudflare Workers has native fetch/HTTP via nodejs_compat
+      // undici: Cloudflare Workers has native fetch
       "undici",
     ],
   },
+  // Disable splitting as it causes resolution errors in Wrangler Pages
   experimental: {
-    splitting: true,
+    splitting: false,
   },
 });
