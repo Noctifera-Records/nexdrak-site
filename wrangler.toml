@@ -3,13 +3,11 @@ pages_build_output_dir = ".open-next/assets"
 compatibility_date = "2024-11-18"
 compatibility_flags = ["nodejs_compat"]
 
-[assets]
-directory = ".open-next/assets"
-binding = "ASSETS"
+# No usamos [assets] con binding "ASSETS" porque Pages lo reserva
+# Solo definimos el directorio de salida para que Wrangler lo sepa
+[site]
+bucket = ".open-next/assets"
 
 [[services]]
 binding = "WORKER_SELF_REFERENCE"
 service = "nex-website"
-
-[vars]
-# NODE_ENV = "production"

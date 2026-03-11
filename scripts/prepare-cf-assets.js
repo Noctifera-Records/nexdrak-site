@@ -24,47 +24,15 @@ function copyDirRecursive(src, dest) {
   }
 }
 
-/**
- * Helper: Copy a single file.
- */
 function copyFile(src, dest) {
   const dir = path.dirname(dest);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
   fs.copyFileSync(src, dest);
 }
 
-/**
- * Helper: Inject node: prefix into builtin modules in JS files.
- */
-function fixBuiltinRequires(filePath) {
-  let content = fs.readFileSync(filePath, 'utf8');
-  const builtins = ['fs', 'path', 'crypto', 'stream', 'buffer', 'util', 'http', 'https', 'os', 'url', 'vm', 'async_hooks', 'zlib', 'events'];
-  let changed = false;
-  for (const mod of builtins) {
-    const regex = new RegExp(`require\\(["']${mod}["']\\)`, 'g');
-    if (regex.test(content)) {
-      content = content.replace(regex, `require("node:${mod}")`);
-      changed = true;
-    }
-  }
-  if (changed) fs.writeFileSync(filePath, content);
-}
+console.log('--- Final Cloudflare Pages Preparation ---');
 
-function walkAndFix(dir) {
-  const files = fs.readdirSync(dir);
-  for (const file of files) {
-    const filePath = path.join(dir, file);
-    if (fs.statSync(filePath).isDirectory()) {
-      walkAndFix(filePath);
-    } else if (filePath.endsWith('.js') || filePath.endsWith('.mjs')) {
-      fixBuiltinRequires(filePath);
-    }
-  }
-}
-
-console.log('--- Preparing Cloudflare Pages Assets ---');
-
-// 1. Copy technical directories
+// 1. Technical directories
 ['.build', 'server-functions', 'middleware', 'cloudflare'].forEach(dir => {
   const src = path.join(sourceDir, dir);
   if (fs.existsSync(src)) {
@@ -73,23 +41,37 @@ console.log('--- Preparing Cloudflare Pages Assets ---');
   }
 });
 
-// 2. Identify and copy _worker.js
+// 2. Main worker with GLOBAL POLYFILL INJECTION
 let workerSrc = path.join(sourceDir, 'worker.js');
 if (!fs.existsSync(workerSrc)) workerSrc = path.join(sourceDir, 'cloudflare', '_worker.js');
 
 if (fs.existsSync(workerSrc)) {
-  copyFile(workerSrc, path.join(assetsDir, '_worker.js'));
-  console.log('  Copied: _worker.js');
+  let content = fs.readFileSync(workerSrc, 'utf8');
+  
+  // POLYFILL: Define globals so legacy 'require' works without node: prefix
+  const polyfill = `
+globalThis.process = globalThis.process || { env: {} };
+try {
+  const nodeModules = ['fs', 'path', 'crypto', 'stream', 'buffer', 'util', 'http', 'https', 'os', 'url', 'vm', 'async_hooks', 'zlib', 'events'];
+  for (const mod of nodeModules) {
+    try {
+      // @ts-ignore
+      const m = require('node:' + mod);
+      // @ts-ignore
+      require.cache[mod] = { exports: m };
+    } catch(e) {}
+  }
+} catch(e) {}
+`;
+  
+  fs.writeFileSync(path.join(assetsDir, '_worker.js'), polyfill + content);
+  console.log('  Injected Node.js polyfill into _worker.js');
 } else {
   console.error('CRITICAL: Worker source not found!');
   process.exit(1);
 }
 
-// 3. Fix Node.js builtin imports in ALL JS files in assets
-console.log('  Fixing node: imports in assets...');
-walkAndFix(assetsDir);
-
-// 4. Generate _routes.json
+// 3. Generate _routes.json
 const routesConfig = {
   version: 1,
   include: ['/*'],
@@ -101,4 +83,4 @@ const routesConfig = {
 fs.writeFileSync(path.join(assetsDir, '_routes.json'), JSON.stringify(routesConfig, null, 2));
 console.log('  Written: .open-next/assets/_routes.json');
 
-console.log('\nDeployment assets ready in .open-next/assets/');
+console.log('\nReady to deploy!');
