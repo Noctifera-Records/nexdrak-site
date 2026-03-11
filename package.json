@@ -10,7 +10,7 @@
     "vercel-build": "next build",
     "build:cf": "opennextjs-cloudflare build",
     "preview:cf": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "deploy:cf": "npm run build:ci && npx wrangler pages deploy .open-next/assets --project-name nex-website --compatibility-flag=nodejs_compat --compatibility-date=2024-11-18 --external=./server-functions/* --external=./middleware/* --external=./cloudflare/* --external=./.build/* --external=node:*",
+    "deploy:cf": "npm run build:ci && npx wrangler pages deploy .open-next/assets --project-name nex-website --compatibility-flag=nodejs_compat --compatibility-date=2024-11-18",
     "build:ci": "opennextjs-cloudflare build && node scripts/prepare-cf-assets.js",
     "analyze": "ANALYZE=true npm run build",
     "optimize-images": "node scripts/optimize-images.js",
