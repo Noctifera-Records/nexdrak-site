@@ -265,12 +265,12 @@ const verifyEmailTemplate = (url: string) => `
 `;
 
 export const auth = betterAuth({
-  database: new Pool({
+  database: process.env.DATABASE_URL ? new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : undefined,
     max: process.env.NODE_ENV === "production" ? 1 : 10,
     connectionTimeoutMillis: 5000,
-  }),
+  }) : new Pool({}), // Fallback to empty pool if no env var, better-auth might complain but won't crash on import
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
