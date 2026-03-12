@@ -19,31 +19,34 @@ export default function ResetPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (password !== confirmPassword) {
       toast.error("Passwords do not match");
       return;
     }
 
     if (password.length < 8) {
-        toast.error("Password must be at least 8 characters");
-        return;
+      toast.error("Password must be at least 8 characters");
+      return;
     }
 
     setLoading(true);
-    
-    await authClient.resetPassword({
-      newPassword: password,
-    }, {
-      onSuccess: () => {
-        toast.success("Password reset successfully");
-        router.push("/login");
+
+    await authClient.resetPassword(
+      {
+        newPassword: password,
       },
-      onError: (ctx) => {
-        toast.error(ctx.error.message || "Failed to reset password");
+      {
+        onSuccess: () => {
+          toast.success("Password reset successfully");
+          router.push("/login");
+        },
+        onError: (ctx) => {
+          toast.error(ctx.error.message || "Failed to reset password");
+        },
       }
-    });
-    
+    );
+
     setLoading(false);
   };
 
@@ -52,9 +55,7 @@ export default function ResetPasswordPage() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Reset Password</CardTitle>
-          <CardDescription>
-            Enter your new password below.
-          </CardDescription>
+          <CardDescription>Enter your new password below.</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
@@ -92,3 +93,4 @@ export default function ResetPasswordPage() {
     </div>
   );
 }
+

@@ -38,7 +38,7 @@ export default function LoginForm() {
             toast.info("Two-factor authentication required");
         } else {
             toast.success("Successfully logged in");
-            router.push("/admin");
+            router.push("/");
         }
       },
       onError: (ctx) => {
@@ -89,7 +89,7 @@ export default function LoginForm() {
     setGoogleLoading(true);
     await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/admin"
+        callbackURL: "/"
     }, {
         onError: (ctx) => {
             toast.error(ctx.error.message || "Failed to login with Google");

@@ -38,7 +38,11 @@ NexDrak is the official artist website for an electronic music producer. It feat
 ## Architecture & Directory Structure
 
 ### Application Routes
-- **`app/`**: Next.js App Router pages
+- **`app/`**: Next.js App Router pages (public site `nexdrak.com`)
+  - `app/login`, `app/register`, `app/auth/callback`, `app/auth/reset-password` (user auth for site visitors)
+  - `/admin` (redirects to `https://admin.nexdrak.com`)
+
+- **Admin app** (new repository `admin-nexdrak`, deployed en `admin.nexdrak.com`)
   - **`app/admin/`**: Protected admin routes (middleware + role checks)
     - `app/admin/music/` - Song CRUD + streaming links
     - `app/admin/events/` - Event CRUD

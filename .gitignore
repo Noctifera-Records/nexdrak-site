@@ -12,6 +12,7 @@
 
 # production
 /build
+/admin-app/
 build/bin
 build/other_templetes
 example_images
