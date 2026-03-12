@@ -41,7 +41,21 @@ console.log('--- Final Cloudflare Pages Preparation ---');
   }
 });
 
-// 2. Main worker with GLOBAL POLYFILL INJECTION
+// 2. CRITICAL OPTIMIZATION: Remove unnecessarily huge Next.js JSON files
+// Next.js bundles a 4.2MB capsize-font-metrics.json which breaks the 3MB free limit on CF
+const bloatFiles = [
+  path.join(assetsDir, 'server-functions/default/node_modules/next/dist/server/capsize-font-metrics.json'),
+  path.join(assetsDir, 'server-functions/default/node_modules/next/dist/server/dev/font-metrics.json')
+];
+
+bloatFiles.forEach(file => {
+  if (fs.existsSync(file)) {
+    console.log(`  DELETING BLOAT FILE to save space: ${file}`);
+    fs.unlinkSync(file);
+  }
+});
+
+// 3. Main worker with GLOBAL POLYFILL INJECTION
 let workerSrc = path.join(sourceDir, 'worker.js');
 if (!fs.existsSync(workerSrc)) workerSrc = path.join(sourceDir, 'cloudflare', '_worker.js');
 
