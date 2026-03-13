@@ -103,8 +103,8 @@ export default function RootLayout({
         <ErrorBoundary>
           <ThemeProvider
             attribute="class"
-            defaultTheme="dark"
-            enableSystem={false}
+            defaultTheme="system"
+            enableSystem={true}
             disableTransitionOnChange
           >
             <NotificationProvider>

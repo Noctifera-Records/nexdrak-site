@@ -239,14 +239,34 @@ if (!session?.user || session.user.role !== 'admin') {
 ### Custom Tables
 *Exist directly in Supabase PostgreSQL (not all tracked by Drizzle migrations)*
 
-- **`songs`**: Music releases (`id`, `title`, `artist`, `stream_url`, `cover_image_url`, `release_date`, `type`, `slug`, `album_name`, `created_at`)
-  - **Note**: Does NOT contain `track_number`. Order album songs by `title` or `created_at`
-- **`streaming_links`**: Links to Spotify, Apple Music, etc. (`id`, `song_id`, `platform`, `url`, `is_primary`)
-- **`events`**: Upcoming shows (`id`, `title`, `date`, `venue`, `location`, `ticket_url`, `is_published`, `created_at`)
+- **`songs`**: Music releases (`id`, `title`, `artist`, `stream_url`, `cover_image_url`, `release_date`, `type`, `slug`, `album_name`, `created_at`, `updated_at`, `youtube_embed_id`)
+  - **Note**: Does NOT contain `track_number`. Order album songs by `title` or `created_at` in the UI.
+- **`streaming_links`**: Links to Spotify, Apple Music, etc. (`id`, `song_id`, `platform`, `url`, `is_primary`, `created_at`)
+  - **Note**: Does NOT contain `updated_at`.
+- **`events`**: Upcoming shows (`id`, `title`, `description`, `date`, `venue`, `location`, `ticket_url`, `image_url`, `is_featured`, `is_published`, `created_at`)
 - **`merch`**: Merchandise items (`id`, `name`, `description`, `price`, `image_url`, `purchase_url`, `is_available`, `created_at`)
 - **`downloads`**: Downloadable content (`id`, `title`, `description`, `file_url`, `download_count`, `is_featured`, `created_at`)
 - **`releases`**: Release groupings (`id`, `title`, `release_date`, etc.) - queried via raw SQL in `app/admin/releases/actions.ts`
-- **`site_settings`**: Global site configuration (`key`, `value`)
+- **`site_settings`**: Global site configuration (`id`, `key`, `value`, `description`, `type`, `created_at`, `updated_at`)
+
+### 3. Date Serialization & Supabase
+**CRITICAL**: When fetching data from Supabase via HTTP clients (like `createServiceRoleClient`), date fields like `created_at` or `release_date` are returned as **ISO Strings**, not `Date` objects.
+
+- **Incorrect**: `song.created_at.toISOString()` (will throw "is not a function" error)
+- **Correct**: Always check type or use a helper to ensure serialization for Client Components:
+```typescript
+const serializeDate = (date: any) => {
+  if (!date) return null;
+  if (typeof date === 'string') return date;
+  return new Date(date).toISOString();
+};
+```
+
+### 4. Cloudflare Pages & Windows
+**Build Note**: In Windows environments, the build script `scripts/prepare-cf-assets.js` ignores `node_modules` inside `server-functions` to avoid `EPERM` errors (locked files). This is safe as OpenNext already bundles necessary dependencies.
+
+### 5. Styling & Tailwind
+**Note**: Tailwind content scanning is restricted to source directories (`/app`, `/components`, `/lib`, etc.). Avoid adding code to the root directory as it may cause build errors if files are moved.
 
 ### RPC Functions
 - **`increment_download_count(download_id INTEGER)`**: Atomically increments download count

@@ -9,6 +9,7 @@ import { admin, twoFactor } from "better-auth/plugins";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
+import { schema as authSchema } from './lib/db/schema';
 
 const { DATABASE_URL, BETTER_AUTH_URL, BETTER_AUTH_SECRET } = process.env;
 
@@ -22,6 +23,7 @@ const db = drizzle(sql);
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
+    schema: authSchema,
   }),
   baseURL: BETTER_AUTH_URL || "http://localhost:3000",
   secret: BETTER_AUTH_SECRET || "development-secret-key",

@@ -3,6 +3,7 @@ import { admin, twoFactor } from "better-auth/plugins";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { Resend } from "resend";
 import { getDb } from "./db";
+import { schema as authSchema } from "./db/schema";
 import { resetPasswordTemplate, verifyEmailTemplate } from "./email-templates";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -19,6 +20,7 @@ export const auth = (() => {
     return betterAuth({
       database: drizzleAdapter(db, {
         provider: "pg", // Use 'pg' for postgres dialect
+        schema: authSchema,
       }),
       emailAndPassword: {
         enabled: true,

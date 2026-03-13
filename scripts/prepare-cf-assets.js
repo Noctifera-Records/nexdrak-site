@@ -10,16 +10,37 @@ const assetsDir = path.join(sourceDir, 'assets');
  */
 function copyDirRecursive(src, dest) {
   if (!fs.existsSync(src)) return;
+  
+  // Skip node_modules inside server-functions as they are huge and cause EPERM on Windows
+  // OpenNext already bundles what's needed into the worker
+  if (src.includes('node_modules') && src.includes('server-functions')) {
+    // console.log(`  Skipping heavy node_modules: ${src}`);
+    return;
+  }
+
   if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
   
   const entries = fs.readdirSync(src, { withFileTypes: true });
   for (const entry of entries) {
     const srcPath = path.join(src, entry.name);
     const destPath = path.join(dest, entry.name);
-    if (entry.isDirectory()) {
-      copyDirRecursive(srcPath, destPath);
-    } else {
-      fs.copyFileSync(srcPath, destPath);
+    
+    try {
+      if (entry.isDirectory()) {
+        copyDirRecursive(srcPath, destPath);
+      } else if (entry.isSymbolicLink()) {
+        // Skip symlinks on Windows to avoid EPERM
+        continue;
+      } else {
+        fs.copyFileSync(srcPath, destPath);
+      }
+    } catch (err) {
+      // Log error but don't stop the build for non-critical files
+      if (err.code === 'EPERM' || err.code === 'EBUSY') {
+        console.warn(`  Warning: Could not copy ${entry.name} (locked or no permission). Skipping...`);
+      } else {
+        console.error(`  Error copying ${srcPath} to ${destPath}:`, err.message);
+      }
     }
   }
 }

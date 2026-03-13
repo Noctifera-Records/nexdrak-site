@@ -15,7 +15,6 @@ export interface Song {
   cover_image_url?: string
   type: 'album' | 'single'
   album_name?: string
-  track_number?: number
   release_date?: string
   created_at: string
 }

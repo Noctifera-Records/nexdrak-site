@@ -30,7 +30,7 @@ export default async function DownloadsPage() {
   // Serialize dates
   const formattedDownloads = downloads.map((d: any) => ({
     ...d,
-    created_at: d.created_at.toISOString()
+    created_at: d.created_at ? (typeof d.created_at === 'string' ? d.created_at : new Date(d.created_at).toISOString()) : null,
   }));
 
   return (

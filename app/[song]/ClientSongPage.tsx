@@ -27,7 +27,6 @@ interface Song {
   cover_image_url?: string;
   type: 'album' | 'single';
   album_name?: string;
-  track_number?: number;
   release_date?: string;
   created_at: string;
   youtube_embed_id?: string;
@@ -41,7 +40,6 @@ interface StreamingLink {
   url: string;
   is_primary: boolean;
   created_at: string;
-  updated_at: string;
 }
 
 interface ClientSongPageProps {
@@ -120,11 +118,18 @@ export default function ClientSongPage({ song, streamingLinks, isAlbumView, albu
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    if (!dateString) return "";
+    try {
+      const d = new Date(dateString);
+      if (isNaN(d.getTime())) return dateString;
+      return d.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch {
+      return dateString;
+    }
   };
 
   const getPrimaryLink = () => {
@@ -468,7 +473,7 @@ export default function ClientSongPage({ song, streamingLinks, isAlbumView, albu
                     >
                       <div className="flex items-center gap-4">
                         <span className={`text-sm font-mono w-6 text-center ${isCurrent ? 'text-primary font-bold' : 'text-muted-foreground'}`}>
-                          {track.track_number || index + 1}
+                          {index + 1}
                         </span>
                         <div>
                           <p className={`font-medium ${isCurrent ? 'text-primary' : 'text-foreground'}`}>

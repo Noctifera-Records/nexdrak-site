@@ -35,23 +35,38 @@ export default async function SongPage({ params }: SongPageProps) {
     notFound();
   }
   
-  // Serialize dates
+  // Serialize dates for client component
+  const serializeDate = (date: any) => {
+    if (!date) return null;
+    // If it's already a string, assume it's an ISO string from Supabase
+    if (typeof date === 'string') return date;
+    // If it's a Date object, convert to ISO string
+    if (date instanceof Date) return date.toISOString();
+    // Otherwise, try to create a Date and convert
+    try {
+      const d = new Date(date);
+      return isNaN(d.getTime()) ? null : d.toISOString();
+    } catch {
+      return null;
+    }
+  };
+
   const song = {
     ...data.song,
-    created_at: data.song.created_at.toISOString(),
-    release_date: data.song.release_date ? new Date(data.song.release_date).toISOString() : null,
+    created_at: serializeDate(data.song.created_at),
+    release_date: serializeDate(data.song.release_date),
   };
   
   const streamingLinks = data.streamingLinks.map((link: any) => ({
     ...link,
-    created_at: link.created_at.toISOString(),
-    updated_at: link.updated_at ? link.updated_at.toISOString() : null,
+    created_at: serializeDate(link.created_at),
+    // Removed updated_at as it doesn't exist in schema
   }));
   
   const albumSongs = data.albumSongs.map((s: any) => ({
     ...s,
-    created_at: s.created_at.toISOString(),
-    release_date: s.release_date ? new Date(s.release_date).toISOString() : null,
+    created_at: serializeDate(s.created_at),
+    release_date: serializeDate(s.release_date),
   }));
 
   return (

@@ -33,45 +33,45 @@ export default async function Home() {
       <HeroSection settings={settings} />
 
       {/* Quick Links Section */}
-      <section className="py-12 bg-black border-y border-white/5">
+      <section className="py-12 bg-background text-foreground dark:bg-black dark:text-white border-y border-gray-200 dark:border-white/5">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <Link 
               href="/music" 
-              className="group p-6 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all duration-300 flex items-center space-x-4"
+              className="group p-6 bg-white/5 text-foreground dark:bg-slate-900 dark:text-white dark:hover:bg-slate-800 hover:bg-gray-100 border border-gray-300 dark:border-white/20 rounded-lg transition-all duration-300 flex items-center space-x-4"
             >
               <div className="p-3 bg-white/10 rounded-full group-hover:scale-110 transition-transform">
-                <Music className="w-6 h-6 text-white" />
+                <Music className="w-6 h-6 text-foreground dark:text-white" />
               </div>
               <div>
                 <h3 className="font-bold text-lg">Music</h3>
-                <p className="text-white/60 text-sm">Latest releases & tracks</p>
+                <p className="text-foreground/70 dark:text-white/70 text-sm">Latest releases & tracks</p>
               </div>
             </Link>
             
             <Link 
               href="/events" 
-              className="group p-6 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all duration-300 flex items-center space-x-4"
+              className="group p-6 bg-white/5 text-foreground dark:bg-slate-900 dark:text-white dark:hover:bg-slate-800 hover:bg-gray-100 border border-gray-300 dark:border-white/20 rounded-lg transition-all duration-300 flex items-center space-x-4"
             >
               <div className="p-3 bg-white/10 rounded-full group-hover:scale-110 transition-transform">
-                <CalendarDays className="w-6 h-6 text-white" />
+                <CalendarDays className="w-6 h-6 text-foreground dark:text-white" />
               </div>
               <div>
                 <h3 className="font-bold text-lg">Events</h3>
-                <p className="text-white/60 text-sm">Shows & performances</p>
+                <p className="text-foreground/70 dark:text-white/70 text-sm">Shows & performances</p>
               </div>
             </Link>
             
             <Link 
               href="/merch" 
-              className="group p-6 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all duration-300 flex items-center space-x-4"
+              className="group p-6 bg-white/5 text-foreground dark:bg-slate-900 dark:text-white dark:hover:bg-slate-800 hover:bg-gray-100 border border-gray-300 dark:border-white/20 rounded-lg transition-all duration-300 flex items-center space-x-4"
             >
               <div className="p-3 bg-white/10 rounded-full group-hover:scale-110 transition-transform">
-                <ShoppingBag className="w-6 h-6 text-white" />
+                <ShoppingBag className="w-6 h-6 text-foreground dark:text-white" />
               </div>
               <div>
                 <h3 className="font-bold text-lg">Merch</h3>
-                <p className="text-white/60 text-sm">Exclusive artist gear</p>
+                <p className="text-foreground/70 dark:text-white/70 text-sm">Exclusive artist gear</p>
               </div>
             </Link>
           </div>
@@ -79,19 +79,19 @@ export default async function Home() {
       </section>
 
       {/* Latest Releases Section */}
-      <section id="music" className="py-20 bg-black">
+      <section id="music" className="py-20 bg-white text-black dark:bg-black dark:text-white">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
             <div>
               <h2 className="text-3xl md:text-4xl font-black mb-4 uppercase tracking-tighter">
                 Latest <span className="text-white/40">Releases</span>
               </h2>
-              <p className="text-white/60 max-w-xl">
+              <p className="text-foreground/70 dark:text-white/70 max-w-xl">
                 Explore the latest sounds from NexDrak. From high-energy techno to immersive house beats.
               </p>
             </div>
             <Link href="/music">
-              <Button variant="outline" className="border-white/20 hover:bg-white/10 hover:text-white uppercase tracking-widest text-xs h-12 px-8">
+              <Button variant="outline" className="border-gray-300 text-foreground dark:border-white/20 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 dark:hover:text-white uppercase tracking-widest text-xs h-12 px-8">
                 View All Tracks
               </Button>
             </Link>
@@ -101,19 +101,19 @@ export default async function Home() {
       </section>
 
       {/* Upcoming Events Section */}
-      <section id="events" className="py-20 bg-zinc-950">
+      <section id="events" className="py-20 bg-slate-100 text-slate-900 dark:bg-zinc-950 dark:text-white">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
             <div>
               <h2 className="text-3xl md:text-4xl font-black mb-4 uppercase tracking-tighter">
                 Tour <span className="text-white/40">Dates</span>
               </h2>
-              <p className="text-white/60 max-w-xl">
+              <p className="text-foreground/70 dark:text-white/70 max-w-xl">
                 Catch NexDrak live at festivals and clubs near you. Secure your tickets for the next experience.
               </p>
             </div>
             <Link href="/events">
-              <Button variant="outline" className="border-white/20 hover:bg-white/10 hover:text-white uppercase tracking-widest text-xs h-12 px-8">
+              <Button variant="outline" className="border-gray-300 text-foreground dark:border-white/20 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 dark:hover:text-white uppercase tracking-widest text-xs h-12 px-8">
                 See Full Schedule
               </Button>
             </Link>
@@ -123,15 +123,15 @@ export default async function Home() {
       </section>
 
       {/* Connect Section */}
-      <section className="py-20 bg-black relative overflow-hidden">
+      <section className="py-20 bg-white text-black dark:bg-black dark:text-white relative overflow-hidden">
         {/* Abstract background element */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-white/5 blur-[120px] rounded-full -z-10" />
         
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-4xl md:text-6xl font-black mb-8 uppercase tracking-tighter">
-            Stay in <span className="text-white/40">The Loop</span>
+            Stay in <span className="text-foreground/50 dark:text-white/40">The Loop</span>
           </h2>
-          <p className="text-white/60 max-w-2xl mx-auto mb-12 text-lg">
+          <p className="text-foreground/70 dark:text-white/70 max-w-2xl mx-auto mb-12 text-lg">
             Join the community for early access to new music, exclusive tour announcements, and limited merchandise drops.
           </p>
           <div className="max-w-xl mx-auto">

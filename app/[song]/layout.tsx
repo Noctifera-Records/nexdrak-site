@@ -36,7 +36,7 @@ export default async function SongLayout({
         .from('songs')
         .select('*')
         .eq('album_name', song.album_name)
-        .order('track_number', { ascending: true });
+        .order('title', { ascending: true });
       albumTracks = tracks || [];
     } catch {}
   }
@@ -54,6 +54,15 @@ export default async function SongLayout({
     } catch {}
   }
 
+  const serializeDateForLd = (date: any) => {
+    if (!date) return undefined;
+    try {
+      return new Date(date).toISOString().slice(0, 10);
+    } catch {
+      return undefined;
+    }
+  };
+
   const jsonLd =
     song?.type === 'album'
       ? {
@@ -64,15 +73,13 @@ export default async function SongLayout({
             ? { '@type': 'MusicGroup', name: song.artist }
             : undefined,
           image: imageUrl,
-          datePublished: song?.release_date
-            ? new Date(song.release_date).toISOString().slice(0, 10)
-            : undefined,
+          datePublished: serializeDateForLd(song?.release_date),
           numTracks: albumTracks?.length || undefined,
           track:
-            albumTracks?.map((t) => ({
+            albumTracks?.map((t, index) => ({
               '@type': 'MusicRecording',
               name: t?.title,
-              position: t?.track_number,
+              position: index + 1,
               inAlbum: song?.album_name
                 ? { '@type': 'MusicAlbum', name: song.album_name }
                 : undefined,
@@ -80,9 +87,7 @@ export default async function SongLayout({
                 ? { '@type': 'MusicGroup', name: song.artist }
                 : undefined,
               image: t?.cover_image_url || imageUrl,
-              datePublished: t?.release_date
-                ? new Date(t.release_date).toISOString().slice(0, 10)
-                : undefined,
+              datePublished: serializeDateForLd(t?.release_date),
               url: canonical,
             })) || undefined,
           url: canonical,
@@ -96,9 +101,7 @@ export default async function SongLayout({
             ? { '@type': 'MusicGroup', name: song.artist }
             : undefined,
           image: imageUrl,
-          datePublished: song?.release_date
-            ? new Date(song.release_date).toISOString().slice(0, 10)
-            : undefined,
+          datePublished: serializeDateForLd(song?.release_date),
           inAlbum: song?.album_name
             ? { '@type': 'MusicAlbum', name: song.album_name }
             : undefined,

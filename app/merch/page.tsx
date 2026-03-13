@@ -12,7 +12,7 @@ export default async function MerchPage() {
   // Serialize dates for client component
   const formattedMerch = merchData.map((item: any) => ({
     ...item,
-    created_at: item.created_at.toISOString(),
+    created_at: item.created_at ? (typeof item.created_at === 'string' ? item.created_at : new Date(item.created_at).toISOString()) : null,
     // Ensure price is a number if it comes as string from DB (numeric type)
     price: typeof item.price === 'string' ? parseFloat(item.price) : item.price,
   }));
