@@ -6,6 +6,7 @@ import { defineCloudflareConfig } from "@opennextjs/cloudflare";
  */
 export default defineCloudflareConfig({
   minify: true,
+  // Force externalization for anything potentially problematic
   external: [
     "pg",
     "pg-native",
@@ -19,8 +20,6 @@ export default defineCloudflareConfig({
     "oracledb",
     "tedious",
     "sqlite3",
-    "@vscode/sqlite3",
-    "kysely",
-    "async_hooks"
+    "kysely"
   ],
 });
