@@ -11,8 +11,8 @@ export default async function SongLayout({
   if (!resolvedParams?.song) {
     return <>{children}</>;
   }
-  const { createClient } = await import('@/lib/supabase/server');
-  const supabase = await createClient();
+  const { createServiceRoleClient } = await import('@/lib/supabase/service');
+  const supabase = createServiceRoleClient();
   const slugParam = resolvedParams.song.toLowerCase();
 
   let song: any = null;
@@ -131,8 +131,8 @@ export default async function SongLayout({
 export async function generateMetadata(
   { params }: { params: Promise<{ song: string }> }
 ): Promise<Metadata> {
-  const { createClient } = await import('@/lib/supabase/server');
-  const supabase = await createClient();
+  const { createServiceRoleClient } = await import('@/lib/supabase/service');
+  const supabase = createServiceRoleClient();
   const resolvedParams = await params;
   const slugParam = resolvedParams.song.toLowerCase();
 
