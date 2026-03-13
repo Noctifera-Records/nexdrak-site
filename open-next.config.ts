@@ -5,8 +5,7 @@ import { defineCloudflareConfig } from "@opennextjs/cloudflare";
  */
 export default defineCloudflareConfig({
   minify: true,
-  // We specify only what's absolutely necessary as external.
-  // The eval('require') in lib/db.ts should prevent everything else from being found.
+  // Externalize heavy libraries to keep the bundle under 3MB
   external: [
     "pg",
     "pg-native",
@@ -21,6 +20,13 @@ export default defineCloudflareConfig({
     "oracledb",
     "tedious",
     "sqlite3",
-    "kysely"
+    "kysely",
+    "recharts",
+    "undici",
+    "@supabase/supabase-js",
+    "better-auth",
+    "zod",
+    "lucide-react",
+    "resend"
   ],
 });

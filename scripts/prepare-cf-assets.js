@@ -54,7 +54,9 @@ function copyFile(src, dest) {
 console.log('--- Final Cloudflare Pages Preparation ---');
 
 // 1. Technical directories
-['.build', 'server-functions', 'middleware', 'cloudflare'].forEach(dir => {
+// IMPORTANT: We only copy what's strictly necessary.
+// Many of these are redundant because OpenNext bundles them into the worker.
+['.build'].forEach(dir => {
   const src = path.join(sourceDir, dir);
   if (fs.existsSync(src)) {
     console.log(`  Copying ${dir}...`);
@@ -62,11 +64,25 @@ console.log('--- Final Cloudflare Pages Preparation ---');
   }
 });
 
-// 2. CRITICAL OPTIMIZATION: Remove unnecessarily huge Next.js JSON files
-// Next.js bundles a 4.2MB capsize-font-metrics.json which breaks the 3MB free limit on CF
+// 2. AGGRESSIVE CLEANUP: Remove huge redundant directories from assets
+// These are often duplicated in the bundle or not needed at the edge.
+const redundantDirs = [
+  path.join(assetsDir, 'server-functions'),
+  path.join(assetsDir, 'middleware'),
+  path.join(assetsDir, 'cloudflare'),
+];
+
+redundantDirs.forEach(dir => {
+  if (fs.existsSync(dir)) {
+    console.log(`  DELETING REDUNDANT DIRECTORY: ${dir}`);
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// 3. Remove huge Next.js font metrics files that bloat the bundle
 const bloatFiles = [
-  path.join(assetsDir, 'server-functions/default/node_modules/next/dist/server/capsize-font-metrics.json'),
-  path.join(assetsDir, 'server-functions/default/node_modules/next/dist/server/dev/font-metrics.json')
+  path.join(sourceDir, 'server-functions/default/node_modules/next/dist/server/capsize-font-metrics.json'),
+  path.join(sourceDir, 'server-functions/default/node_modules/next/dist/server/dev/font-metrics.json')
 ];
 
 bloatFiles.forEach(file => {
