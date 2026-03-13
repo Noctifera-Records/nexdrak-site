@@ -22,12 +22,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 export default function Navbar() {
   const [isMainMenuOpen, setIsMainMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const { data: session } = authClient.useSession();
-  const router = useRouter();
   
+  // Use session hook
+  const { data: session, isPending } = authClient.useSession();
+  
+  const router = useRouter();
   const { settings } = useSiteSettings();
-  const user = session?.user;
-  const isAdmin = user?.role === "admin";
 
   useEffect(() => {
     setMounted(true);
@@ -38,8 +38,6 @@ export default function Navbar() {
           fetchOptions: {
               onSuccess: () => {
                   toast.success("Successfully logged out");
-                  router.push("/login");
-                  // Force a full page reload to clear any client-side session state
                   window.location.href = "/login";
               },
           },
@@ -55,15 +53,9 @@ export default function Navbar() {
     { name: "BIO", href: "/about" },
   ];
 
-  if (!mounted) {
-    return (
-      <header className="fixed top-0 left-0 right-0 z-[100] bg-background border-b border-border h-20">
-        <div className="container mx-auto px-6 h-full flex items-center justify-between">
-            <div className="h-10 w-32 bg-muted/20 animate-pulse rounded" />
-        </div>
-      </header>
-    );
-  }
+  // Logic to determine if user is logged in, ONLY after mounting to avoid hydration mismatch
+  const user = mounted ? session?.user : null;
+  const isAdmin = user?.role === "admin";
 
   return (
     <>
@@ -122,7 +114,9 @@ export default function Navbar() {
             <div className="flex items-center gap-4">
               <ThemeToggle />
               
-              {user ? (
+              {!mounted || isPending ? (
+                <div className="h-9 w-9 rounded-full bg-muted animate-pulse" />
+              ) : user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-9 w-9 rounded-full ml-2 ring-2 ring-transparent hover:ring-primary/20 transition-all">
@@ -144,7 +138,7 @@ export default function Navbar() {
                     <DropdownMenuSeparator />
                     {isAdmin && (
                       <DropdownMenuItem asChild>
-                        <Link href="/admin" className="cursor-pointer w-full flex items-center">
+                        <Link href="/admin" prefetch={false} className="cursor-pointer w-full flex items-center">
                           <Settings className="mr-2 h-4 w-4" />
                           <span>Admin Dashboard</span>
                         </Link>
@@ -217,7 +211,9 @@ export default function Navbar() {
                 </Link>
               ))}
 
-              {user ? (
+              {!mounted || isPending ? (
+                <div className="h-16 w-16 rounded-full bg-muted animate-pulse mx-auto" />
+              ) : user ? (
                 <div className="space-y-4 pt-8 w-full max-w-sm mx-auto">
                   <div className="flex flex-col items-center gap-3 px-2 py-4 bg-muted/30 rounded-lg">
                     <Avatar className="h-16 w-16 border-2 border-primary/20">
@@ -233,6 +229,7 @@ export default function Navbar() {
                   {isAdmin && (
                     <Link
                       href="/admin"
+                      prefetch={false}
                       className="flex items-center justify-center gap-3 p-4 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors text-lg font-medium text-primary"
                       onClick={() => setIsMainMenuOpen(false)}
                     >

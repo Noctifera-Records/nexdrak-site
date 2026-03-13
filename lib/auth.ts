@@ -6,28 +6,29 @@ import { schema as authSchema } from "./db/schema";
 import { resetPasswordTemplate, verifyEmailTemplate } from "./email-templates";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const fromEmail = process.env.EMAIL_FROM!;
-
-if (!fromEmail) {
-    console.warn("WARN: EMAIL_FROM environment variable is not set. Emails may fail to send.");
-}
+const fromEmail = process.env.EMAIL_FROM || "noreply@nexdrak.com";
 
 export const auth = (() => {
   try {
     const db = getDb();
     
+    // Better Auth requires a secret in production. 
+    // If BETTER_AUTH_SECRET is missing, we use a fallback only to prevent crash, 
+    // but production SHOULD have it set in Cloudflare dashboard.
+    const secret = process.env.BETTER_AUTH_SECRET || process.env.AUTH_SECRET || "development-secret-key-min-32-chars-long-placeholder";
+    const baseURL = process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_BETTER_AUTH_URL || "https://nexdrak.com";
+
     return betterAuth({
       database: drizzleAdapter(db, {
-        provider: "pg", // Use 'pg' for postgres dialect
+        provider: "pg",
         schema: authSchema,
       }),
-      // Use environment variable or default to production URL
-      baseURL: process.env.BETTER_AUTH_URL || "https://nexdrak.com",
-      secret: process.env.BETTER_AUTH_SECRET,
+      baseURL,
+      secret,
       emailAndPassword: {
         enabled: true,
         requireEmailVerification: true,
-        async sendResetPassword(data, request) {
+        async sendResetPassword(data) {
           await resend.emails.send({
             from: fromEmail,
             to: data.user.email,
@@ -37,7 +38,7 @@ export const auth = (() => {
         },
       },
       emailVerification: {
-        async sendVerificationEmail(data, request) {
+        async sendVerificationEmail(data) {
           await resend.emails.send({
             from: fromEmail,
             to: data.user.email,
@@ -48,21 +49,21 @@ export const auth = (() => {
       },
       socialProviders: {
         google: {
-          clientId: process.env.GOOGLE_CLIENT_ID as string,
-          clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+          clientId: process.env.GOOGLE_CLIENT_ID || "",
+          clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
         },
       },
       rateLimit: {
-        enabled: false, // Cloudflare handles this, internal RL causes 429s on prefetch
+        enabled: false,
       },
       plugins: [
       ],
     });
   } catch (error) {
-    console.error("Better Auth init failed:", error);
+    console.error("CRITICAL: Better Auth initialization failed:", error);
     return {
       api: { getSession: async () => null },
-      handler: async () => new Response("Auth unavailable", { status: 503 }),
+      handler: async () => new Response("Auth Configuration Error", { status: 500 }),
     } as any;
   }
 })();
