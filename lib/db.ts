@@ -153,8 +153,10 @@ export function getDb(): ReturnType<typeof drizzleNeon> {
   if (isSupabaseHost(connectionString) && !isEdgeRuntime()) {
     try {
       const pool = getPgPool();
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { drizzle } = require('drizzle-orm/node-postgres');
+      // We use eval('require') here too to hide drizzle-orm/node-postgres from esbuild.
+      // This module statically requires 'pg', which triggers the pg-cloudflare error.
+      const req = eval('require');
+      const { drizzle } = req('drizzle-orm/node-postgres');
       cachedDb = drizzle(pool);
       ensureVerificationSchema().catch((err) => console.warn('ensureVerificationSchema failed', err));
       return cachedDb as ReturnType<typeof drizzleNeon>;
