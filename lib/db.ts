@@ -7,18 +7,8 @@ import { drizzle as drizzleNeon } from 'drizzle-orm/neon-http';
 function getConnectionString() {
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) {
-    throw new Error('DATABASE_URL environment variable is not set. Please configure it with your PostgreSQL connection string.');
+    throw new Error('DATABASE_URL variable is not set.');
   }
-
-  try {
-    const url = new URL(connectionString);
-    if (!url.hostname) {
-      throw new Error('DATABASE_URL has no host.');
-    }
-  } catch (error) {
-    throw new Error(`DATABASE_URL is invalid: ${error instanceof Error ? error.message : String(error)}`);
-  }
-
   return connectionString;
 }
 
@@ -30,11 +20,12 @@ let cachedPgPool: any = null;
 
 function getPgPool() {
   if (cachedPgPool) return cachedPgPool;
+  
+  if (process.env.NEXT_RUNTIME === 'edge' || typeof EdgeRuntime !== 'undefined') {
+    return null;
+  }
 
   try {
-    // We use eval('require') to completely hide this from esbuild's static analysis.
-    // This is necessary because even dynamic string concatenation can sometimes be tracked.
-    // Since we use Neon HTTP on Cloudflare, 'pg' is never actually needed there.
     const req = eval('require');
     const { Pool } = req('pg');
     cachedPgPool = new Pool({
@@ -43,105 +34,7 @@ function getPgPool() {
     });
     return cachedPgPool;
   } catch (error) {
-    console.error('pg Pool initialization failed', error);
-    throw error;
-  }
-}
-
-async function queryWithFallback(sqlText: string, params?: unknown[]) {
-  const connectionString = getConnectionString();
-
-  try {
-    const sql = neon(connectionString, { fullResults: true });
-    const result = await sql.query(sqlText, params || []);
-    return { rows: (result.rows as any[]) || [] };
-  } catch (error) {
-    if (isSupabaseHost(connectionString) && !isEdgeRuntime()) {
-      try {
-        const pool = getPgPool();
-        const result = await pool.query(sqlText, params || []);
-        return { rows: result.rows || [] };
-      } catch (pgError) {
-        console.error('PG fallback query failed', pgError);
-        throw pgError;
-      }
-    }
-
-    console.error('Database query error:', error);
-    throw error;
-  }
-}
-
-async function ensureTableCamelCaseColumns(tableName: string, mapping: Record<string, string>) {
-  const columns = await queryWithFallback(`SELECT column_name FROM information_schema.columns WHERE table_name='${tableName}'`);
-  const columnNames = (columns.rows as Array<{ column_name: string }>).map((row) => row.column_name);
-
-  for (const [legacy, snake] of Object.entries(mapping)) {
-    if (columnNames.includes(legacy) && !columnNames.includes(snake)) {
-      await queryWithFallback(`ALTER TABLE "${tableName}" RENAME COLUMN "${legacy}" TO "${snake}"`);
-    }
-  }
-}
-
-async function ensureVerificationSchema() {
-  try {
-    const tableExists = await queryWithFallback("SELECT to_regclass('public.verification') as exists");
-    if (!tableExists.rows?.[0]?.exists) {
-      console.warn('verification table does not exist yet, skipping verification schema enforcement');
-      return;
-    }
-
-    await ensureTableCamelCaseColumns('verification', {
-      expiresAt: 'expires_at',
-      createdAt: 'created_at',
-      updatedAt: 'updated_at',
-    });
-
-    await queryWithFallback(`ALTER TABLE verification ADD COLUMN IF NOT EXISTS expires_at TIMESTAMPTZ;`);
-    await queryWithFallback(`ALTER TABLE verification ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ;`);
-    await queryWithFallback(`ALTER TABLE verification ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ;`);
-
-    await ensureTableCamelCaseColumns('user', {
-      emailVerified: 'email_verified',
-      createdAt: 'created_at',
-      updatedAt: 'updated_at',
-      banReason: 'ban_reason',
-      banExpires: 'ban_expires',
-      twoFactorEnabled: 'two_factor_enabled',
-    });
-
-    await ensureTableCamelCaseColumns('session', {
-      expiresAt: 'expires_at',
-      createdAt: 'created_at',
-      updatedAt: 'updated_at',
-      ipAddress: 'ip_address',
-      userAgent: 'user_agent',
-      userId: 'user_id',
-      impersonatedBy: 'impersonated_by',
-    });
-
-    // Ensure the new Better Auth column exists for impersonation feature
-    await queryWithFallback(`ALTER TABLE session ADD COLUMN IF NOT EXISTS impersonated_by text`);
-
-    await ensureTableCamelCaseColumns('account', {
-      accountId: 'account_id',
-      providerId: 'provider_id',
-      userId: 'user_id',
-      accessToken: 'access_token',
-      refreshToken: 'refresh_token',
-      idToken: 'id_token',
-      accessTokenExpiresAt: 'access_token_expires_at',
-      refreshTokenExpiresAt: 'refresh_token_expires_at',
-      createdAt: 'created_at',
-      updatedAt: 'updated_at',
-    });
-
-    await ensureTableCamelCaseColumns('two_factor', {
-      backupCodes: 'backup_codes',
-      userId: 'user_id',
-    });
-  } catch (error) {
-    console.warn('Could not enforce verification schema automatically:', error);
+    return null;
   }
 }
 
@@ -153,28 +46,28 @@ export function getDb(): ReturnType<typeof drizzleNeon> {
   if (isSupabaseHost(connectionString) && !isEdgeRuntime()) {
     try {
       const pool = getPgPool();
-      // We use eval('require') here too to hide drizzle-orm/node-postgres from esbuild.
-      // This module statically requires 'pg', which triggers the pg-cloudflare error.
-      const req = eval('require');
-      const { drizzle } = req('drizzle-orm/node-postgres');
-      cachedDb = drizzle(pool);
-      ensureVerificationSchema().catch((err) => console.warn('ensureVerificationSchema failed', err));
-      return cachedDb as ReturnType<typeof drizzleNeon>;
+      if (pool) {
+        const req = eval('require');
+        const { drizzle } = req('drizzle-orm/node-postgres');
+        cachedDb = drizzle(pool);
+        return cachedDb as ReturnType<typeof drizzleNeon>;
+      }
     } catch (error) {
-      console.warn('Supabase pg fallback failed, using Neon HTTP in fallback mode', error);
+      // Fallback to Neon HTTP
     }
   }
 
   const sql = neon(connectionString);
   cachedDb = drizzleNeon(sql);
-  ensureVerificationSchema().catch((err) => console.warn('ensureVerificationSchema failed', err));
   return cachedDb as ReturnType<typeof drizzleNeon>;
 }
 
-// Legacy compatibility for existing code that uses db.query(sql, params)
-type DbQueryResult<Row = any> = { rows: Row[] };
-type DbLike = { query: (sql: string, params?: unknown[]) => Promise<DbQueryResult> };
-
-export const db: DbLike = {
-  query: (sqlText: string, params?: unknown[]) => queryWithFallback(sqlText, params),
+// Legacy compatibility
+export const db = {
+  query: async (sqlText: string, params?: unknown[]) => {
+    const connectionString = getConnectionString();
+    const sql = neon(connectionString, { fullResults: true });
+    const result = await sql.query(sqlText, params || []);
+    return { rows: (result.rows as any[]) || [] };
+  },
 };

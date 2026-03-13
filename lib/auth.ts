@@ -1,5 +1,4 @@
 import { betterAuth } from "better-auth";
-import { admin, twoFactor } from "better-auth/plugins";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { Resend } from "resend";
 import { getDb } from "./db";
@@ -51,10 +50,6 @@ export const auth = (() => {
         },
       },
       plugins: [
-        admin(),
-        twoFactor({
-          issuer: "NexDrak",
-        }),
       ],
     });
   } catch (error) {

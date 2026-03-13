@@ -1,17 +1,12 @@
-import type { Metadata } from 'next';
+"use client";
+
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { CalendarDays, MapPin, Clock, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { getPublicEvents } from './actions';
-
-export const revalidate = 3600;
-export const metadata: Metadata = {
-  title: 'Upcoming Events',
-  description: 'Catch NexDrak live at venues around the world.',
-  alternates: { canonical: '/events' }
-}
 
 interface Event {
   id: number;
@@ -28,24 +23,53 @@ interface Event {
   created_at: string;
 }
 
-export default async function EventsPage() {
-  const events = await getPublicEvents();
+export default function EventsPage() {
+  const [events, setEvents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getPublicEvents().then(data => {
+      setEvents(data);
+      setLoading(false);
+    });
+  }, []);
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    try {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch {
+      return dateString;
+    }
   };
 
   const formatTime = (timeString?: string) => {
     if (!timeString) return '';
-    return new Date(`2000-01-01T${timeString}`).toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    try {
+      return new Date(`2000-01-01T${timeString}`).toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch {
+      return timeString;
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-24 mt-10 text-center">
+        <div className="animate-pulse flex flex-col items-center">
+          <div className="h-12 w-64 bg-muted rounded mb-8"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+            {[1, 2, 3].map(i => <div key={i} className="h-96 bg-muted rounded-xl"></div>)}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-24 mt-10 text-foreground">
@@ -55,40 +79,11 @@ export default async function EventsPage() {
           Catch NexDrak live at venues around the world. Experience the immersive audio-visual journey in person.
         </p>
       </div>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "ItemList",
-            itemListElement: events.map((e: any, i: number) => ({
-              "@type": "Event",
-              position: i + 1,
-              name: e.title,
-              startDate: e.date,
-              eventStatus: "https://schema.org/EventScheduled",
-              location: e.location
-                ? { "@type": "Place", name: e.location }
-                : undefined,
-              image: e.image_url || undefined,
-              offers: e.ticket_url
-                ? {
-                    "@type": "Offer",
-                    url: e.ticket_url,
-                    availability: "https://schema.org/InStock",
-                  }
-                : undefined,
-              description: e.description || undefined,
-            })),
-          }),
-        }}
-      />
 
       {events.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {events.map((event: any) => (
             <Card key={event.id} className="bg-card/50 dark:bg-black/50 backdrop-blur-sm border-border dark:border-white/20 overflow-hidden group hover:border-foreground/40 dark:hover:border-white/40 transition-all shadow-sm dark:shadow-none">
-              {/* Imagen del evento */}
               {event.image_url && (
                 <div className="relative aspect-video bg-muted dark:bg-gray-800">
                   <Image
@@ -179,19 +174,8 @@ export default async function EventsPage() {
         <div className="text-center py-12">
           <Calendar className="h-16 w-16 text-muted-foreground dark:text-gray-600 mx-auto mb-4" />
           <p className="text-muted-foreground dark:text-gray-400 text-lg">There are no upcoming events scheduled.</p>
-          <p className="text-muted-foreground/80 dark:text-gray-500 text-sm">Upcoming events will be announced here when they are scheduled.</p>
         </div>
       )}
-
-      <div className="max-w-2xl mx-auto mt-16 p-8 bg-card/50 dark:bg-black/50 backdrop-blur-sm border border-border dark:border-white/20 rounded-xl text-center shadow-sm dark:shadow-none">
-        <h2 className="text-2xl font-bold mb-4 text-foreground dark:text-white">PRIVATE BOOKINGS</h2>
-        <p className="text-muted-foreground dark:text-gray-300 mb-6">
-          Interested in booking NexDrak for a private event or festival? Get in touch with our booking team.
-        </p>
-        <a href="mailto:mgmt@nexdrak.com?subject=Private%20Booking%20Inquiry" className="block w-full">
-          <Button className="bg-foreground text-background hover:bg-foreground/90 dark:bg-white dark:hover:bg-gray-200 dark:text-black transition-colors">CONTACT FOR BOOKING</Button>
-        </a>
-      </div>
     </div>
   );
 }

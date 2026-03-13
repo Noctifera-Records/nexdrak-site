@@ -2,11 +2,12 @@ import { defineCloudflareConfig } from "@opennextjs/cloudflare";
 
 /**
  * OpenNext Cloudflare Configuration
+ * AGGRESSIVE OPTIMIZATION for 3MB Limit
  */
 export default defineCloudflareConfig({
   minify: true,
-  // Externalize heavy libraries to keep the bundle under 3MB
   external: [
+    // Database drivers (Hidden via eval('require') in lib/db.ts)
     "pg",
     "pg-native",
     "pg-pool",
@@ -21,12 +22,25 @@ export default defineCloudflareConfig({
     "tedious",
     "sqlite3",
     "kysely",
-    "recharts",
-    "undici",
-    "@supabase/supabase-js",
-    "better-auth",
-    "zod",
+    
+    // Heavy libraries that should be in client chunks or are redundant at the edge
     "lucide-react",
-    "resend"
+    "next-seo",
+    "resend",
+    "recharts",
+    "react-qr-code",
+    "@radix-ui/react-dropdown-menu",
+    
+    // Node.js built-ins provided by nodejs_compat
+    "async_hooks",
+    "events",
+    "fs",
+    "path",
+    "os",
+    "crypto",
+    "buffer",
+    "util",
+    "stream",
+    "v8"
   ],
 });

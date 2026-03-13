@@ -5,7 +5,6 @@
  * Run: npx @better-auth/cli@latest generate --config ./better-auth.config.ts --output ./lib/db/auth.schema.ts
  */
 import { betterAuth } from "better-auth";
-import { admin, twoFactor } from "better-auth/plugins";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
@@ -38,9 +37,5 @@ export const auth = betterAuth({
     },
   },
   plugins: [
-    admin(),
-    twoFactor({
-      issuer: "NexDrak",
-    }),
   ],
 });
