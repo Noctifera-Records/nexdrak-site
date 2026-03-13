@@ -151,7 +151,7 @@ export default function Navbar() {
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuItem asChild>
-                      <Link href="/account" className="cursor-pointer w-full flex items-center">
+                      <Link href="/account" prefetch={false} className="cursor-pointer w-full flex items-center">
                         <User className="mr-2 h-4 w-4" />
                         <span>My Account</span>
                       </Link>
@@ -165,7 +165,7 @@ export default function Navbar() {
                 </DropdownMenu>
               ) : (
                 <Button asChild size="sm" className="px-6 font-semibold tracking-wide ml-2">
-                  <Link href="/login">LOGIN</Link>
+                  <Link href="/login" prefetch={false}>LOGIN</Link>
                 </Button>
               )}
             </div>
@@ -242,6 +242,7 @@ export default function Navbar() {
                   )}
                   <Link
                     href="/account"
+                    prefetch={false}
                     className="flex items-center justify-center gap-3 p-4 rounded-lg hover:bg-muted/50 transition-colors text-lg font-medium"
                     onClick={() => setIsMainMenuOpen(false)}
                   >
@@ -268,7 +269,7 @@ export default function Navbar() {
                   asChild
                   onClick={() => setIsMainMenuOpen(false)}
                 >
-                  <Link href="/login">LOGIN</Link>
+                  <Link href="/login" prefetch={false}>LOGIN</Link>
                 </Button>
               )}
             </nav>

@@ -49,6 +49,9 @@ export const auth = (() => {
           clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
         },
       },
+      rateLimit: {
+        enabled: false, // Cloudflare handles this, internal RL causes 429s on prefetch
+      },
       plugins: [
       ],
     });
