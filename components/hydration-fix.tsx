@@ -1,66 +1,21 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-interface HydrationFixProps {
-  children: React.ReactNode;
-}
-
-export default function HydrationFix({ children }: HydrationFixProps) {
-  const [isHydrated, setIsHydrated] = useState(false);
+/**
+ * Helper component to delay rendering of children until client-side hydration is complete.
+ * This prevents React Hydration Mismatch errors (#418, #423, etc.)
+ */
+export function HydrationFix({ children }: { children: React.ReactNode }) {
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    // Handle hydration errors
-    const handleError = (event: ErrorEvent) => {
-      if (event.message?.includes('Cannot read properties of null') && 
-          event.message?.includes('firstChild')) {
-        console.warn('Hydration error handled, forcing re-render');
-        event.preventDefault();
-        event.stopPropagation();
-        
-        // Force a re-render after hydration error
-        setIsHydrated(false);
-        setTimeout(() => setIsHydrated(true), 100);
-        return true;
-      }
-      return false;
-    };
-
-    // Handle unhandled promise rejections
-    const handleRejection = (event: PromiseRejectionEvent) => {
-      if (event.reason?.message?.includes('Cannot read properties of null') && 
-          event.reason?.message?.includes('firstChild')) {
-        console.warn('Hydration promise rejection handled');
-        event.preventDefault();
-        
-        // Force a re-render
-        setIsHydrated(false);
-        setTimeout(() => setIsHydrated(true), 100);
-      }
-    };
-
-    window.addEventListener('error', handleError, true);
-    window.addEventListener('unhandledrejection', handleRejection);
-
-    // Set hydrated state
-    setIsHydrated(true);
-
-    return () => {
-      window.removeEventListener('error', handleError, true);
-      window.removeEventListener('unhandledrejection', handleRejection);
-    };
+    setIsMounted(true);
   }, []);
 
-  // Show loading state during hydration issues
-  if (!isHydrated) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center transition-colors duration-300">
-        <div className="text-foreground">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-current mx-auto mb-4"></div>
-          <p className="text-lg font-medium">Loading...</p>
-        </div>
-      </div>
-    );
+  if (!isMounted) {
+    // Return null or a non-interactive version during SSR
+    return null;
   }
 
   return <>{children}</>;

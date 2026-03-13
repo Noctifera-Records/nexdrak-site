@@ -2,22 +2,16 @@ import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
-// @ts-ignore - CSS module import has no type declarations
 import { ThemeProvider } from "@/components/theme-provider"
 import Navbar from "@/components/navbar"
-// import BackgroundAnimation from "@/components/background-animation"
 import { NotificationProvider } from "@/components/notification-system"
 import ErrorBoundary from "@/components/error-boundary"
-// import HydrationFix from "@/components/hydration-fix"
+import { HydrationFix } from "@/components/hydration-fix"
 import StructuredData from "./structured-data"
-// import ResourcePreloader from "@/components/resource-preloader"
-// import WebVitals from "@/components/web-vitals"
 import { Toaster } from "@/components/ui/toaster"
 import { Toaster as SonnerToaster } from "@/components/ui/sonner"
 import FooterBar from "@/components/footer-bar"
 import GlobalBackground from "@/components/global-background"
-
-// export const runtime = 'edge'
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -27,62 +21,17 @@ export const metadata: Metadata = {
     default: 'NexDrak',
     template: '%s | NexDrak',
   },
-  description: 'Official website of NexDrak. Listen to the latest electronic music releases, check upcoming events, and get exclusive merchandise.',
-  keywords: ['Electronic Music', 'NexDrak', 'DJ', 'Producer', 'Techno', 'House', 'Music Events', 'Dubstep'],
-  authors: [{ name: 'NexDrak' }],
-  creator: 'NexDrak',
-  openGraph: {
-    type: 'website',
-    locale: 'en_US',
-    url: 'https://nexdrak.com',
-    siteName: 'NexDrak',
-    title: 'NexDrak | Official Artist Website',
-    description: 'Official website of NexDrak. Listen to the latest electronic music releases, check upcoming events, and get exclusive merchandise.',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'NexDrak Official Website',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'NexDrak | Official Artist Website',
-    description: 'Official website of NexDrak. Listen to the latest electronic music releases, check upcoming events, and get exclusive merchandise.',
-    images: ['/og-image.png'],
-    creator: '@nexdrak',
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-      },
-  },
+  description: 'Official website of NexDrak. Electronic music, events, and merchandise.',
   alternates: {
     canonical: 'https://nexdrak.com',
   },
-  icons: {
-    icon: '/favicon.ico',
-    apple: '/apple-touch-icon.png',
-  },
   manifest: '/site.webmanifest',
-  verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION,
-  },
 }
 
 export const viewport: Viewport = {
   themeColor: '#000000',
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 5,
 }
 
 export default function RootLayout({
@@ -91,7 +40,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link
           rel="stylesheet"
@@ -99,7 +48,7 @@ export default function RootLayout({
         />
         <StructuredData />
       </head>
-      <body className={`${inter.className} min-h-screen bg-white dark:bg-black text-black dark:text-white antialiased overflow-x-hidden selection:bg-purple-500/30 selection:text-purple-900 dark:selection:text-purple-200 transition-colors duration-300`}>
+      <body className={`${inter.className} min-h-screen bg-white dark:bg-black text-black dark:text-white antialiased overflow-x-hidden transition-colors duration-300`}>
         <ErrorBoundary>
           <ThemeProvider
             attribute="class"
@@ -108,12 +57,9 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <NotificationProvider>
-              {/* <ResourcePreloader /> */}
-              {/* <WebVitals /> */}
-              {/* <BackgroundAnimation /> */}
               <GlobalBackground />
               
-              {/* <HydrationFix> */}
+              <HydrationFix>
                 <Navbar />
                 <main className="flex-grow flex flex-col relative z-0">
                   {children}
@@ -121,7 +67,8 @@ export default function RootLayout({
                 <FooterBar />
                 <Toaster />
                 <SonnerToaster />
-              {/* </HydrationFix> */}
+              </HydrationFix>
+              
             </NotificationProvider>
           </ThemeProvider>
         </ErrorBoundary>

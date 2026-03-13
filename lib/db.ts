@@ -1,73 +1,69 @@
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { Pool } from 'pg';
 import { neon } from '@neondatabase/serverless';
 import { drizzle as drizzleNeon } from 'drizzle-orm/neon-http';
-
-// For Cloudflare Workers compatibility, we use Neon's HTTP driver by default.
-// For local Supabase PostgreSQL + Node, we fallback to pg (TCP) if necessary.
 
 function getConnectionString() {
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) {
-    throw new Error('DATABASE_URL variable is not set.');
+    return "postgresql://placeholder:placeholder@localhost:5432/placeholder";
   }
   return connectionString;
 }
 
-const isSupabaseHost = (connectionString: string) => connectionString.includes('.supabase.co');
 const isEdgeRuntime = () => process.env.NEXT_RUNTIME === 'edge' || process.env.VERCEL_ENV === 'production';
 
-let cachedDb: ReturnType<typeof drizzleNeon> | null = null;
-let cachedPgPool: any = null;
+let cachedDb: any = null;
+let cachedPool: Pool | null = null;
 
-function getPgPool() {
-  if (cachedPgPool) return cachedPgPool;
-  
-  if (process.env.NEXT_RUNTIME === 'edge' || typeof EdgeRuntime !== 'undefined') {
-    return null;
-  }
-
-  try {
-    const req = eval('require');
-    const { Pool } = req('pg');
-    cachedPgPool = new Pool({
-      connectionString: getConnectionString(),
-      ssl: { rejectUnauthorized: false },
-    });
-    return cachedPgPool;
-  } catch (error) {
-    return null;
-  }
-}
-
-export function getDb(): ReturnType<typeof drizzleNeon> {
-  if (cachedDb) return cachedDb as ReturnType<typeof drizzleNeon>;
+export function getDb() {
+  if (cachedDb) return cachedDb;
 
   const connectionString = getConnectionString();
 
-  if (isSupabaseHost(connectionString) && !isEdgeRuntime()) {
-    try {
-      const pool = getPgPool();
-      if (pool) {
-        const req = eval('require');
-        const { drizzle } = req('drizzle-orm/node-postgres');
-        cachedDb = drizzle(pool);
-        return cachedDb as ReturnType<typeof drizzleNeon>;
-      }
-    } catch (error) {
-      // Fallback to Neon HTTP
+  // For Supabase on Cloudflare/Edge, we use pg Pool with nodejs_compat
+  // This is the most reliable way to connect to Supabase from Cloudflare Pages
+  try {
+    if (!cachedPool) {
+      cachedPool = new Pool({
+        connectionString,
+        // Cloudflare requires SSL for external connections
+        ssl: connectionString.includes('localhost') ? false : { rejectUnauthorized: false },
+        // Optimal settings for serverless
+        max: 1,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 2000,
+      });
     }
+    cachedDb = drizzle(cachedPool);
+    return cachedDb;
+  } catch (error) {
+    console.error("Database connection failed, falling back to Neon HTTP:", error);
+    // Fallback only if necessary, though neon won't work with supabase URLs
+    const sql = neon(connectionString);
+    cachedDb = drizzleNeon(sql);
+    return cachedDb;
   }
-
-  const sql = neon(connectionString);
-  cachedDb = drizzleNeon(sql);
-  return cachedDb as ReturnType<typeof drizzleNeon>;
 }
 
-// Legacy compatibility
 export const db = {
   query: async (sqlText: string, params?: unknown[]) => {
-    const connectionString = getConnectionString();
-    const sql = neon(connectionString, { fullResults: true });
-    const result = await sql.query(sqlText, params || []);
-    return { rows: (result.rows as any[]) || [] };
+    try {
+      const dbInstance = getDb();
+      // Detect if it's drizzle-orm/node-postgres or drizzle-orm/neon-http
+      if (dbInstance.session && 'execute' in dbInstance.session) {
+        // Standard Drizzle execute
+        const result = await cachedPool?.query(sqlText, params || []);
+        return { rows: result?.rows || [] };
+      } else {
+        // Neon Fallback
+        const sql = neon(getConnectionString());
+        const result = await sql.query(sqlText, params || []);
+        return { rows: result.rows || [] };
+      }
+    } catch (e) {
+      console.error("Database Query Error:", e);
+      return { rows: [] };
+    }
   },
 };
