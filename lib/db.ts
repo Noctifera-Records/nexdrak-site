@@ -32,8 +32,12 @@ function getPgPool() {
   if (cachedPgPool) return cachedPgPool;
 
   try {
+    // We use a variable for the module name to hide this from esbuild's static analysis.
+    // This prevents esbuild from trying to bundle 'pg' and its dependencies (like pg-cloudflare)
+    // when building for Cloudflare/Edge environments where 'pg' isn't needed or used.
+    const pgModule = 'pg';
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { Pool } = require('pg');
+    const { Pool } = require(pgModule);
     cachedPgPool = new Pool({
       connectionString: getConnectionString(),
       ssl: { rejectUnauthorized: false },
