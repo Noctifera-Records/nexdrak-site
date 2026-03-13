@@ -64,6 +64,6 @@ logs
 *.njsproj
 *.sln
 *.sw?
-#AGENTS.md
+AGENTS.md
 .agents
 skills-lock.json
