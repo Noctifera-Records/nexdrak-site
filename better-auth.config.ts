@@ -24,7 +24,7 @@ export const auth = betterAuth({
     provider: "pg",
     schema: authSchema,
   }),
-  baseURL: BETTER_AUTH_URL || "http://localhost:3000",
+  baseURL: BETTER_AUTH_URL || "https://nexdrak.com",
   secret: BETTER_AUTH_SECRET || "development-secret-key",
   emailAndPassword: {
     enabled: true,

@@ -21,6 +21,9 @@ export const auth = (() => {
         provider: "pg", // Use 'pg' for postgres dialect
         schema: authSchema,
       }),
+      // Use environment variable or default to production URL
+      baseURL: process.env.BETTER_AUTH_URL || "https://nexdrak.com",
+      secret: process.env.BETTER_AUTH_SECRET,
       emailAndPassword: {
         enabled: true,
         requireEmailVerification: true,
