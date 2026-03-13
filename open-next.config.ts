@@ -1,7 +1,12 @@
 import { defineCloudflareConfig } from "@opennextjs/cloudflare";
 
+/**
+ * OpenNext Cloudflare Configuration
+ * Ref: https://opennext.js.org/cloudflare/get-started
+ */
 export default defineCloudflareConfig({
   minify: true,
+  // Ensure we externalize database drivers to avoid bundling issues
   external: [
     "pg-cloudflare",
     "pgpass",
@@ -17,30 +22,19 @@ export default defineCloudflareConfig({
     "sqlite3",
     "@vscode/sqlite3",
     "kysely",
-    "@supabase/auth-helpers-nextjs",
-    "@supabase/auth-ui-react",
-    "@supabase/auth-ui-shared",
-    "@vercel/node",
-    "@vercel/remix-builder",
-    "@vercel/og",
-    "esbuild",
-    "swc",
-    "async_hooks",
-    "buffer",
-    "crypto",
-    "events",
-    "fs",
-    "http",
-    "https",
-    "os",
-    "path",
-    "stream",
-    "util",
-    "vm",
-    "url",
-    "zlib",
-    "string_decoder",
-    "tls",
-    "net"
+    "async_hooks"
   ],
-});
+  // Extra esbuild options if needed
+  build: {
+    minify: true,
+    external: [
+      "pg-cloudflare",
+      "pgpass",
+      "pg",
+      "pg-native",
+      "pg-pool",
+      "pg-protocol",
+      "pg-types"
+    ]
+  }
+} as any);
