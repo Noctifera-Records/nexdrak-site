@@ -12,7 +12,12 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(loginUrl);
     }
 
-    return NextResponse.next();
+    // Add header to help with Cloudflare rate limiting for authenticated users
+    const response = NextResponse.next();
+    if (sessionToken) {
+      response.headers.set('x-authenticated-user', 'true');
+    }
+    return response;
   } catch (error) {
     console.error('Middleware Error:', error);
     // In case of error, allow the request to proceed to avoid breaking the site

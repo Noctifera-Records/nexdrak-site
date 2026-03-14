@@ -50,16 +50,15 @@ export default function RootLayout({
       </head>
       <body className={`${inter.className} min-h-screen bg-white dark:bg-black text-black dark:text-white antialiased overflow-x-hidden transition-colors duration-300`}>
         <ErrorBoundary>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem={true}
-            disableTransitionOnChange
-          >
-            <NotificationProvider>
-              <GlobalBackground />
-              
-              <HydrationFix>
+          <HydrationFix>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem={true}
+              disableTransitionOnChange
+            >
+              <NotificationProvider>
+                <GlobalBackground />
                 <Navbar />
                 <main className="flex-grow flex flex-col relative z-0">
                   {children}
@@ -67,10 +66,9 @@ export default function RootLayout({
                 <FooterBar />
                 <Toaster />
                 <SonnerToaster />
-              </HydrationFix>
-              
-            </NotificationProvider>
-          </ThemeProvider>
+              </NotificationProvider>
+            </ThemeProvider>
+          </HydrationFix>
         </ErrorBoundary>
       </body>
     </html>
