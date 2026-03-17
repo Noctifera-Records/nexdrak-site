@@ -27,6 +27,7 @@ const nextConfig = {
     "better-auth",
     "drizzle-orm",
     "undici",
+    "node:sqlite",
     "prisma", 
     "@prisma/client", 
     "@better-auth/prisma-adapter",

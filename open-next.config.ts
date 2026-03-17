@@ -30,6 +30,8 @@ export default defineCloudflareConfig({
     "buffer",
     "util",
     "stream",
-    "v8"
+    "v8",
+    "node:sqlite",
+    "node:worker_threads"
   ],
 });
