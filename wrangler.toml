@@ -2,11 +2,3 @@ name = "nex-website"
 pages_build_output_dir = ".open-next/assets"
 compatibility_date = "2024-11-18"
 compatibility_flags = ["nodejs_compat"]
-minify = true
-
-# No usamos [assets] con binding "ASSETS" porque Pages lo reserva
-# Eliminado [site] porque no es compatible con Cloudflare Pages
-
-# [[services]]
-# binding = "WORKER_SELF_REFERENCE"
-# service = "nex-website"
