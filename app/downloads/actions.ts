@@ -46,10 +46,13 @@ export async function incrementDownloadCount(id: number) {
     throw new Error("Database unavailable");
   }
 
-  const { error } = await supabase.rpc("increment_download_count", { download_id: id });
-  
-  if (error) {
-    throw new Error("Failed to increment download count");
+  try {
+    const { error } = await supabase.rpc("increment_download_count", { download_id: id });
+    if (error) {
+      console.warn("Could not increment download count:", error.message);
+    }
+  } catch (err) {
+    console.error("Error in incrementDownloadCount:", err);
   }
   
   return { success: true };

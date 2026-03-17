@@ -18,14 +18,21 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   metadataBase: new URL('https://nexdrak.com'),
   title: {
-    default: 'NexDrak',
+    default: 'Home | NexDrak',
     template: '%s | NexDrak',
   },
-  description: 'Official website of NexDrak. Electronic music, events, and merchandise.',
+  description: 'Official NexDrak Website, Drop the bass.',
   alternates: {
     canonical: 'https://nexdrak.com',
   },
   manifest: '/site.webmanifest',
+    twitter: {
+    card: 'summary_large_image',
+    title: 'Home | NexDrak',
+    description: 'Official NexDrak Website, Drop the bass',
+    images: ['/nexdrak_opengraph.webp'],
+    creator: '@nexdrak',
+  },
 }
 
 export const viewport: Viewport = {

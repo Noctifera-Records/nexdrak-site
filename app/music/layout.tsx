@@ -10,13 +10,13 @@ export const metadata: Metadata = {
     title: 'Music',
     description: 'Discover albums and singles by NexDrak with streaming links.',
     siteName: 'NexDrak',
-    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+    images: [{ url: '/nexdrak_opengraph.webp', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Music',
     description: 'Discover albums and singles by NexDrak with streaming links.',
-    images: ['/og-image.png'],
+    images: ['/nexdrak_opengraph.webp'],
     creator: '@nexdrak',
   },
 };

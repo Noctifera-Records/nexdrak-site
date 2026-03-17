@@ -64,5 +64,6 @@ logs
 *.sln
 *.sw?
 AGENTS.md
+nex-web.md
 .agents
 skills-lock.json

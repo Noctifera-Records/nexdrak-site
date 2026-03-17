@@ -27,7 +27,7 @@ export default async function SongLayout({
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://nexdrak.com';
   const canonical = `${siteUrl}/${slugParam}`;
-  const imageUrl = song?.cover_image_url || `${siteUrl}/og-image.png`;
+  const imageUrl = song?.cover_image_url || `${siteUrl}/nexdrak_opengraph.webp`;
 
   let albumTracks: any[] = [];
   if (song?.type === 'album' && song?.album_name) {
@@ -153,7 +153,7 @@ export async function generateMetadata(
   const description = song?.artist
     ? `Listen to ${song.title} by ${song.artist}.`
     : 'Discover NexDrak music releases.';
-  const imageUrl = song?.cover_image_url || `${siteUrl}/og-image.png`;
+  const imageUrl = song?.cover_image_url || `${siteUrl}/nexdrak_opengraph.webp`;
 
   return {
     title,
