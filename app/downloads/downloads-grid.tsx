@@ -31,9 +31,11 @@ interface DownloadItem {
   description: string | null
   category: string
   file_url: string
-  thumbnail_url: string | null
+  thumbnail_url?: string | null
+  cover_image_url?: string | null
   file_size: string | null
-  file_format: string | null
+  file_format?: string | null
+  file_type?: string | null
   is_featured: boolean
   download_count: number
   created_at: string
@@ -266,9 +268,9 @@ function DownloadCard({
     }`}>
       {/* Thumbnail */}
       <div className="relative aspect-video bg-muted dark:bg-gray-800">
-        {download.thumbnail_url ? (
+        {(download.cover_image_url || download.thumbnail_url) ? (
           <Image
-            src={download.thumbnail_url}
+            src={(download.cover_image_url || download.thumbnail_url) as string}
             alt={download.title}
             fill
             className="object-cover group-hover:scale-105 transition-transform"
@@ -334,9 +336,9 @@ function DownloadCard({
             {download.file_size && (
               <span>{download.file_size}</span>
             )}
-            {download.file_format && (
+            {(download.file_type || download.file_format) && (
               <span className="bg-muted dark:bg-gray-800 px-2 py-1 rounded text-foreground dark:text-gray-300">
-                {download.file_format}
+                {download.file_type || download.file_format}
               </span>
             )}
           </div>

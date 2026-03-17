@@ -42,7 +42,7 @@ export default function PressKitPage() {
         <h2 className="text-2xl font-semibold border-b pb-2">Assets</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Logos Card */}
-          <Card>
+          {/* <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 Logos
@@ -50,7 +50,6 @@ export default function PressKitPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="aspect-video relative bg-muted rounded-lg flex items-center justify-center p-8">
-                {/* Placeholder for Logo Preview */}
                 <div className="text-center space-y-2">
                   <div className="font-bold text-2xl">NEXDRAK</div>
                   <div className="text-xs text-muted-foreground">Vector & PNG formats</div>
@@ -63,13 +62,13 @@ export default function PressKitPage() {
                 </Link>
               </Button>
             </CardContent>
-          </Card>
+          </Card> */}
 
           {/* Photos Card */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                Promotional Photos
+                Logos & Promotional Photos
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -77,7 +76,7 @@ export default function PressKitPage() {
                 {/* Placeholder for Photo Preview */}
                 <div className="absolute inset-0 flex items-center justify-center bg-zinc-900 text-zinc-500">
                   <Image 
-                    src="/img/logo.png" 
+                    src="/img/logo_copy.png" 
                     alt="NexDrak Promo" 
                     width={400} 
                     height={400} 
@@ -86,7 +85,7 @@ export default function PressKitPage() {
                 </div>
               </div>
               <Button className="w-full" variant="outline" asChild>
-                <Link href="/assets/nexdrak-photos.zip" download>
+                <Link href="https://drive.google.com/file/d/1wU3RqGdryXSJV-y4DWf4G7zBX5plrD1J/view?usp=sharing" download>
                   <Download className="mr-2 h-4 w-4" />
                   Download Hi-Res Photos
                 </Link>
@@ -108,9 +107,9 @@ export default function PressKitPage() {
               </p>
             </div>
             <Button size="lg" asChild>
-              <a href="mailto:contact@nexdrak.com">
+              <a href="mailto:info@nexdrak.com">
                 <Mail className="mr-2 h-4 w-4" />
-                contact@nexdrak.com
+                info@nexdrak.com
               </a>
             </Button>
           </CardContent>

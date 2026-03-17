@@ -16,7 +16,7 @@ export default function HeroSection({ settings }: { settings: SiteSettings }) {
   }, []);
 
   return (
-    <div className="h-screen flex flex-col items-center justify-center text-center px-4 relative overflow-hidden" suppressHydrationWarning>
+    <div className="h-[95vh] flex flex-col items-center justify-center text-center px-4 relative overflow-hidden" suppressHydrationWarning>
       {/* Background Image - Priority for LCP */}
       <div className="absolute inset-0 z-0">
         <Image
@@ -34,8 +34,8 @@ export default function HeroSection({ settings }: { settings: SiteSettings }) {
       {/* Overlay: Oscuro en dark mode, Claro en light mode */}
       <div className="absolute inset-0 bg-white/30 dark:bg-black/60 z-0 transition-colors duration-500" />
 
-      <div className="relative z-10 max-w-4xl mx-auto flex flex-col items-center">
-        <div className="mb-8">
+      <div className="relative z-10 max-w-4xl mx-auto flex flex-col items-center justify-center h-full pt-0 -mt-10">
+        <div className="flex flex-col items-center">
           {/* Desktop Logo */}
           <div 
             className={`hidden md:block transition-all duration-1000 ease-out transform ${
@@ -49,7 +49,7 @@ export default function HeroSection({ settings }: { settings: SiteSettings }) {
               alt="Site Logo"
               width={400}
               height={400}
-              className="w-auto h-40 mb-8 mx-auto object-contain invert dark:invert-0 transition-all duration-500"
+              className="w-auto h-48 mb-8 mx-auto object-contain invert dark:invert-0 transition-all duration-500"
               priority
             />
           </div>
@@ -67,7 +67,7 @@ export default function HeroSection({ settings }: { settings: SiteSettings }) {
               alt="Site Logo Mobile"
               width={300}
               height={300}
-              className="w-auto h-32 mb-6 mx-auto object-contain invert dark:invert-0 transition-all duration-500"
+              className="w-auto h-40 mb-6 mx-auto object-contain invert dark:invert-0 transition-all duration-500"
               priority
             />
           </div>
@@ -105,7 +105,7 @@ export default function HeroSection({ settings }: { settings: SiteSettings }) {
         </div>
       </div>
       
-      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+      <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 animate-bounce">
         <div className="w-6 h-10 border-2 border-foreground/30 dark:border-white/30 rounded-full flex justify-center pt-2 transition-colors">
           <div className="w-1 h-2 bg-foreground dark:bg-white rounded-full animate-scroll transition-colors" />
         </div>

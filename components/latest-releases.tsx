@@ -16,6 +16,7 @@ export interface Song {
   type: 'album' | 'single'
   album_name?: string
   release_date?: string
+  track_number?: number
   created_at: string
 }
 

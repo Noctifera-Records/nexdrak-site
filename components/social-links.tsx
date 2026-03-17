@@ -1,4 +1,4 @@
-import { Instagram, Twitter, Youtube, Music, Facebook, TvMinimal } from "lucide-react"
+import { Instagram, Twitter, Youtube, Music, Facebook, TvMinimal, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 

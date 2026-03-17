@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | NexDrak",
+  title: "Privacy Policy",
   description: "Privacy Policy for NexDrak.com",
 };
 
@@ -58,7 +58,7 @@ export default function PrivacyPolicyPage() {
 
           <h2 className="text-2xl font-bold mt-8 mb-4">5. Contact Us</h2>
           <p>
-            If you have any questions about this Privacy Policy, please contact us by email: info@nexdrak.com
+            If you have any questions about this Privacy Policy, please contact us by email: <strong>info@nexdrak.com</strong>
           </p>
         </div>
       </div>

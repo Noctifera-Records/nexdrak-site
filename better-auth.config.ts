@@ -6,8 +6,8 @@
  */
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { neon } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-http';
+import { Pool } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-serverless';
 import { schema as authSchema } from './lib/db/schema';
 
 const { DATABASE_URL, BETTER_AUTH_URL, BETTER_AUTH_SECRET } = process.env;
@@ -16,8 +16,8 @@ if (!DATABASE_URL) {
   throw new Error('DATABASE_URL is required for schema generation');
 }
 
-const sql = neon(DATABASE_URL);
-const db = drizzle(sql);
+const pool = new Pool({ connectionString: DATABASE_URL });
+const db = drizzle(pool);
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {

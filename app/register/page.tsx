@@ -8,9 +8,9 @@ export default function RegisterPage() {
         <h1 className="text-2xl font-bold mb-4">Register</h1>
         <RegisterForm />
         <p className="mt-4 text-sm text-muted-foreground">
-          ¿Ya tienes cuenta?{' '}
+          Do you already have an account?{' '}
           <Link href="/login" className="text-primary hover:underline">
-            Ingresa aquí
+            Sign in here
           </Link>
         </p>
       </section>

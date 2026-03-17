@@ -14,8 +14,8 @@ interface Song {
   cover_image_url?: string;
   type: 'album' | 'single';
   album_name?: string;
-  track_number?: number;
   release_date?: string;
+  track_number?: number;
   created_at: string;
 }
 
@@ -250,10 +250,12 @@ export default function MusicClient({ initialSongs, initialLinks }: MusicClientP
                           </div>
                         )}
                         <div className="space-y-2">
-                          {album.songs.map((song, songIndex) => (
+                          {[...album.songs]
+                            .sort((a, b) => (a.track_number || 0) - (b.track_number || 0))
+                            .map((song, songIndex) => (
                             <div key={song.id} className="flex items-center justify-between p-3 hover:bg-muted dark:hover:bg-white/5 rounded-lg transition-colors">
                               <div className="flex items-center gap-4">
-                                <span className="text-muted-foreground dark:text-gray-500 w-8 text-center">{songIndex + 1}</span>
+                                <span className="text-muted-foreground dark:text-gray-500 w-8 text-center">{song.track_number || songIndex + 1}</span>
                                 <span className="text-foreground dark:text-white">{song.title}</span>
                               </div>
                               <div className="flex items-center gap-2">

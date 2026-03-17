@@ -28,6 +28,7 @@ interface Song {
   type: 'album' | 'single';
   album_name?: string;
   release_date?: string;
+  track_number?: number;
   created_at: string;
   youtube_embed_id?: string;
   slug?: string;
@@ -460,53 +461,55 @@ export default function ClientSongPage({ song, streamingLinks, isAlbumView, albu
             <CardContent className="p-6">
               <h3 className="text-xl font-bold mb-4 text-foreground">Album Tracklist - {song?.album_name}</h3>
               <div className="flex flex-col gap-2">
-                {albumSongs.map((track, index) => {
-                  const isCurrent = track.id === song?.id;
-                  return (
-                    <div
-                      key={track.id}
-                      className={`flex items-center justify-between px-4 py-3 rounded-lg transition-colors ${
-                        isCurrent 
-                          ? 'bg-primary/10 border border-primary/20' 
-                          : 'bg-card hover:bg-accent border border-transparent'
-                      }`}
-                    >
-                      <div className="flex items-center gap-4">
-                        <span className={`text-sm font-mono w-6 text-center ${isCurrent ? 'text-primary font-bold' : 'text-muted-foreground'}`}>
-                          {index + 1}
-                        </span>
-                        <div>
-                          <p className={`font-medium ${isCurrent ? 'text-primary' : 'text-foreground'}`}>
-                            {track.title}
-                          </p>
-                          {isCurrent && (
-                            <p className="text-xs text-primary/80">
-                              Now Playing
+                {[...albumSongs]
+                  .sort((a, b) => (a.track_number || 0) - (b.track_number || 0))
+                  .map((track, index) => {
+                    const isCurrent = track.id === song?.id;
+                    return (
+                      <div
+                        key={track.id}
+                        className={`flex items-center justify-between px-4 py-3 rounded-lg transition-colors ${
+                          isCurrent 
+                            ? 'bg-primary/10 border border-primary/20' 
+                            : 'bg-card hover:bg-accent border border-transparent'
+                        }`}
+                      >
+                        <div className="flex items-center gap-4">
+                          <span className={`text-sm font-mono w-6 text-center ${isCurrent ? 'text-primary font-bold' : 'text-muted-foreground'}`}>
+                            {track.track_number || index + 1}
+                          </span>
+                          <div>
+                            <p className={`font-medium ${isCurrent ? 'text-primary' : 'text-foreground'}`}>
+                              {track.title}
                             </p>
+                            {isCurrent && (
+                              <p className="text-xs text-primary/80">
+                                Now Playing
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          {isCurrent && (
+                            <div className="flex gap-0.5 h-3 items-end mr-2">
+                              <div className="w-1 bg-primary animate-[music-bar_1s_ease-in-out_infinite]" style={{ height: '60%' }}></div>
+                              <div className="w-1 bg-primary animate-[music-bar_1.1s_ease-in-out_infinite_0.1s]" style={{ height: '100%' }}></div>
+                              <div className="w-1 bg-primary animate-[music-bar_1.2s_ease-in-out_infinite_0.2s]" style={{ height: '40%' }}></div>
+                            </div>
+                          )}
+                          
+                          {!isCurrent && (
+                            <Button variant="ghost" size="sm" asChild className="h-8 w-8 p-0">
+                              <Link href={`/${track.slug}`} aria-label={`Go to ${track.title}`}>
+                                <Play className="w-4 h-4 text-muted-foreground" />
+                              </Link>
+                            </Button>
                           )}
                         </div>
                       </div>
-                      
-                      <div className="flex items-center gap-2">
-                        {isCurrent && (
-                          <div className="flex gap-0.5 h-3 items-end mr-2">
-                            <div className="w-1 bg-primary animate-[music-bar_1s_ease-in-out_infinite]" style={{ height: '60%' }}></div>
-                            <div className="w-1 bg-primary animate-[music-bar_1.1s_ease-in-out_infinite_0.1s]" style={{ height: '100%' }}></div>
-                            <div className="w-1 bg-primary animate-[music-bar_1.2s_ease-in-out_infinite_0.2s]" style={{ height: '40%' }}></div>
-                          </div>
-                        )}
-                        
-                        {!isCurrent && (
-                          <Button variant="ghost" size="sm" asChild className="h-8 w-8 p-0">
-                            <Link href={`/${track.slug}`} aria-label={`Go to ${track.title}`}>
-                              <Play className="w-4 h-4 text-muted-foreground" />
-                            </Link>
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
               </div>
             </CardContent>
           </Card>

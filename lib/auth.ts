@@ -13,7 +13,13 @@ export const auth = (() => {
     const db = getDb();
     
     // Parse and clean BETTER_AUTH_URL
-    let baseURL = process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_BETTER_AUTH_URL || "https://nexdrak.com";
+    let baseURL = process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_BETTER_AUTH_URL;
+    
+    // Default to localhost in dev, production otherwise
+    if (!baseURL) {
+      baseURL = process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://nexdrak.com";
+    }
+    
     // If multiple URLs are provided (common mistake), take the production one
     if (baseURL.includes(" ")) {
       baseURL = baseURL.split(" ").find(u => u.includes("nexdrak.com")) || baseURL.split(" ")[0];

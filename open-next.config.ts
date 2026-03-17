@@ -7,22 +7,6 @@ import { defineCloudflareConfig } from "@opennextjs/cloudflare";
 export default defineCloudflareConfig({
   minify: true,
   external: [
-    // Database drivers (Hidden via eval('require') in lib/db.ts)
-    "pg",
-    "pg-native",
-    "pg-pool",
-    "pg-protocol",
-    "pg-types",
-    "pg-cloudflare",
-    "pgpass",
-    "drizzle-orm/node-postgres",
-    "better-sqlite3",
-    "mysql2",
-    "oracledb",
-    "tedious",
-    "sqlite3",
-    "kysely",
-    
     // Heavy libraries that should be in client chunks or are redundant at the edge
     "lucide-react",
     "next-seo",
