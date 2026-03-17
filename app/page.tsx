@@ -5,7 +5,7 @@ import { getSiteSettings } from "@/lib/site-settings";
 import { getPublicSongs } from "@/app/music/actions";
 import HeroSection from "@/components/hero-section";
 import QuickLinks from "@/components/quick-links";
-import SocialLinks from "@/components/social-links";
+// import SocialLinks from "@/components/social-links";
 
 const LatestReleases = dynamicImport(() => import("@/components/latest-releases"), {
   loading: () => <div className="h-96 w-full animate-pulse bg-gray-900 rounded-lg" />,
@@ -97,7 +97,7 @@ export default async function Home() {
           <div className="flex flex-col items-center gap-12">
             <div className="w-full max-w-4xl mx-auto">
               <h3 className="text-sm font-bold tracking-[10.3em] uppercase text-foreground/40 dark:text-white/20 mb-8">Follow the journey</h3>
-              <SocialLinks />
+              {/* <SocialLinks /> */}
             </div>
 
             <div className="flex flex-wrap justify-center gap-x-12 gap-y-4 text-[10px] md:text-xs font-bold tracking-[0.3em] uppercase text-foreground/40 dark:text-white/20">

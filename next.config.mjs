@@ -21,9 +21,6 @@ const nextConfig = {
   generateEtags: true,
   trailingSlash: false,
   reactStrictMode: true,
-
-  // IMPORTANT: Externalize DB and other node-heavy packages
-  serverExternalPackages: ["pg", "pg-native"],
   
   experimental: {
     optimizeCss: false,
