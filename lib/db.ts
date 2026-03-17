@@ -1,15 +1,11 @@
 import { Pool, neonConfig } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-serverless';
+import * as undici from 'undici';
 
 // Configure Neon to use WebSockets correctly in serverless environments
 if (typeof window === 'undefined') {
-  // Cloudflare Workers provide a global WebSocket constructor
-  // If it's not available (e.g. in some local Node environments), we can use undici
   if (!globalThis.WebSocket) {
-    // Dynamic import to avoid bundling undici if not needed
-    import('undici').then(ws => {
-      neonConfig.webSocketConstructor = ws.WebSocket;
-    });
+    neonConfig.webSocketConstructor = undici.WebSocket;
   }
 }
 

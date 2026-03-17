@@ -1,12 +1,41 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { Resend } from "resend";
 import { getDb } from "./db";
 import { schema as authSchema } from "./db/schema";
 import { resetPasswordTemplate, verifyEmailTemplate } from "./email-templates";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 const fromEmail = process.env.EMAIL_FROM || "noreply@nexdrak.com";
+
+async function sendResendEmail({ to, subject, html }: { to: string, subject: string, html: string }) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.error("RESEND_API_KEY is not set");
+    return;
+  }
+
+  try {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: fromEmail,
+        to,
+        subject,
+        html,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      console.error("Resend API error:", error);
+    }
+  } catch (e) {
+    console.error("Failed to send email via Resend API", e);
+  }
+}
 
 export const auth = (() => {
   try {
@@ -38,30 +67,20 @@ export const auth = (() => {
         enabled: true,
         requireEmailVerification: true,
         async sendResetPassword(data) {
-          try {
-            await resend.emails.send({
-              from: fromEmail,
-              to: data.user.email,
-              subject: "Reset your password",
-              html: resetPasswordTemplate(data.url),
-            });
-          } catch (e) {
-            console.error("Failed to send reset email", e);
-          }
+          await sendResendEmail({
+            to: data.user.email,
+            subject: "Reset your password",
+            html: resetPasswordTemplate(data.url),
+          });
         },
       },
       emailVerification: {
         async sendVerificationEmail(data) {
-          try {
-            await resend.emails.send({
-              from: fromEmail,
-              to: data.user.email,
-              subject: "Verify your email address",
-              html: verifyEmailTemplate(data.url),
-            });
-          } catch (e) {
-            console.error("Failed to send verification email", e);
-          }
+          await sendResendEmail({
+            to: data.user.email,
+            subject: "Verify your email address",
+            html: verifyEmailTemplate(data.url),
+          });
         },
       },
       socialProviders: {

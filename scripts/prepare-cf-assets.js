@@ -53,18 +53,40 @@ console.log('--- Final Cloudflare Pages Preparation ---');
   }
 });
 
-// 2. CRITICAL OPTIMIZATION: Remove unnecessarily huge Next.js JSON files
-// These font metrics files are ~4MB each and not needed at runtime
+// 2. CRITICAL OPTIMIZATION: Remove unnecessarily huge Next.js JSON files and other bloat
 const findAndRemoveBloat = (dir) => {
   if (!fs.existsSync(dir)) return;
   const entries = fs.readdirSync(dir, { withFileTypes: true });
   for (const entry of entries) {
     const fullPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
+      // If we accidentally copied node_modules, kill them
+      if (entry.name === 'node_modules') {
+        console.log(`DELETING ENTIRE DIRECTORY: ${fullPath}`);
+        fs.rmSync(fullPath, { recursive: true, force: true });
+        continue;
+      }
       findAndRemoveBloat(fullPath);
-    } else if (entry.name.endsWith('font-metrics.json')) {
-      console.log(`  DELETING BLOAT FILE: ${fullPath}`);
-      fs.unlinkSync(fullPath);
+    } else {
+      const name = entry.name.toLowerCase();
+      const isBloat = 
+        name.endsWith('font-metrics.json') || 
+        name.endsWith('.js.map') || 
+        name.endsWith('.mjs.map') ||
+        name.endsWith('.d.ts') ||
+        name === 'readme.md' ||
+        name === 'license';
+        
+      if (isBloat) {
+        console.log(`DELETING BLOAT FILE: ${fullPath}`);
+        fs.unlinkSync(fullPath);
+      }
+      
+      // Also delete any file > 1MB that isn't a known required file
+      else if (fs.statSync(fullPath).size > 1024 * 1024 && !name.includes('handler') && !name.includes('_worker')) {
+        console.log(`DELETING LARGE UNKNOWN FILE (${Math.round(fs.statSync(fullPath).size / 1024 / 1024)}MB): ${fullPath}`);
+        fs.unlinkSync(fullPath);
+      }
     }
   }
 };

@@ -9,11 +9,16 @@ export default defineCloudflareConfig({
   external: [
     // Heavy libraries that should be in client chunks or are redundant at the edge
     "lucide-react",
-    "next-seo",
-    "resend",
-    "recharts",
-    "react-qr-code",
     "@radix-ui/react-dropdown-menu",
+    
+    // PRISMA: Explicitly exclude huge Prisma related packages if pulled by Better Auth
+    "prisma",
+    "@prisma/client",
+    "@better-auth/prisma-adapter",
+    "@mrleebo/prisma-ast",
+    "@electric-sql/pglite",
+    "@electric-sql/pglite-socket",
+    "@electric-sql/pglite-tools",
     
     // Node.js built-ins provided by nodejs_compat
     "async_hooks",

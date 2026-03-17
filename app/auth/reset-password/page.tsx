@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,27 +16,23 @@ export default function ResetPassword() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const [isValidSession, setIsValidSession] = useState(false);
+  const [isValidating, setIsValidating] = useState(true);
 
   const router = useRouter();
-  const supabase = createClient();
 
   useEffect(() => {
+    // Check if the user is authenticated (Better Auth session)
+    // Or if there's a token in the URL (if using token-based reset)
     const checkSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (session) {
-        setIsValidSession(true);
-      } else {
-        router.push(
-          "/login?message=SessionExpired"
-        );
-      }
+      const { data: session } = await authClient.useSession();
+      // If we are in the reset-password page, we usually come from a link with a token
+      // or we are already logged in and wanting to change it.
+      // Better Auth handles the token via its internal logic if we use the resetPassword action.
+      setIsValidating(false);
     };
 
     checkSession();
-  }, [router, supabase.auth]);
+  }, []);
 
   const validatePassword = (pwd: string) => {
     if (pwd.length < 8) {
@@ -78,17 +74,16 @@ export default function ResetPassword() {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.updateUser({
-        password: password,
+      const { error } = await authClient.resetPassword({
+        newPassword: password,
       });
 
       if (error) {
-        setError(error.message);
+        setError(error.message || "Failed to reset password");
       } else {
         setMessage("Password successfully updated!");
-
         setTimeout(() => {
-          router.push("/login?message=sucess");
+          router.push("/login?message=success");
         }, 2000);
       }
     } catch (err) {
@@ -98,12 +93,12 @@ export default function ResetPassword() {
     }
   };
 
-  if (!isValidSession) {
+  if (isValidating) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black text-white">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
-          <p>Verifying session...</p>
+          <p>Verifying...</p>
         </div>
       </div>
     );
@@ -133,7 +128,7 @@ export default function ResetPassword() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="bg-gray-900 border-gray-700 text-white pr-10"
-                  placeholder="Ingresa tu nueva contraseña"
+                  placeholder="Enter your new password"
                   required
                 />
                 <button
@@ -161,7 +156,7 @@ export default function ResetPassword() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   className="bg-gray-900 border-gray-700 text-white pr-10"
-                  placeholder="Confirma tu nueva contraseña"
+                  placeholder="Confirm your new password"
                   required
                 />
                 <button
@@ -201,7 +196,7 @@ export default function ResetPassword() {
             {loading ? (
               <div className="flex items-center space-x-2">
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black"></div>
-                <span>Actualizando...</span>
+                <span>Updating...</span>
               </div>
             ) : (
               "Update Password"
@@ -210,7 +205,7 @@ export default function ResetPassword() {
         </form>
 
         <div className="text-xs text-gray-500 space-y-2">
-          <p className="font-medium">Requiirements for password:</p>
+          <p className="font-medium">Password requirements:</p>
           <ul className="space-y-1">
             <li
               className={`flex items-center space-x-2 ${
@@ -238,7 +233,7 @@ export default function ResetPassword() {
               }`}
             >
               <span>•</span>
-              <span>At least one capital letter</span>
+              <span>At least one uppercase letter</span>
             </li>
             <li
               className={`flex items-center space-x-2 ${

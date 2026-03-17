@@ -21,6 +21,20 @@ const nextConfig = {
   generateEtags: true,
   trailingSlash: false,
   reactStrictMode: true,
+
+  // IMPORTANT: Externalize DB and other node-heavy packages
+  serverExternalPackages: [
+    "better-auth",
+    "drizzle-orm",
+    "undici",
+    "prisma", 
+    "@prisma/client", 
+    "@better-auth/prisma-adapter",
+    "@mrleebo/prisma-ast",
+    "@electric-sql/pglite",
+    "@electric-sql/pglite-socket",
+    "@electric-sql/pglite-tools",
+  ],
   
   experimental: {
     optimizeCss: false,
