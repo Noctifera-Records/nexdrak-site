@@ -93,7 +93,33 @@ const findAndRemoveBloat = (dir) => {
 
 findAndRemoveBloat(assetsDir);
 
-// 3. Main worker with GLOBAL POLYFILL INJECTION
+// 3. CRITICAL FIX: Neuter node:sqlite and node:worker_threads which don't exist in CF
+// This prevents Wrangler's esbuild from failing during resolution
+const neuterUnsupportedNodeModules = (dir) => {
+  if (!fs.existsSync(dir)) return;
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      neuterUnsupportedNodeModules(fullPath);
+    } else if (entry.name.endsWith('.js') || entry.name.endsWith('.mjs')) {
+      let content = fs.readFileSync(fullPath, 'utf8');
+      if (content.includes('node:sqlite') || content.includes('node:worker_threads')) {
+        console.log(`  NEUTERING UNSUPPORTED MODULES IN: ${fullPath}`);
+        // Replace require calls with empty objects
+        content = content.replace(/require\(['"]node:sqlite['"]\)/g, '{}');
+        content = content.replace(/require\(['"]node:worker_threads['"]\)/g, '{}');
+        fs.writeFileSync(fullPath, content);
+      }
+    }
+  }
+};
+
+console.log('  Patching generated files for Cloudflare compatibility...');
+neuterUnsupportedNodeModules(path.join(assetsDir, 'server-functions'));
+neuterUnsupportedNodeModules(path.join(assetsDir, 'middleware'));
+
+// 4. Main worker with GLOBAL POLYFILL INJECTION
 let workerSrc = path.join(sourceDir, 'worker.js');
 if (!fs.existsSync(workerSrc)) workerSrc = path.join(sourceDir, 'cloudflare', '_worker.js');
 
