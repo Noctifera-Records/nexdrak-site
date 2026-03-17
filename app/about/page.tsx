@@ -30,7 +30,7 @@ export default function AboutPage() {
         </div>
         <div className="relative aspect-square select-none pointer-events-none">
           <Image
-            src="/img/others/xayah.jpg"
+            src="https://i.ibb.co/1YSDgbj8/nex-title.png"
             alt="NexDrak Artist Photo"
             fill
             className="object-cover rounded-xl"

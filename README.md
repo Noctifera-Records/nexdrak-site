@@ -1,4 +1,4 @@
-![imageTitle](./nex-title.png)
+![imageTitle](https://i.ibb.co/1YSDgbj8/nex-title.png)
 
 [![Static Badge](https://img.shields.io/badge/%20build-MIT-brightgreen?logo=github&label=LICENSE)]([./LICENSE](https://github.com/Rawierdt/PassPai/blob/main/LICENSE))
 ![Static Badge](https://img.shields.io/badge/LANGUAGE-JavaScript-yellow?logo=javascript&label=LANGUAGE)
