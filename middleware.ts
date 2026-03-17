@@ -6,7 +6,10 @@ export async function middleware(request: NextRequest) {
     // Better Auth uses "better-auth.session_token" or "__Secure-better-auth.session_token"
     const sessionToken = request.cookies.get("better-auth.session_token") || request.cookies.get("__Secure-better-auth.session_token");
 
-    if (!sessionToken && (request.nextUrl.pathname.startsWith('/admin') || request.nextUrl.pathname.startsWith('/account'))) {
+    const protectedPaths = ['/admin', '/account', '/downloads'];
+    const isProtected = protectedPaths.some(path => request.nextUrl.pathname.startsWith(path));
+
+    if (!sessionToken && isProtected) {
         const loginUrl = new URL('/login', request.url);
         loginUrl.searchParams.set('callbackUrl', request.nextUrl.pathname);
         return NextResponse.redirect(loginUrl);
@@ -29,5 +32,6 @@ export const config = {
   matcher: [
     '/admin/:path*',
     '/account/:path*',
+    '/downloads/:path*',
   ]
 }

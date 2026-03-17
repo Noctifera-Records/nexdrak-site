@@ -24,8 +24,6 @@ const nextConfig = {
 
   // IMPORTANT: Externalize DB and other node-heavy packages
   serverExternalPackages: [
-    "better-auth",
-    "drizzle-orm",
     "undici",
     "node:sqlite",
     "prisma", 
