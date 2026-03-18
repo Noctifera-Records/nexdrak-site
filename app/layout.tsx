@@ -18,7 +18,7 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   metadataBase: new URL('https://nexdrak.com'),
   title: {
-    default: 'Home | NexDrak',
+    default: 'NexDrak',
     template: '%s | NexDrak',
   },
   description: 'Official NexDrak Website, Drop the bass.',
