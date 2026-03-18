@@ -45,7 +45,7 @@ export default function HeroSection({ settings }: { settings: SiteSettings }) {
             }`}
           >
             <OptimizedImage
-              src={settings.site_logo}
+              src={settings?.site_logo || '/logo.webp'}
               alt="Site Logo"
               width={400}
               height={400}
@@ -63,7 +63,7 @@ export default function HeroSection({ settings }: { settings: SiteSettings }) {
             }`}
           >
             <OptimizedImage
-              src={settings.site_logo_mobile}
+              src={settings?.site_logo_mobile || '/logo.webp'}
               alt="Site Logo Mobile"
               width={300}
               height={300}
@@ -79,7 +79,7 @@ export default function HeroSection({ settings }: { settings: SiteSettings }) {
                 : 'opacity-0 translate-y-8'
             }`}
           >
-            {settings.hero_release_text}
+            {settings?.hero_release_text || 'NEW RELEASE'}
           </h2>
           <div 
             className={`flex justify-center gap-4 mt-6 transition-all duration-1000 delay-500 ease-out transform ${
@@ -89,7 +89,8 @@ export default function HeroSection({ settings }: { settings: SiteSettings }) {
             }`}
           >
             <Link
-              href={settings.hero_album_link}
+              href={settings?.hero_album_link || '#'}
+
               target="_blank"
               rel="noopener noreferrer"
             >
