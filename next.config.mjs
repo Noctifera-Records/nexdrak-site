@@ -60,14 +60,52 @@ const nextConfig = {
   },
 
   async headers() {
+    const cspHeader = `
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://s.ytimg.com https://accounts.google.com;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;
+      img-src 'self' blob: data: https://*.supabase.co https://i.ibb.co https://*.postimages.org https://*.googleusercontent.com https://*.ytimg.com https://nexdrak.com;
+      font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
+      object-src 'none';
+      base-uri 'self';
+      form-action 'self' https://accounts.google.com;
+      frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://accounts.google.com;
+      connect-src 'self' https://*.supabase.co https://api.resend.com https://accounts.google.com https://*.googleapis.com;
+      upgrade-insecure-requests;
+    `.replace(/\s{2,}/g, ' ').trim();
+
     return [
       {
         source: "/(.*)",
         headers: [
-          { key: "X-Frame-Options", value: "DENY" },
-          { key: "X-Content-Type-Options", value: "nosniff" },
-          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-          { key: "X-XSS-Protection", value: "1; mode=block" },
+          {
+            key: 'Content-Security-Policy',
+            value: cspHeader,
+          },
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=31536000; includeSubDomains; preload',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
+          },
         ],
       },
     ];

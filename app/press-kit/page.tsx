@@ -5,8 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 
 export const metadata = {
-  title: "Press Kit",
-  description: "Official press kit, biography, logos, and promotional assets for NexDrak.",
+  title: "Press Kit | NexDrak",
+  description: "Official press kit for NexDrak. Download high-resolution promotional photos, logos, and read the official artist biography for media and booking purposes.",
 };
 
 export default function PressKitPage() {

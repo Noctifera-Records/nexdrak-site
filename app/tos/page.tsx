@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Terms of Service",
-  description: "Terms of Service for NexDrak.com",
+  title: "Terms of Service | NexDrak",
+  description: "Review the NexDrak Terms of Service to understand the rules, regulations, and guidelines for using our website and services.",
 };
 
 export default function TermsOfServicePage() {

@@ -45,7 +45,7 @@ export default function HeroSection({ settings }: { settings: SiteSettings }) {
             }`}
           >
             <OptimizedImage
-              src={settings?.site_logo || '/logo.webp'}
+              src={settings?.site_logo ? settings.site_logo : '/logo.webp'} 
               alt="Site Logo"
               width={400}
               height={400}
@@ -63,7 +63,8 @@ export default function HeroSection({ settings }: { settings: SiteSettings }) {
             }`}
           >
             <OptimizedImage
-              src={settings?.site_logo_mobile || '/logo.webp'}
+              src={settings?.site_logo_mobile ? settings.site_logo_mobile : '/logo.webp'} 
+              // src={settings?.site_logo_mobile || '/logo.webp'}
               alt="Site Logo Mobile"
               width={300}
               height={300}

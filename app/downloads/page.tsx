@@ -33,8 +33,32 @@ export default async function DownloadsPage() {
     created_at: d.created_at ? (typeof d.created_at === 'string' ? d.created_at : new Date(d.created_at).toISOString()) : null,
   }));
 
+  // Structured Data
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "NexDrak Exclusive Downloads",
+    "description": "Producer tools, wallpapers, and exclusive content from NexDrak.",
+    "itemListElement": formattedDownloads.map((d: any, index: number) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "SoftwareApplication",
+        "name": d.title,
+        "description": d.description,
+        "applicationCategory": "MultimediaApplication",
+        "operatingSystem": "Any",
+        "image": d.cover_image_url
+      }
+    }))
+  };
+
   return (
     <div className="container mx-auto px-4 py-24 mt-10 text-foreground">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4 text-foreground dark:text-white">EXCLUSIVE DOWNLOADS</h1>

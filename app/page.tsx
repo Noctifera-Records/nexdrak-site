@@ -6,6 +6,36 @@ import { getPublicSongs } from "@/app/music/actions";
 import HeroSection from "@/components/hero-section";
 import QuickLinks from "@/components/quick-links";
 import SocialLinks from "@/components/social-links";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "NexDrak | Official Artist Website",
+  description: "Official website of NexDrak, electronic music artist specializing in Techno, House, and Darkwave. Listen to latest releases, see tour dates, and shop official merchandise.",
+  keywords: ["NexDrak", "Electronic Music", "Techno", "House Music", "Darkwave", "Music Artist", "EDM", "NexDrak Music"],
+  openGraph: {
+    title: "NexDrak | Official Artist Website",
+    description: "Official website of NexDrak. Listen to latest releases, see tour dates, and shop official merchandise.",
+    url: "https://nexdrak.com",
+    siteName: "NexDrak",
+    images: [
+      {
+        url: "/img/red.png",
+        width: 1200,
+        height: 630,
+        alt: "NexDrak Official Site",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "NexDrak | Official Artist Website",
+    description: "Official website of NexDrak. Electronic music, tour dates, and more.",
+    images: ["/img/red.png"],
+    creator: "@nexdrak",
+  },
+};
 
 const LatestReleases = dynamicImport(() => import("@/components/latest-releases"), {
   loading: () => <div className="h-96 w-full animate-pulse bg-gray-900 rounded-lg" />,

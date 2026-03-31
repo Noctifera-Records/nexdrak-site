@@ -1,22 +1,22 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Downloads',
-  description: 'Official NexDrak downloads.',
+  title: 'Downloads | NexDrak',
+  description: 'Access exclusive producer tools, sample packs, and free downloads from NexDrak. Enhance your production with high-quality assets.',
   alternates: { canonical: '/downloads' },
   openGraph: {
     type: 'website',
     url: '/downloads',
     title: 'Downloads | NexDrak',
-    description: 'Official NexDrak downloads.',
+    description: 'Exclusive producer tools and free downloads from NexDrak.',
     siteName: 'NexDrak',
-    images: [{ url: '/nexdrak_opengraph.webp', width: 1200, height: 630 }],
+    images: [{ url: '/img/red.png', width: 1200, height: 630, alt: 'NexDrak Downloads' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Downloads | NexDrak',
-    description: 'Official NexDrak downloads.',
-    images: ['/nexdrak_opengraph.webp'],
+    description: 'Free producer tools and downloads from NexDrak.',
+    images: ['/img/red.png'],
     creator: '@nexdrak',
   },
 };

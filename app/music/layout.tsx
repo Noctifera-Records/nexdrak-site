@@ -1,22 +1,22 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Music',
-  description: 'Discover albums and singles by NexDrak with streaming links.',
+  title: 'Music | NexDrak',
+  description: 'Explore the full discography of NexDrak. Stream techno, house, and darkwave releases including albums, singles, and exclusive tracks with direct streaming links.',
   alternates: { canonical: '/music' },
   openGraph: {
     type: 'website',
     url: '/music',
-    title: 'Music',
-    description: 'Discover albums and singles by NexDrak with streaming links.',
+    title: 'Music | NexDrak',
+    description: 'Explore the full discography of NexDrak. Stream techno, house, and darkwave releases.',
     siteName: 'NexDrak',
-    images: [{ url: '/nexdrak_opengraph.webp', width: 1200, height: 630 }],
+    images: [{ url: '/img/red.png', width: 1200, height: 630, alt: 'NexDrak Music' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Music',
-    description: 'Discover albums and singles by NexDrak with streaming links.',
-    images: ['/nexdrak_opengraph.webp'],
+    title: 'Music | NexDrak',
+    description: 'Listen to the latest electronic music releases from NexDrak.',
+    images: ['/img/red.png'],
     creator: '@nexdrak',
   },
 };

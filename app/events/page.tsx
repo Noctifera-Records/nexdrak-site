@@ -73,6 +73,35 @@ export default function EventsPage() {
 
   return (
     <div className="container mx-auto px-4 py-24 mt-10 text-foreground">
+      {/* JSON-LD for Events */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(events.map(event => ({
+            "@context": "https://schema.org",
+            "@type": "MusicEvent",
+            "name": event.title,
+            "startDate": event.date,
+            "location": {
+              "@type": "Place",
+              "name": event.venue || event.location,
+              "address": event.location
+            },
+            "description": event.description,
+            "image": event.image_url,
+            "offers": event.ticket_url ? {
+              "@type": "Offer",
+              "url": event.ticket_url,
+              "availability": "https://schema.org/InStock"
+            } : undefined,
+            "performer": {
+              "@type": "MusicGroup",
+              "name": "NexDrak",
+              "url": "https://nexdrak.com"
+            }
+          })))
+        }}
+      />
       <div className="max-w-4xl mx-auto mb-12 text-center">
         <h1 className="text-4xl font-bold mb-4 text-foreground dark:text-white">UPCOMING EVENTS</h1>
         <p className="text-muted-foreground dark:text-gray-300">
