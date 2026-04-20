@@ -1,43 +1,24 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-serverless';
-
-// Configure Neon for Cloudflare Workers
-if (typeof window === 'undefined') {
-  // Use the native WebSocket provided by Cloudflare
-  if (globalThis.WebSocket) {
-    neonConfig.webSocketConstructor = globalThis.WebSocket;
-  }
-  
-  // CRITICAL for SASL errors in some proxies/poolers:
-  // Disabling pipelineTLS can fix "server signature is missing" errors
-  neonConfig.pipelineTLS = false;
-  neonConfig.useSecureWebSocket = true;
-}
+import { neon } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-http';
 
 function getConnectionString() {
   let connectionString = process.env.DATABASE_URL;
   if (!connectionString) {
     return "postgresql://placeholder:placeholder@localhost:5432/placeholder";
   }
-
-  // CRITICAL: When using @neondatabase/serverless (WebSockets) in Cloudflare,
-  // we MUST use port 5432. Port 6543 is for TCP pooling and causes SASL errors
-  // when wrapped in WebSockets.
-  if (connectionString.includes(':6543')) {
-    connectionString = connectionString.replace(':6543', ':5432');
-  }
-
-  // Ensure sslmode is set for secure handshake
+  
+  // For HTTP driver, we want the standard port 5432 or the direct connection
+  // Ensure sslmode is set
   if (!connectionString.includes('sslmode')) {
     const separator = connectionString.includes('?') ? '&' : '?';
     connectionString += `${separator}sslmode=require`;
   }
-
+  
   return connectionString;
 }
 
+// We use a simplified singleton for the HTTP client
 let cachedDb: any = null;
-let cachedPool: Pool | null = null;
 
 export function getDb() {
   if (cachedDb) return cachedDb;
@@ -45,31 +26,25 @@ export function getDb() {
   const connectionString = getConnectionString();
 
   try {
-    // For Cloudflare Workers, a single-connection pool is most CPU-efficient
-    cachedPool = new Pool({
-      connectionString,
-      connectionTimeoutMillis: 15000, 
-      max: 1, 
-    });
-
-    cachedDb = drizzle(cachedPool);
+    // The HTTP client is much more stable in Cloudflare Workers
+    const sql = neon(connectionString);
+    cachedDb = drizzle(sql);
     return cachedDb;
   } catch (error) {
-    console.error("Database connection failed:", error);
+    console.error("Database initialization failed:", error);
     throw error;
   }
 }
 
-
 export const db = {
   query: async (sqlText: string, params?: unknown[]) => {
     try {
-      getDb(); // Ensure cachedPool is initialized
-      const result = await cachedPool?.query(sqlText, params || []);
-      return { rows: result?.rows || [] };
+      const connectionString = getConnectionString();
+      const sql = neon(connectionString);
+      const rows = await sql(sqlText, (params || []) as any);
+      return { rows: rows || [] };
     } catch (e) {
       console.error("Database Query Error:", e);
-      // Re-throw or handle as appropriate for your application
       throw e;
     }
   },
