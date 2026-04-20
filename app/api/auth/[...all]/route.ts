@@ -1,25 +1,8 @@
 import { auth } from "@/lib/auth";
 
-export const GET = async (req: Request) => {
-  return await auth.handler(req);
-};
-
-export const POST = async (req: Request) => {
-  return await auth.handler(req);
-};
-
-export const PATCH = async (req: Request) => {
-  return await auth.handler(req);
-};
-
-export const PUT = async (req: Request) => {
-  return await auth.handler(req);
-};
-
-export const DELETE = async (req: Request) => {
-  return await auth.handler(req);
-};
-
-export const OPTIONS = async (req: Request) => {
-  return await auth.handler(req);
-};
+export const GET = (req: Request) => auth.handler(req);
+export const POST = (req: Request) => auth.handler(req);
+export const PATCH = (req: Request) => auth.handler(req);
+export const PUT = (req: Request) => auth.handler(req);
+export const DELETE = (req: Request) => auth.handler(req);
+export const OPTIONS = (req: Request) => auth.handler(req);

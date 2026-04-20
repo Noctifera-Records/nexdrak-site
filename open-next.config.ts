@@ -5,8 +5,9 @@ import { defineCloudflareConfig } from "@opennextjs/cloudflare";
  * AGGRESSIVE OPTIMIZATION for 3MB Limit
  */
 export default defineCloudflareConfig({
-  minify: false,
+  minify: true,
   external: [
+    "undici",
     // Heavy libraries that should be in client chunks or are redundant at the edge
     "lucide-react",
     "@radix-ui/react-dropdown-menu",

@@ -5,15 +5,8 @@ import { drizzle } from 'drizzle-orm/neon-serverless';
 // Cloudflare Workers already have a global WebSocket
 if (typeof window === 'undefined') {
   if (!globalThis.WebSocket) {
-    // Only import undici if we are in a Node environment without WebSocket
-    // Using dynamic import to avoid bundling it in Cloudflare
-    try {
-      import('undici').then(undici => {
-        neonConfig.webSocketConstructor = undici.WebSocket;
-      });
-    } catch (e) {
-      // Ignore if undici is not available
-    }
+    // We are likely in a Node environment, but we avoid importing undici 
+    // here to keep the Cloudflare bundle small.
   }
 }
 
