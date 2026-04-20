@@ -1,20 +1,37 @@
 import { Pool, neonConfig } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-serverless';
 
-// Configure Neon to use WebSockets correctly in serverless environments
-// Cloudflare Workers already have a global WebSocket
+// Configure Neon for Cloudflare Workers
 if (typeof window === 'undefined') {
-  if (!globalThis.WebSocket) {
-    // We are likely in a Node environment, but we avoid importing undici 
-    // here to keep the Cloudflare bundle small.
+  // Use the native WebSocket provided by Cloudflare
+  if (globalThis.WebSocket) {
+    neonConfig.webSocketConstructor = globalThis.WebSocket;
   }
+  
+  // CRITICAL for SASL errors in some proxies/poolers:
+  // Disabling pipelineTLS can fix "server signature is missing" errors
+  neonConfig.pipelineTLS = false;
+  neonConfig.useSecureWebSocket = true;
 }
 
 function getConnectionString() {
-  const connectionString = process.env.DATABASE_URL;
+  let connectionString = process.env.DATABASE_URL;
   if (!connectionString) {
     return "postgresql://placeholder:placeholder@localhost:5432/placeholder";
   }
+  
+  // For Supabase Pooler (6543), we must use transaction mode compatible settings
+  if (connectionString.includes(':6543')) {
+    if (!connectionString.includes('prepareThreshold')) {
+      const separator = connectionString.includes('?') ? '&' : '?';
+      connectionString += `${separator}prepareThreshold=0`;
+    }
+    // Force sslmode=require for secure SASL handshake
+    if (!connectionString.includes('sslmode')) {
+      connectionString += `&sslmode=require`;
+    }
+  }
+  
   return connectionString;
 }
 
@@ -22,20 +39,20 @@ let cachedDb: any = null;
 let cachedPool: Pool | null = null;
 
 export function getDb() {
+  // In serverless, we sometimes want to recreate the pool if it hangs
+  // but for now let's use a standard singleton pattern with better timeouts
   if (cachedDb) return cachedDb;
 
   const connectionString = getConnectionString();
 
   try {
-    if (!cachedPool) {
-      cachedPool = new Pool({
-        connectionString,
-        // Optimal settings for serverless
-        max: 1,
-        idleTimeoutMillis: 30000,
-        connectionTimeoutMillis: 5000,
-      });
-    }
+    cachedPool = new Pool({
+      connectionString,
+      connectionTimeoutMillis: 10000, // Increase to 10s for high latency (Brazil)
+      idleTimeoutMillis: 20000,
+      max: 10, // Allow more connections
+    });
+    
     cachedDb = drizzle(cachedPool);
     return cachedDb;
   } catch (error) {
