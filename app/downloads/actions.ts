@@ -14,6 +14,9 @@ export async function getDownloads() {
     session = await auth.api.getSession({
       headers: await headers()
     });
+  } catch (e) {
+    console.error("getDownloads auth error", e);
+    session = null;
   } finally {
     await client.end();
   }
@@ -48,6 +51,9 @@ export async function incrementDownloadCount(id: number) {
     session = await auth.api.getSession({
       headers: await headers()
     });
+  } catch (e) {
+    console.error("incrementDownloadCount auth error", e);
+    session = null;
   } finally {
     await client.end();
   }

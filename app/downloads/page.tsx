@@ -5,6 +5,8 @@ import { headers } from "next/headers"
 import DownloadsGrid from './downloads-grid'
 import { getDownloads } from './actions'
 
+export const dynamic = "force-dynamic";
+
 export default async function DownloadsPage() {
   const { db, client } = await createRequestContextDb();
   
@@ -14,6 +16,9 @@ export default async function DownloadsPage() {
     session = await auth.api.getSession({
       headers: await headers()
     });
+  } catch (e) {
+    console.error("Session fetch error", e);
+    session = null;
   } finally {
     await client.end();
   }
@@ -22,7 +27,7 @@ export default async function DownloadsPage() {
     redirect('/login')
   }
 
-  // Obtener descargas
+  // Obtener descargas (este tiene su propio manejo de conexión interna)
   const downloads = await getDownloads();
 
   if (!downloads) {
@@ -37,7 +42,7 @@ export default async function DownloadsPage() {
   }
 
   // Serialize dates
-  const formattedDownloads = downloads.map((d: any) => ({
+  const formattedDownloads = (downloads as any[]).map((d: any) => ({
     ...d,
     created_at: d.created_at ? (typeof d.created_at === 'string' ? d.created_at : new Date(d.created_at).toISOString()) : null,
   }));

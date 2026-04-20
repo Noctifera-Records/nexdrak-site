@@ -18,7 +18,19 @@ export function getConnectionString() {
 }
 
 export async function createRequestContextDb() {
-  const client = new Client(getConnectionString());
+  const connectionString = getConnectionString();
+  
+  // Si estamos en fase de build (fase de construcción) y no hay URL real, devolvemos un objeto mock
+  // para que el compilador de Next.js no se quede colgado.
+  if (!process.env.DATABASE_URL || process.env.NEXT_PHASE === 'phase-production-build') {
+     // Mock objects for the build phase
+     return {
+       db: drizzle({} as any),
+       client: { end: async () => {} } as any
+     };
+  }
+
+  const client = new Client(connectionString);
   await client.connect();
   return {
     db: drizzle(client),
