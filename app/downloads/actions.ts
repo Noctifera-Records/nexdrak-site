@@ -1,82 +1,48 @@
 "use server";
 
-import { createServiceRoleClient } from "@/lib/supabase/service";
 import { getAuth } from "@/lib/auth";
-import { createRequestContextDb } from "@/lib/db";
+import { getRequestContextDb } from "@/lib/db";
 import { headers } from "next/headers";
+import { sql } from "drizzle-orm";
 
 export async function getDownloads() {
-  const { db, client } = await createRequestContextDb();
+  // Obtenemos la conexión compartida de esta petición
+  const { db } = await getRequestContextDb();
   
-  let session;
   try {
     const auth = getAuth(db);
-    session = await auth.api.getSession({
+    const session = await auth.api.getSession({
       headers: await headers()
     });
+
+    if (!session) return null;
+
+    // USAMOS DRIZZLE para ser mucho más rápidos que el cliente de Supabase
+    // Esto evita abrir una segunda conexión HTTP/PostgREST
+    const result = await (db as any).execute(sql`SELECT * FROM downloads ORDER BY is_featured DESC, created_at DESC`);
+    return result.rows || [];
   } catch (e) {
-    console.error("getDownloads auth error", e);
-    session = null;
-  } finally {
-    await client.end();
-  }
-
-  if (!session) {
-    return null;
-  }
-
-  let supabase;
-  try {
-    supabase = createServiceRoleClient();
-  } catch {
+    console.error("getDownloads error", e);
     return [];
   }
-
-  const { data, error } = await supabase
-    .from("downloads")
-    .select("*")
-    .order("is_featured", { ascending: false })
-    .order("created_at", { ascending: false });
-  
-  if (error || !data) return [];
-  return data;
 }
 
 export async function incrementDownloadCount(id: number) {
-  const { db, client } = await createRequestContextDb();
+  const { db } = await getRequestContextDb();
   
-  let session;
   try {
     const auth = getAuth(db);
-    session = await auth.api.getSession({
+    const session = await auth.api.getSession({
       headers: await headers()
     });
-  } catch (e) {
-    console.error("incrementDownloadCount auth error", e);
-    session = null;
-  } finally {
-    await client.end();
-  }
 
-  if (!session) {
-    throw new Error("Unauthorized");
-  }
+    if (!session) throw new Error("Unauthorized");
 
-  let supabase;
-  try {
-    supabase = createServiceRoleClient();
-  } catch {
-    throw new Error("Database unavailable");
-  }
-
-  try {
-    const { error } = await supabase.rpc("increment_download_count", { download_id: id });
-    if (error) {
-      console.warn("Could not increment download count:", error.message);
-    }
+    // Ejecutamos el incremento directamente en SQL
+    await (db as any).execute(sql`SELECT increment_download_count(${id})`);
+    return { success: true };
   } catch (err) {
     console.error("Error in incrementDownloadCount:", err);
+    return { success: false };
   }
-  
-  return { success: true };
 }
