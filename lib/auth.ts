@@ -55,6 +55,9 @@ export const auth = (() => {
       baseURL = baseURL.split(" ").find(u => u.includes("nexdrak.com")) || baseURL.split(" ")[0];
     }
 
+    // Remove trailing slash to prevent double slashes in redirect URIs
+    baseURL = baseURL.replace(/\/$/, "");
+
     const secret = process.env.BETTER_AUTH_SECRET || "development-secret-key-min-32-chars-long-placeholder";
 
     const spotifyClientId = process.env.SPOTIFY_CLIENT_ID;

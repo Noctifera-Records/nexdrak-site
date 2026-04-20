@@ -98,7 +98,7 @@ export default function LoginForm() {
             required 
             />
         </div>
-        <Button type="submit" className="w-full" disabled={loading || googleLoading}>
+        <Button type="submit" className="w-full" disabled={loading || spotifyLoading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Sign In
         </Button>
