@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { getDb } from "./db";
-import { schema as authSchema } from "./db/schema";
+import * as authSchema from "./db/auth.schema";
 import { resetPasswordTemplate, verifyEmailTemplate } from "./email-templates";
 
 const fromEmail = process.env.EMAIL_FROM || "noreply@nexdrak.com";

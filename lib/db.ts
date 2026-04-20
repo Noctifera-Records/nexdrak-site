@@ -48,9 +48,9 @@ export function getDb() {
   try {
     cachedPool = new Pool({
       connectionString,
-      connectionTimeoutMillis: 10000, // Increase to 10s for high latency (Brazil)
-      idleTimeoutMillis: 20000,
-      max: 10, // Allow more connections
+      connectionTimeoutMillis: 10000, // Keep 10s for high latency
+      idleTimeoutMillis: 15000,
+      max: 1, // REDUCED TO 1 TO SAVE CPU
     });
     
     cachedDb = drizzle(cachedPool);
