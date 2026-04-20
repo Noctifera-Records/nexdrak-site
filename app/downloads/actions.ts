@@ -1,13 +1,22 @@
 "use server";
 
 import { createServiceRoleClient } from "@/lib/supabase/service";
-import { auth } from "@/lib/auth";
+import { getAuth } from "@/lib/auth";
+import { createRequestContextDb } from "@/lib/db";
 import { headers } from "next/headers";
 
 export async function getDownloads() {
-  const session = await auth.api.getSession({
-    headers: await headers()
-  });
+  const { db, client } = await createRequestContextDb();
+  
+  let session;
+  try {
+    const auth = getAuth(db);
+    session = await auth.api.getSession({
+      headers: await headers()
+    });
+  } finally {
+    await client.end();
+  }
 
   if (!session) {
     return null;
@@ -31,9 +40,17 @@ export async function getDownloads() {
 }
 
 export async function incrementDownloadCount(id: number) {
-  const session = await auth.api.getSession({
-    headers: await headers()
-  });
+  const { db, client } = await createRequestContextDb();
+  
+  let session;
+  try {
+    const auth = getAuth(db);
+    session = await auth.api.getSession({
+      headers: await headers()
+    });
+  } finally {
+    await client.end();
+  }
 
   if (!session) {
     throw new Error("Unauthorized");

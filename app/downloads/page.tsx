@@ -1,13 +1,22 @@
 import { redirect } from 'next/navigation'
-import { auth } from "@/lib/auth"
+import { getAuth } from "@/lib/auth"
+import { createRequestContextDb } from "@/lib/db"
 import { headers } from "next/headers"
 import DownloadsGrid from './downloads-grid'
 import { getDownloads } from './actions'
 
 export default async function DownloadsPage() {
-  const session = await auth.api.getSession({
-    headers: await headers()
-  });
+  const { db, client } = await createRequestContextDb();
+  
+  let session;
+  try {
+    const auth = getAuth(db);
+    session = await auth.api.getSession({
+      headers: await headers()
+    });
+  } finally {
+    await client.end();
+  }
   
   if (!session) {
     redirect('/login')
