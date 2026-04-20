@@ -1,9 +1,9 @@
 import { getAuth } from "@/lib/auth";
-import { createRequestContextDb } from "@/lib/db";
+import { getRequestContextDb } from "@/lib/db";
 
 const handler = async (req: Request) => {
-  // 1. Creamos la conexión fresca para ESTA petición
-  const { db, client } = await createRequestContextDb();
+  // 1. Obtenemos la conexión compartida para ESTA petición
+  const { db, client } = await getRequestContextDb();
   
   try {
     // 2. Inicializamos auth con ESA conexión
