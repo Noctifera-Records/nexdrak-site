@@ -14,7 +14,7 @@ export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
+  const [spotifyLoading, setSpotifyLoading] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -35,15 +35,15 @@ export default function LoginForm() {
     setLoading(false);
   };
 
-  const handleGoogleLogin = async () => {
-    setGoogleLoading(true);
+  const handleSpotifyLogin = async () => {
+    setSpotifyLoading(true);
     await authClient.signIn.social({
-        provider: "google",
+        provider: "spotify",
         callbackURL: "/"
     }, {
         onError: (ctx) => {
-            toast.error(ctx.error.message || "Failed to login with Google");
-            setGoogleLoading(false);
+            toast.error(ctx.error.message || "Failed to login with Spotify");
+            setSpotifyLoading(false);
         }
     });
   };
@@ -55,18 +55,18 @@ export default function LoginForm() {
         <Button 
             variant="outline" 
             type="button" 
-            className="w-full" 
-            onClick={handleGoogleLogin}
-            disabled={loading || googleLoading}
+            className="w-full bg-black hover:bg-[#1DB954] text-white hover:text-black border-zinc-800 transition-colors" 
+            onClick={handleSpotifyLogin}
+            disabled={loading || spotifyLoading}
         >
-            {googleLoading ? (
+            {spotifyLoading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
-                <svg className="mr-2 h-4 w-4" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="google" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
-                    <path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"></path>
+                <svg className="mr-2 h-4 w-4 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.508 17.302c-.218.358-.686.474-1.044.255-2.887-1.765-6.521-2.164-10.803-1.185-.41.094-.821-.164-.915-.574-.094-.41.164-.821.574-.915 4.693-1.072 8.706-.613 11.933 1.358.358.219.474.687.255 1.061zm1.47-3.253c-.274.446-.856.59-1.302.316-3.303-2.03-8.342-2.617-12.247-1.433-.504.153-1.037-.134-1.19-.638-.153-.504.134-1.037.638-1.19 4.455-1.353 10.005-.705 13.785 1.619.446.274.59.856.316 1.306zm.127-3.398C15.187 8.24 8.71 8.026 4.933 9.173c-.604.183-1.24-.165-1.423-.769-.183-.604.165-1.24.769-1.423 4.335-1.316 11.488-1.071 16.05 1.64.544.323.722 1.026.399 1.57-.323.544-1.026.722-1.57.399z"/>
                 </svg>
             )}
-            Google
+            Spotify
         </Button>
 
         <div className="space-y-2">

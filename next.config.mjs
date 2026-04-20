@@ -61,15 +61,15 @@ const nextConfig = {
     async headers() {
     const cspHeader = `
       default-src 'self';
-      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://s.ytimg.com https://accounts.google.com https://static.cloudflareinsights.com;
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://s.ytimg.com https://accounts.google.com https://static.cloudflareinsights.com https://sdk.scdn.co;
       style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;
-      img-src 'self' blob: data: https://*.supabase.co https://i.ibb.co https://*.postimages.org https://*.googleusercontent.com https://*.ytimg.com https://nexdrak.com;
+      img-src 'self' blob: data: https://*.supabase.co https://i.ibb.co https://*.postimages.org https://*.googleusercontent.com https://*.ytimg.com https://nexdrak.com https://*.scdn.co https://i.scdn.co;
       font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
       object-src 'none';
       base-uri 'self';
-      form-action 'self' https://accounts.google.com;
-      frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://accounts.google.com;
-      connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.resend.com https://accounts.google.com https://*.googleapis.com;
+      form-action 'self' https://accounts.google.com https://accounts.spotify.com;
+      frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://accounts.google.com https://*.spotify.com;
+      connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.resend.com https://accounts.google.com https://*.googleapis.com https://accounts.spotify.com https://api.spotify.com;
       upgrade-insecure-requests;
     `.replace(/\s{2,}/g, ' ').trim();
     return [

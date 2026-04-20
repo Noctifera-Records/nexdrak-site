@@ -44,10 +44,10 @@ export const auth = (() => {
     // Parse and clean BETTER_AUTH_URL
     let baseURL = process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_BETTER_AUTH_URL;
     
-    // Default to localhost in dev, production otherwise
     // CRITICAL: On Cloudflare, ensure we use the production URL if not explicitly set
     if (!baseURL || (baseURL.includes("localhost") && process.env.NODE_ENV === "production")) {
-      baseURL = process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://nexdrak.com";
+      baseURL = "https://nexdrak.com";
+      console.log("Better Auth: Falling back to production baseURL:", baseURL);
     }
     
     // If multiple URLs are provided (common mistake), take the production one
@@ -57,14 +57,14 @@ export const auth = (() => {
 
     const secret = process.env.BETTER_AUTH_SECRET || "development-secret-key-min-32-chars-long-placeholder";
 
-    const googleClientId = process.env.GOOGLE_CLIENT_ID;
-    const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
+    const spotifyClientId = process.env.SPOTIFY_CLIENT_ID;
+    const spotifyClientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 
-    if (!googleClientId || !googleClientSecret) {
-      console.warn("Better Auth: GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET is missing. Google login will fail.");
+    if (!spotifyClientId || !spotifyClientSecret) {
+      console.warn("Better Auth: SPOTIFY_CLIENT_ID or SPOTIFY_CLIENT_SECRET is missing. Spotify login will fail.");
     }
 
-    return betterAuth({
+    const authInstance = betterAuth({
       database: drizzleAdapter(db, {
         provider: "pg",
         schema: authSchema,
@@ -92,9 +92,9 @@ export const auth = (() => {
         },
       },
       socialProviders: {
-        google: {
-          clientId: process.env.GOOGLE_CLIENT_ID || "",
-          clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+        spotify: {
+          clientId: spotifyClientId || "placeholder",
+          clientSecret: spotifyClientSecret || "placeholder",
         },
       },
       rateLimit: {
@@ -103,12 +103,24 @@ export const auth = (() => {
       plugins: [
       ],
     });
+
+    return authInstance;
   } catch (error) {
     console.error("CRITICAL: Better Auth initialization failed:", error);
     // Return a dummy handler that returns 500 with the error message for debugging
+    // This object MUST match the expected interface enough to not throw TypeErrors
     return {
       api: { getSession: async () => null },
-      handler: async () => new Response(`Auth Error: ${error instanceof Error ? error.message : 'Unknown'}`, { status: 500 }),
+      handler: async (req: Request) => {
+        console.error("Auth handler called but Better Auth failed to initialize", error);
+        return new Response(JSON.stringify({ 
+          error: "Auth Initialization Failed", 
+          message: error instanceof Error ? error.message : 'Unknown' 
+        }), { 
+          status: 500,
+          headers: { "Content-Type": "application/json" }
+        });
+      },
     } as any;
   }
 })();
