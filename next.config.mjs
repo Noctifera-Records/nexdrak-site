@@ -23,7 +23,6 @@ const nextConfig = {
 
     // IMPORTANT: Externalize DB and other node-heavy packages
     serverExternalPackages: [
-    "undici",
     "node:sqlite",
     "prisma",
     "@prisma/client",
