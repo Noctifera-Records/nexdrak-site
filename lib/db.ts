@@ -19,19 +19,20 @@ function getConnectionString() {
   if (!connectionString) {
     return "postgresql://placeholder:placeholder@localhost:5432/placeholder";
   }
-  
-  // For Supabase Pooler (6543), we must use transaction mode compatible settings
+
+  // CRITICAL: When using @neondatabase/serverless (WebSockets) in Cloudflare,
+  // we MUST use port 5432. Port 6543 is for TCP pooling and causes SASL errors
+  // when wrapped in WebSockets.
   if (connectionString.includes(':6543')) {
-    if (!connectionString.includes('prepareThreshold')) {
-      const separator = connectionString.includes('?') ? '&' : '?';
-      connectionString += `${separator}prepareThreshold=0`;
-    }
-    // Force sslmode=require for secure SASL handshake
-    if (!connectionString.includes('sslmode')) {
-      connectionString += `&sslmode=require`;
-    }
+    connectionString = connectionString.replace(':6543', ':5432');
   }
-  
+
+  // Ensure sslmode is set for secure handshake
+  if (!connectionString.includes('sslmode')) {
+    const separator = connectionString.includes('?') ? '&' : '?';
+    connectionString += `${separator}sslmode=require`;
+  }
+
   return connectionString;
 }
 
@@ -39,20 +40,18 @@ let cachedDb: any = null;
 let cachedPool: Pool | null = null;
 
 export function getDb() {
-  // In serverless, we sometimes want to recreate the pool if it hangs
-  // but for now let's use a standard singleton pattern with better timeouts
   if (cachedDb) return cachedDb;
 
   const connectionString = getConnectionString();
 
   try {
+    // For Cloudflare Workers, a single-connection pool is most CPU-efficient
     cachedPool = new Pool({
       connectionString,
-      connectionTimeoutMillis: 10000, // Keep 10s for high latency
-      idleTimeoutMillis: 15000,
-      max: 1, // REDUCED TO 1 TO SAVE CPU
+      connectionTimeoutMillis: 15000, 
+      max: 1, 
     });
-    
+
     cachedDb = drizzle(cachedPool);
     return cachedDb;
   } catch (error) {
@@ -60,6 +59,7 @@ export function getDb() {
     throw error;
   }
 }
+
 
 export const db = {
   query: async (sqlText: string, params?: unknown[]) => {
