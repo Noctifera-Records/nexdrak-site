@@ -45,7 +45,8 @@ export const auth = (() => {
     let baseURL = process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_BETTER_AUTH_URL;
     
     // Default to localhost in dev, production otherwise
-    if (!baseURL) {
+    // CRITICAL: On Cloudflare, ensure we use the production URL if not explicitly set
+    if (!baseURL || (baseURL.includes("localhost") && process.env.NODE_ENV === "production")) {
       baseURL = process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://nexdrak.com";
     }
     
@@ -55,6 +56,13 @@ export const auth = (() => {
     }
 
     const secret = process.env.BETTER_AUTH_SECRET || "development-secret-key-min-32-chars-long-placeholder";
+
+    const googleClientId = process.env.GOOGLE_CLIENT_ID;
+    const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
+
+    if (!googleClientId || !googleClientSecret) {
+      console.warn("Better Auth: GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET is missing. Google login will fail.");
+    }
 
     return betterAuth({
       database: drizzleAdapter(db, {
