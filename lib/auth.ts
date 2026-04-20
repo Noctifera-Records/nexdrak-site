@@ -70,7 +70,6 @@ export const auth = (() => {
     const authInstance = betterAuth({
       database: drizzleAdapter(db, {
         provider: "pg",
-        schema: authSchema,
       }),
       baseURL,
       secret,
