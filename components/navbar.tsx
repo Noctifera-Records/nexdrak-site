@@ -22,6 +22,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 export default function Navbar() {
   const [isMainMenuOpen, setIsMainMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [hasTokenCookie, setHasTokenCookie] = useState(false);
   
   // Use session hook
   const { data: session, isPending } = authClient.useSession();
@@ -31,6 +32,12 @@ export default function Navbar() {
 
   useEffect(() => {
     setMounted(true);
+    // Check for session cookie presence locally for immediate UI response
+    const hasToken = document.cookie.split(';').some(c => 
+      c.trim().startsWith('better-auth.session_token=') || 
+      c.trim().startsWith('__Secure-better-auth.session_token=')
+    );
+    setHasTokenCookie(hasToken);
   }, []);
 
   const handleLogout = async () => {
@@ -53,9 +60,72 @@ export default function Navbar() {
     { name: "BIO", href: "/about" },
   ];
 
-  // Logic to determine if user is logged in, ONLY after mounting to avoid hydration mismatch
+  // Logic to determine if user is logged in
   const user = mounted ? session?.user : null;
   const isAdmin = user?.role === "admin";
+  
+  // Determine what to show in the auth section (Desktop)
+  const renderDesktopAuth = () => {
+    if (!mounted) return <div className="h-9 w-9 rounded-full bg-muted animate-pulse ml-2" />;
+    
+    // If we have a user, show the avatar dropdown
+    if (user) {
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="relative h-9 w-9 rounded-full ml-2 ring-2 ring-transparent hover:ring-primary/20 transition-all">
+              <Avatar className="h-9 w-9 border border-border">
+                <AvatarImage src={user.image || ""} alt={user.name || ""} />
+                <AvatarFallback>{user.name?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
+              </Avatar>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56 mt-2" align="end" forceMount>
+            <DropdownMenuLabel className="font-normal">
+              <div className="flex flex-col space-y-1">
+                <p className="text-sm font-medium leading-none">{user.name}</p>
+                <p className="text-xs leading-none text-muted-foreground">
+                  {user.email}
+                </p>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {isAdmin && (
+              <DropdownMenuItem asChild>
+                <Link href="/admin" prefetch={false} className="cursor-pointer w-full flex items-center">
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Admin Dashboard</span>
+                </Link>
+              </DropdownMenuItem>
+            )}
+            <DropdownMenuItem asChild>
+              <Link href="/account" prefetch={false} className="cursor-pointer w-full flex items-center">
+                <User className="mr-2 h-4 w-4" />
+                <span>My Account</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive focus:text-destructive w-full flex items-center">
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Log out</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    }
+    
+    // If we are still loading AND there is a cookie, show skeleton
+    if (isPending && hasTokenCookie) {
+      return <div className="h-9 w-9 rounded-full bg-muted animate-pulse ml-2" />;
+    }
+    
+    // Otherwise show LOGIN button (immediate if no cookie)
+    return (
+      <Button asChild size="sm" className="px-6 font-semibold tracking-wide ml-2">
+        <Link href="/login" prefetch={false}>LOGIN</Link>
+      </Button>
+    );
+  };
 
   return (
     <>
@@ -113,55 +183,7 @@ export default function Navbar() {
 
             <div className="flex items-center gap-4">
               <ThemeToggle />
-              
-              {!mounted || isPending ? (
-                <div className="h-9 w-9 rounded-full bg-muted animate-pulse" />
-              ) : user ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-9 w-9 rounded-full ml-2 ring-2 ring-transparent hover:ring-primary/20 transition-all">
-                      <Avatar className="h-9 w-9 border border-border">
-                        <AvatarImage src={user.image || ""} alt={user.name || ""} />
-                        <AvatarFallback>{user.name?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
-                      </Avatar>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56 mt-2" align="end" forceMount>
-                    <DropdownMenuLabel className="font-normal">
-                      <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">{user.name}</p>
-                        <p className="text-xs leading-none text-muted-foreground">
-                          {user.email}
-                        </p>
-                      </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    {isAdmin && (
-                      <DropdownMenuItem asChild>
-                        <Link href="/admin" prefetch={false} className="cursor-pointer w-full flex items-center">
-                          <Settings className="mr-2 h-4 w-4" />
-                          <span>Admin Dashboard</span>
-                        </Link>
-                      </DropdownMenuItem>
-                    )}
-                    <DropdownMenuItem asChild>
-                      <Link href="/account" prefetch={false} className="cursor-pointer w-full flex items-center">
-                        <User className="mr-2 h-4 w-4" />
-                        <span>My Account</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive focus:text-destructive w-full flex items-center">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <Button asChild size="sm" className="px-6 font-semibold tracking-wide ml-2">
-                  <Link href="/login" prefetch={false}>LOGIN</Link>
-                </Button>
-              )}
+              {renderDesktopAuth()}
             </div>
           </div>
 
@@ -211,7 +233,7 @@ export default function Navbar() {
                 </Link>
               ))}
 
-              {!mounted || isPending ? (
+              {!mounted ? (
                 <div className="h-16 w-16 rounded-full bg-muted animate-pulse mx-auto" />
               ) : user ? (
                 <div className="space-y-4 pt-8 w-full max-w-sm mx-auto">
@@ -259,6 +281,8 @@ export default function Navbar() {
                     Log out
                   </Button>
                 </div>
+              ) : (isPending && hasTokenCookie) ? (
+                <div className="h-16 w-16 rounded-full bg-muted animate-pulse mx-auto" />
               ) : (
                 <Button
                   size="lg"
