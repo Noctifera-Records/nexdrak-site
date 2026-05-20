@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 interface SiteSettings {
@@ -31,12 +31,19 @@ const defaultSettings: SiteSettings = {
   booking_email: "mgmt@nexdrak.com",
 };
 
+// Objeto para cachear los settings y evitar múltiples peticiones
+let cachedSettings: SiteSettings | null = null;
+
 export function useSiteSettings() {
-  const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
-  const [loading, setLoading] = useState(true);
-  const supabase = createClient();
+  const [settings, setSettings] = useState<SiteSettings>(cachedSettings || defaultSettings);
+  const [loading, setLoading] = useState(!cachedSettings);
+  
+  // Memorizamos el cliente para evitar recrearlo en cada render
+  const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
+    let isMounted = true;
+
     const fetchSettings = async () => {
       try {
         const { data, error } = await supabase
@@ -45,11 +52,11 @@ export function useSiteSettings() {
 
         if (error) {
           console.error("Error fetching site settings:", error);
-          setLoading(false);
+          if (isMounted) setLoading(false);
           return;
         }
 
-        if (data) {
+        if (data && isMounted) {
           const settingsMap: Partial<SiteSettings> = {};
           data.forEach((item) => {
             if (item.key in defaultSettings) {
@@ -58,33 +65,33 @@ export function useSiteSettings() {
             }
           });
 
-          setSettings({ ...defaultSettings, ...settingsMap });
+          const finalSettings = { ...defaultSettings, ...settingsMap };
+          cachedSettings = finalSettings;
+          setSettings(finalSettings);
         }
       } catch (error) {
-        console.error("Error:", error);
+        console.error("Error site-settings hook:", error);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
 
-    fetchSettings();
+    // Si ya tenemos caché, no volvemos a pedir inmediatamente (ahorro de CPU)
+    if (!cachedSettings) {
+      fetchSettings();
+    } else {
+      setLoading(false);
+    }
 
-    // Suscribirse a cambios en tiempo real
-    const subscription = supabase
-      .channel("site_settings_changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "site_settings" },
-        () => {
-          fetchSettings();
-        }
-      )
-      .subscribe();
+    // ELIMINAMOS LA SUSCRIPCIÓN REALTIME
+    // Esta era la causa del error "cannot add postgres_changes callbacks"
+    // que rompía el sitio. Los ajustes del sitio no cambian tan a menudo
+    // como para arriesgar la estabilidad del sitio por esto.
 
     return () => {
-      subscription.unsubscribe();
+      isMounted = false;
     };
-  }, []);
+  }, [supabase]);
 
   return { settings, loading };
 }
