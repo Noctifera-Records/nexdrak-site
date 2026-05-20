@@ -24,31 +24,26 @@ export default function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [hasTokenCookie, setHasTokenCookie] = useState(false);
   
-  // Use session hook
   const { data: session, isPending } = authClient.useSession();
-  
-  const router = useRouter();
   const { settings } = useSiteSettings();
 
   useEffect(() => {
     setMounted(true);
-    // Check for session cookie presence locally for immediate UI response
-    const hasToken = document.cookie.split(';').some(c => 
-      c.trim().startsWith('better-auth.session_token=') || 
-      c.trim().startsWith('__Secure-better-auth.session_token=')
-    );
+    // Verificación segura de cookie solo en el cliente
+    const hasToken = document.cookie.includes('better-auth.session_token') || 
+                     document.cookie.includes('__Secure-better-auth.session_token');
     setHasTokenCookie(hasToken);
   }, []);
 
   const handleLogout = async () => {
-      await authClient.signOut({
-          fetchOptions: {
-              onSuccess: () => {
-                  toast.success("Successfully logged out");
-                  window.location.href = "/login";
-              },
-          },
-      });
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          toast.success("Successfully logged out");
+          window.location.href = "/login";
+        },
+      },
+    });
   };
 
   const navItems = [
@@ -60,121 +55,30 @@ export default function Navbar() {
     { name: "BIO", href: "/about" },
   ];
 
-  // Logic to determine if user is logged in
-  const user = mounted ? session?.user : null;
+  const user = session?.user;
   const isAdmin = user?.role === "admin";
-  
-  // Determine what to show in the auth section (Desktop)
-  const renderDesktopAuth = () => {
-    if (!mounted) return <div className="h-9 w-9 rounded-full bg-muted animate-pulse ml-2" />;
-    
-    // If we have a user, show the avatar dropdown
-    if (user) {
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-9 w-9 rounded-full ml-2 ring-2 ring-transparent hover:ring-primary/20 transition-all">
-              <Avatar className="h-9 w-9 border border-border">
-                <AvatarImage src={user.image || ""} alt={user.name || ""} />
-                <AvatarFallback>{user.name?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
-              </Avatar>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56 mt-2" align="end" forceMount>
-            <DropdownMenuLabel className="font-normal">
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{user.name}</p>
-                <p className="text-xs leading-none text-muted-foreground">
-                  {user.email}
-                </p>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            {isAdmin && (
-              <DropdownMenuItem asChild>
-                <Link href="/admin" prefetch={false} className="cursor-pointer w-full flex items-center">
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Admin Dashboard</span>
-                </Link>
-              </DropdownMenuItem>
-            )}
-            <DropdownMenuItem asChild>
-              <Link href="/account" prefetch={false} className="cursor-pointer w-full flex items-center">
-                <User className="mr-2 h-4 w-4" />
-                <span>My Account</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive focus:text-destructive w-full flex items-center">
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>Log out</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    }
-    
-    // If we are still loading AND there is a cookie, show skeleton
-    if (isPending && hasTokenCookie) {
-      return <div className="h-9 w-9 rounded-full bg-muted animate-pulse ml-2" />;
-    }
-    
-    // Otherwise show LOGIN button (immediate if no cookie)
-    return (
-      <Button asChild size="sm" className="px-6 font-semibold tracking-wide ml-2">
-        <Link href="/login" prefetch={false}>LOGIN</Link>
-      </Button>
-    );
-  };
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-[100] bg-background/70 backdrop-blur-md border-b border-border shadow-sm transition-all duration-300">
+      <header className="fixed top-0 left-0 right-0 z-[100] bg-background/70 backdrop-blur-md border-b border-border shadow-sm">
         <div className="container mx-auto px-6 h-20 flex items-center justify-between">
           
-          {/* Left Section: Logo & Socials */}
           <div className="flex items-center gap-6">
-            <Link href="/" aria-label="Go to homepage" className="flex-shrink-0 flex items-center z-20">
-                {settings?.navbar_logo ? (
-                  <img
-                    src={settings.navbar_logo}
-                    alt={settings.site_title || "Logo"}
-                    className="h-10 w-auto object-contain transition-opacity hover:opacity-80"
-                  />
-                ) : (
-                  <span className="text-2xl font-bold tracking-tighter text-foreground">NEXDRAK</span>
-                )}
+            <Link href="/" className="flex-shrink-0 flex items-center z-20">
+              {settings?.navbar_logo ? (
+                <img src={settings.navbar_logo} alt="Logo" className="h-10 w-auto object-contain" />
+              ) : (
+                <span className="text-2xl font-bold tracking-tighter">NEXDRAK</span>
+              )}
             </Link>
-
-            <span className="h-6 w-px bg-border hidden lg:block" />
-
-            <div className="hidden lg:flex items-center gap-4 text-muted-foreground">
-              <a href="https://www.instagram.com/nexdrak" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors hover:scale-110">
-                <i className="fa-brands fa-instagram text-lg" />
-              </a>
-              <a href="https://x.com/nexdrak" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors hover:scale-110">
-                <i className="fa-brands fa-x-twitter text-lg" />
-              </a>
-              <a href="https://www.youtube.com/@nexdrak" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors hover:scale-110">
-                <i className="fa-brands fa-youtube text-lg" />
-              </a>
-              <a href="https://open.spotify.com/artist/1DRRpAYf6HmdFkLLPXeMEx" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors hover:scale-110">
-                <i className="fa-brands fa-spotify text-lg" />
-              </a>
-            </div>
           </div>
 
-          {/* Right Section: Navigation & Auth */}
+          {/* Desktop Nav */}
           <div className="hidden lg:flex items-center justify-end gap-8">
-            <nav className="flex items-center gap-6 xl:gap-8">
+            <nav className="flex items-center gap-6">
               {navItems.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="text-sm font-medium tracking-widest text-muted-foreground hover:text-primary transition-all duration-200 relative group py-2"
-                >
+                <Link key={item.name} href={item.href} className="text-sm font-medium tracking-widest text-muted-foreground hover:text-primary transition-colors">
                   {item.name}
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
                 </Link>
               ))}
             </nav>
@@ -183,133 +87,96 @@ export default function Navbar() {
 
             <div className="flex items-center gap-4">
               <ThemeToggle />
-              {renderDesktopAuth()}
+              
+              {!mounted ? (
+                <div className="h-9 w-9 rounded-full bg-muted animate-pulse" />
+              ) : user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                      <Avatar className="h-9 w-9">
+                        <AvatarImage src={user.image || ""} />
+                        <AvatarFallback>{user.name?.charAt(0) || "U"}</AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel>{user.name}</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {isAdmin && (
+                      <DropdownMenuItem asChild>
+                        <Link href="/admin">Admin Dashboard</Link>
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuItem asChild>
+                      <Link href="/account">My Account</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+                      Log out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (isPending && hasTokenCookie) ? (
+                <div className="h-9 w-9 rounded-full bg-muted animate-pulse" />
+              ) : (
+                <Button asChild size="sm">
+                  <Link href="/login">LOGIN</Link>
+                </Button>
+              )}
             </div>
           </div>
 
           {/* Mobile Menu Toggle */}
           <div className="lg:hidden flex items-center gap-4 z-20">
             <ThemeToggle />
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsMainMenuOpen(true)}
-              aria-label="Open menu"
-            >
+            <Button variant="ghost" size="icon" onClick={() => setIsMainMenuOpen(true)}>
               <Menu className="h-7 w-7" />
             </Button>
           </div>
         </div>
       </header>
 
-      {/* Spacer */}
       <div className="h-20" />
 
-      {/* Mobile Menu Overlay */}
+      {/* Mobile Menu */}
       {isMainMenuOpen && (
-        <div className="fixed inset-0 z-[150] lg:hidden bg-background/80 backdrop-blur-md">
-          <div className="flex flex-col h-full p-6 animate-in slide-in-from-right-10 duration-200">
-            <div className="flex items-center justify-between mb-8">
-              <span className="text-xl font-bold tracking-tight">MENU</span>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsMainMenuOpen(false)}
-                className="h-10 w-10"
-              >
+        <div className="fixed inset-0 z-[150] lg:hidden bg-background/95 backdrop-blur-md">
+          <div className="flex flex-col h-full p-6">
+            <div className="flex justify-end mb-8">
+              <Button variant="ghost" size="icon" onClick={() => setIsMainMenuOpen(false)}>
                 <X className="h-8 w-8" />
               </Button>
             </div>
             
-            <nav className="flex flex-col space-y-6 flex-grow overflow-y-auto text-center justify-center">
+            <nav className="flex flex-col space-y-6 text-center">
               {navItems.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="text-3xl font-bold tracking-widest hover:text-primary transition-colors py-4 border-b border-border/10"
-                  onClick={() => setIsMainMenuOpen(false)}
-                >
+                <Link key={item.name} href={item.href} className="text-2xl font-bold tracking-widest" onClick={() => setIsMainMenuOpen(false)}>
                   {item.name}
                 </Link>
               ))}
 
-              {!mounted ? (
-                <div className="h-16 w-16 rounded-full bg-muted animate-pulse mx-auto" />
-              ) : user ? (
-                <div className="space-y-4 pt-8 w-full max-w-sm mx-auto">
-                  <div className="flex flex-col items-center gap-3 px-2 py-4 bg-muted/30 rounded-lg">
-                    <Avatar className="h-16 w-16 border-2 border-primary/20">
-                      <AvatarImage src={user.image || ""} alt={user.name || ""} />
-                      <AvatarFallback className="text-xl">{user.name?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
+              <div className="pt-8">
+                {!mounted ? (
+                  <div className="h-16 w-16 rounded-full bg-muted animate-pulse mx-auto" />
+                ) : user ? (
+                  <div className="flex flex-col items-center gap-4">
+                    <Avatar className="h-16 w-16">
+                      <AvatarImage src={user.image || ""} />
+                      <AvatarFallback>{user.name?.charAt(0) || "U"}</AvatarFallback>
                     </Avatar>
-                    <div className="flex flex-col text-center">
-                      <p className="font-semibold text-xl">{user.name}</p>
-                      <p className="text-sm text-muted-foreground">{user.email}</p>
-                    </div>
+                    <p className="font-bold">{user.name}</p>
+                    <Button variant="destructive" onClick={handleLogout} className="w-full max-w-xs">Log out</Button>
                   </div>
-
-                  {isAdmin && (
-                    <Link
-                      href="/admin"
-                      prefetch={false}
-                      className="flex items-center justify-center gap-3 p-4 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors text-lg font-medium text-primary"
-                      onClick={() => setIsMainMenuOpen(false)}
-                    >
-                      <Settings className="h-6 w-6" />
-                      Admin Dashboard
-                    </Link>
-                  )}
-                  <Link
-                    href="/account"
-                    prefetch={false}
-                    className="flex items-center justify-center gap-3 p-4 rounded-lg hover:bg-muted/50 transition-colors text-lg font-medium"
-                    onClick={() => setIsMainMenuOpen(false)}
-                  >
-                    <User className="h-6 w-6" />
-                    My Account
-                  </Link>
-                  <Button
-                    variant="destructive"
-                    size="lg"
-                    className="w-full justify-center mt-6 text-lg"
-                    onClick={() => {
-                      handleLogout();
-                      setIsMainMenuOpen(false);
-                    }}
-                  >
-                    <LogOut className="mr-3 h-5 w-5" />
-                    Log out
+                ) : (isPending && hasTokenCookie) ? (
+                  <div className="h-16 w-16 rounded-full bg-muted animate-pulse mx-auto" />
+                ) : (
+                  <Button size="lg" className="w-full max-w-xs mx-auto" asChild onClick={() => setIsMainMenuOpen(false)}>
+                    <Link href="/login">LOGIN</Link>
                   </Button>
-                </div>
-              ) : (isPending && hasTokenCookie) ? (
-                <div className="h-16 w-16 rounded-full bg-muted animate-pulse mx-auto" />
-              ) : (
-                <Button
-                  size="lg"
-                  className="w-full text-xl py-8 mt-12 font-bold tracking-widest max-w-sm mx-auto"
-                  asChild
-                  onClick={() => setIsMainMenuOpen(false)}
-                >
-                  <Link href="/login" prefetch={false}>LOGIN</Link>
-                </Button>
-              )}
+                )}
+              </div>
             </nav>
-            
-            {/* Mobile Footer */}
-            <div className="flex justify-center gap-10 py-8 mt-auto border-t">
-              <a href="https://www.instagram.com/nexdrak" target="_blank" className="text-muted-foreground hover:text-foreground transition-colors hover:scale-110">
-                <i className="fa-brands fa-instagram text-3xl" />
-              </a>
-              <a href="https://x.com/nexdrak" target="_blank" className="text-muted-foreground hover:text-foreground transition-colors hover:scale-110">
-                <i className="fa-brands fa-x-twitter text-3xl" />
-              </a>
-              <a href="https://www.youtube.com/@nexdrak" target="_blank" className="text-muted-foreground hover:text-foreground transition-colors hover:scale-110">
-                <i className="fa-brands fa-youtube text-3xl" />
-              </a>
-              <a href="https://open.spotify.com/artist/1DRRpAYf6HmdFkLLPXeMEx" target="_blank" className="text-muted-foreground hover:text-foreground transition-colors hover:scale-110">
-                <i className="fa-brands fa-spotify text-3xl" />
-              </a>
-            </div>
           </div>
         </div>
       )}
