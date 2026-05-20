@@ -82,8 +82,8 @@ const findAndRemoveBloat = (dir) => {
         fs.unlinkSync(fullPath);
       }
       
-      // Also delete any file > 1MB that isn't a known required file
-      else if (fs.statSync(fullPath).size > 1024 * 1024 && !name.includes('handler') && !name.includes('_worker')) {
+      // Also delete any file > 10MB (extremely large) that isn't code
+      else if (fs.statSync(fullPath).size > 10 * 1024 * 1024 && !name.endsWith('.js') && !name.endsWith('.mjs')) {
         console.log(`DELETING LARGE UNKNOWN FILE (${Math.round(fs.statSync(fullPath).size / 1024 / 1024)}MB): ${fullPath}`);
         fs.unlinkSync(fullPath);
       }
