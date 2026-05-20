@@ -31,6 +31,8 @@ const defaultSettings: SiteSettings = {
 export async function getSiteSettings(): Promise<SiteSettings> {
   try {
     const supabase = createServiceRoleClient();
+    if (!supabase) return defaultSettings;
+    
     const { data, error } = await supabase.from("site_settings").select("key,value");
 
     if (error || !data || data.length === 0) {

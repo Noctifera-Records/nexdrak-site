@@ -5,6 +5,7 @@ import { createServiceRoleClient } from "@/lib/supabase/service";
 export async function getPublicSongs() {
   try {
     const supabase = createServiceRoleClient();
+    if (!supabase) return { songs: [], streamingLinks: [] };
 
     const { data: songs, error: songsError } = await supabase
       .from("songs")

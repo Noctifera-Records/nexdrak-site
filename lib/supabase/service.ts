@@ -5,13 +5,21 @@ export function createServiceRoleClient() {
   const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
   if (!supabaseUrl || !supabaseServiceRoleKey) {
-    throw new Error('Missing Supabase URL or Service Role Key')
+    // Si faltan variables de entorno, no lanzamos un error que rompa el sitio,
+    // sino que devolvemos un log para diagnosticar en Cloudflare.
+    console.error("DIAGNOSTIC: Missing Supabase Environment Variables");
+    return null;
   }
 
-  return createClient(supabaseUrl, supabaseServiceRoleKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  })
+  try {
+    return createClient(supabaseUrl, supabaseServiceRoleKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    })
+  } catch (e) {
+    console.error("DIAGNOSTIC: Failed to initialize Supabase client", e);
+    return null;
+  }
 }
