@@ -1,10 +1,8 @@
 import { Client, neonConfig } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-serverless';
-import { cache } from 'react';
 
 if (typeof window === 'undefined') {
   neonConfig.pipelineTLS = false;
-  // Acelera la conexión enviando la contraseña inmediatamente
   neonConfig.pipelineConnect = "password";
 }
 
@@ -20,15 +18,16 @@ function getConnectionString() {
   return connectionString;
 }
 
-// Esta función se asegura de que solo haya una conexión por petición HTTP
-export const getRequestContextDb = cache(async () => {
+// Eliminamos cache() de React para evitar errores en entornos no-React (Edge Runtime)
+export async function getRequestContextDb() {
+  // En Cloudflare Workers, crear un Client es muy ligero
   const client = new Client(getConnectionString());
   await client.connect();
   return {
     db: drizzle(client),
     client
   };
-});
+}
 
 // Helper para compatibilidad
 export const getDb = async () => {

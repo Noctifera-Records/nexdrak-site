@@ -60,24 +60,24 @@
     "clsx": "^2.1.1",
     "cmdk": "1.0.4",
     "cookie": "1.0.2",
-    "drizzle-orm": "^0.45.1",
+    "drizzle-orm": "^0.33.0",
     "embla-carousel-react": "8.5.1",
     "input-otp": "1.4.1",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.454.0",
-    "next": ">=15.6.0-canary.61",
+    "next": "15.6.0-canary.61",
     "next-themes": "^0.4.4",
-    "react": "^19",
+    "react": "^19.0.0",
     "react-day-picker": "9.14.0",
-    "react-dom": "^19",
+    "react-dom": "^19.0.0",
     "react-hook-form": "^7.54.1",
     "react-resizable-panels": "^2.1.7",
     "sonner": "^1.7.1",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
-    "undici": "^7.18.2",
+    "undici": "^6.21.0",
     "vaul": "1.1.2",
-    "zod": "^3.25.76"
+    "zod": "^3.23.0"
   },
   "devDependencies": {
     "@opennextjs/cloudflare": "^1.17.1",
@@ -87,7 +87,7 @@
     "@types/react-dom": "^19.2.3",
     "autoprefixer": "^10.4.20",
     "drizzle-kit": "^0.31.9",
-    "esbuild": "0.25.3",
+    "esbuild": "0.21.5",
     "eslint": "9.39.2",
     "eslint-config-next": "16.1.6",
     "postcss": "^8",
@@ -98,15 +98,7 @@
     "wrangler": "^4.58.0"
   },
   "overrides": {
-    "esbuild": "0.25.3",
-    "undici": "^7.18.2",
-    "path-to-regexp": "6.3.0",
-    "tar": "^7.5.11",
-    "@smithy/config-resolver": "^4.4.6",
-    "fast-xml-parser": "^5.3.8",
-    "@tootallnate/once": "^3.0.1",
-    "ajv": "^8.17.1",
-    "minimatch": "^10.2.4"
+    "undici": "^6.21.0"
   },
   "packageManager": "npm@10.8.1"
 }
