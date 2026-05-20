@@ -8,7 +8,6 @@ import { authClient } from "@/lib/auth-client";
 import { useSiteSettings } from "@/hooks/use-site-settings";
 import { ThemeToggle } from "./theme-toggle";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,12 +23,13 @@ export default function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [hasTokenCookie, setHasTokenCookie] = useState(false);
   
-  const { data: session, isPending } = authClient.useSession();
+  // Obtenemos la sesión. Importante: no la usamos directamente en el render inicial.
+  const session = authClient.useSession();
   const { settings } = useSiteSettings();
 
   useEffect(() => {
     setMounted(true);
-    // Verificación segura de cookie solo en el cliente
+    // Verificamos si existe la cookie de sesión
     const hasToken = document.cookie.includes('better-auth.session_token') || 
                      document.cookie.includes('__Secure-better-auth.session_token');
     setHasTokenCookie(hasToken);
@@ -55,7 +55,9 @@ export default function Navbar() {
     { name: "BIO", href: "/about" },
   ];
 
-  const user = session?.user;
+  // Solo evaluamos al usuario si estamos en el cliente (mounted)
+  const user = mounted ? session.data?.user : null;
+  const isPending = session.isPending;
   const isAdmin = user?.role === "admin";
 
   return (
@@ -73,7 +75,6 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Desktop Nav */}
           <div className="hidden lg:flex items-center justify-end gap-8">
             <nav className="flex items-center gap-6">
               {navItems.map((item) => (
@@ -95,24 +96,29 @@ export default function Navbar() {
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                       <Avatar className="h-9 w-9">
-                        <AvatarImage src={user.image || ""} />
+                        <AvatarImage src={user.image || undefined} />
                         <AvatarFallback>{user.name?.charAt(0) || "U"}</AvatarFallback>
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuLabel>{user.name}</DropdownMenuLabel>
+                  <DropdownMenuContent align="end" className="w-56 mt-2">
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">{user.name}</p>
+                        <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                      </div>
+                    </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     {isAdmin && (
                       <DropdownMenuItem asChild>
-                        <Link href="/admin">Admin Dashboard</Link>
+                        <Link href="/admin" className="cursor-pointer">Admin Dashboard</Link>
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuItem asChild>
-                      <Link href="/account">My Account</Link>
+                      <Link href="/account" className="cursor-pointer">My Account</Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+                    <DropdownMenuItem onClick={handleLogout} className="text-destructive cursor-pointer">
                       Log out
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -120,14 +126,13 @@ export default function Navbar() {
               ) : (isPending && hasTokenCookie) ? (
                 <div className="h-9 w-9 rounded-full bg-muted animate-pulse" />
               ) : (
-                <Button asChild size="sm">
+                <Button asChild size="sm" className="px-6 font-semibold">
                   <Link href="/login">LOGIN</Link>
                 </Button>
               )}
             </div>
           </div>
 
-          {/* Mobile Menu Toggle */}
           <div className="lg:hidden flex items-center gap-4 z-20">
             <ThemeToggle />
             <Button variant="ghost" size="icon" onClick={() => setIsMainMenuOpen(true)}>
@@ -139,7 +144,6 @@ export default function Navbar() {
 
       <div className="h-20" />
 
-      {/* Mobile Menu */}
       {isMainMenuOpen && (
         <div className="fixed inset-0 z-[150] lg:hidden bg-background/95 backdrop-blur-md">
           <div className="flex flex-col h-full p-6">
@@ -162,16 +166,19 @@ export default function Navbar() {
                 ) : user ? (
                   <div className="flex flex-col items-center gap-4">
                     <Avatar className="h-16 w-16">
-                      <AvatarImage src={user.image || ""} />
+                      <AvatarImage src={user.image || undefined} />
                       <AvatarFallback>{user.name?.charAt(0) || "U"}</AvatarFallback>
                     </Avatar>
-                    <p className="font-bold">{user.name}</p>
-                    <Button variant="destructive" onClick={handleLogout} className="w-full max-w-xs">Log out</Button>
+                    <div className="text-center">
+                      <p className="font-bold text-xl">{user.name}</p>
+                      <p className="text-sm text-muted-foreground">{user.email}</p>
+                    </div>
+                    <Button variant="destructive" onClick={handleLogout} className="w-full max-w-xs mt-4">Log out</Button>
                   </div>
                 ) : (isPending && hasTokenCookie) ? (
                   <div className="h-16 w-16 rounded-full bg-muted animate-pulse mx-auto" />
                 ) : (
-                  <Button size="lg" className="w-full max-w-xs mx-auto" asChild onClick={() => setIsMainMenuOpen(false)}>
+                  <Button size="lg" className="w-full max-w-xs mx-auto text-xl py-6" asChild onClick={() => setIsMainMenuOpen(false)}>
                     <Link href="/login">LOGIN</Link>
                   </Button>
                 )}
