@@ -47,13 +47,13 @@ export const resetPasswordTemplate = (url: string) => `
           </tr>
           <tr>
             <td style="padding:0 52px 48px;">
-              <a href="\${url}" style="display:inline-block;background:#fff;color:#000;text-decoration:none;font-size:11px;font-weight:700;padding:16px 40px;letter-spacing:4px;text-transform:uppercase;font-family:'Courier New',monospace;">RESET PASSWORD →</a>
+              <a href="${url}" style="display:inline-block;background:#fff;color:#000;text-decoration:none;font-size:11px;font-weight:700;padding:16px 40px;letter-spacing:4px;text-transform:uppercase;font-family:'Courier New',monospace;">RESET PASSWORD →</a>
             </td>
           </tr>
           <tr>
             <td style="padding:24px 52px;border-top:1px solid #1a1a1a;background:#090909;">
               <p style="margin:0 0 6px;color:#333;font-size:10px;letter-spacing:2px;text-transform:uppercase;font-family:'Courier New',monospace;">Direct link</p>
-              <p style="margin:0;word-break:break-all;"><a href="\${url}" style="color:#555;font-size:11px;text-decoration:none;font-family:'Courier New',monospace;">\${url}</a></p>
+              <p style="margin:0;word-break:break-all;"><a href="${url}" style="color:#555;font-size:11px;text-decoration:none;font-family:'Courier New',monospace;">${url}</a></p>
             </td>
           </tr>
           <tr>
@@ -64,7 +64,7 @@ export const resetPasswordTemplate = (url: string) => `
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td><img src="https://nexdrak.com/img/favicon.ico" alt="" style="width:28px;height:28px;display:block;opacity:0.25;filter:brightness(0) invert(1);" /></td>
-                  <td align="right" style="vertical-align:middle;"><span style="color:#2a2a2a;font-size:10px;letter-spacing:3px;font-family:'Courier New',monospace;">© \${new Date().getFullYear()} NEXDRAK</span></td>
+                  <td align="right" style="vertical-align:middle;"><span style="color:#2a2a2a;font-size:10px;letter-spacing:3px;font-family:'Courier New',monospace;">© ${new Date().getFullYear()} NEXDRAK</span></td>
                 </tr>
               </table>
             </td>
@@ -127,13 +127,13 @@ export const verifyEmailTemplate = (url: string) => `
           </tr>
           <tr>
             <td style="padding:0 52px 48px;">
-              <a href="\${url}" style="display:inline-block;background:#fff;color:#000;text-decoration:none;font-size:11px;font-weight:700;padding:16px 40px;letter-spacing:4px;text-transform:uppercase;font-family:'Courier New',monospace;">VERIFY EMAIL →</a>
+              <a href="${url}" style="display:inline-block;background:#fff;color:#000;text-decoration:none;font-size:11px;font-weight:700;padding:16px 40px;letter-spacing:4px;text-transform:uppercase;font-family:'Courier New',monospace;">VERIFY EMAIL →</a>
             </td>
           </tr>
           <tr>
             <td style="padding:24px 52px;border-top:1px solid #1a1a1a;background:#090909;">
               <p style="margin:0 0 6px;color:#333;font-size:10px;letter-spacing:2px;text-transform:uppercase;font-family:'Courier New',monospace;">Direct link</p>
-              <p style="margin:0;word-break:break-all;"><a href="\${url}" style="color:#555;font-size:11px;text-decoration:none;font-family:'Courier New',monospace;">\${url}</a></p>
+              <p style="margin:0;word-break:break-all;"><a href="${url}" style="color:#555;font-size:11px;text-decoration:none;font-family:'Courier New',monospace;">${url}</a></p>
             </td>
           </tr>
           <tr>
@@ -144,7 +144,7 @@ export const verifyEmailTemplate = (url: string) => `
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td><img src="https://nexdrak.com/img/favicon.ico" alt="" style="width:28px;height:28px;display:block;opacity:0.25;filter:brightness(0) invert(1);" /></td>
-                  <td align="right" style="vertical-align:middle;"><span style="color:#2a2a2a;font-size:10px;letter-spacing:3px;font-family:'Courier New',monospace;">© \${new Date().getFullYear()} NEXDRAK</span></td>
+                  <td align="right" style="vertical-align:middle;"><span style="color:#2a2a2a;font-size:10px;letter-spacing:3px;font-family:'Courier New',monospace;">© ${new Date().getFullYear()} NEXDRAK</span></td>
                 </tr>
               </table>
             </td>
