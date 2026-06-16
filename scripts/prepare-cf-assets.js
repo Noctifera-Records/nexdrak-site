@@ -38,7 +38,73 @@ console.log('--- Final Cloudflare Pages Preparation ---');
   }
 });
 
-// 2. Main worker - Solo copiar, NO inyectar polifills que puedan chocar con OpenNext
+// 2. CRITICAL OPTIMIZATION: Remove unnecessarily huge Next.js JSON files and other bloat
+const findAndRemoveBloat = (dir) => {
+  if (!fs.existsSync(dir)) return;
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      // If we accidentally copied node_modules, kill them
+      if (entry.name === 'node_modules') {
+        console.log(`  DELETING ENTIRE DIRECTORY: ${fullPath}`);
+        fs.rmSync(fullPath, { recursive: true, force: true });
+        continue;
+      }
+      findAndRemoveBloat(fullPath);
+    } else {
+      const name = entry.name.toLowerCase();
+      const isBloat = 
+        name.endsWith('font-metrics.json') || 
+        name.endsWith('.js.map') || 
+        name.endsWith('.mjs.map') ||
+        name.endsWith('.d.ts') ||
+        name === 'readme.md' ||
+        name === 'license';
+        
+      if (isBloat) {
+        console.log(`  DELETING BLOAT FILE: ${fullPath}`);
+        fs.unlinkSync(fullPath);
+      }
+      
+      // Also delete any file > 1MB that isn't a known required file
+      else if (fs.statSync(fullPath).size > 1024 * 1024 && !name.includes('handler') && !name.includes('_worker')) {
+        console.log(`  DELETING LARGE UNKNOWN FILE (${Math.round(fs.statSync(fullPath).size / 1024 / 1024)}MB): ${fullPath}`);
+        fs.unlinkSync(fullPath);
+      }
+    }
+  }
+};
+
+findAndRemoveBloat(assetsDir);
+
+// 3. CRITICAL FIX: Neuter node:sqlite and node:worker_threads which don't exist in CF
+// This prevents Wrangler's esbuild from failing during resolution
+const neuterUnsupportedNodeModules = (dir) => {
+  if (!fs.existsSync(dir)) return;
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      neuterUnsupportedNodeModules(fullPath);
+    } else if (entry.name.endsWith('.js') || entry.name.endsWith('.mjs')) {
+      let content = fs.readFileSync(fullPath, 'utf8');
+      if (content.includes('node:sqlite') || content.includes('node:worker_threads')) {
+        console.log(`  NEUTERING UNSUPPORTED MODULES IN: ${fullPath}`);
+        // Replace require calls with empty objects
+        content = content.replace(/require\(['"]node:sqlite['"]\)/g, '{}');
+        content = content.replace(/require\(['"]node:worker_threads['"]\)/g, '{}');
+        fs.writeFileSync(fullPath, content);
+      }
+    }
+  }
+};
+
+console.log('  Patching generated files for Cloudflare compatibility...');
+neuterUnsupportedNodeModules(path.join(assetsDir, 'server-functions'));
+neuterUnsupportedNodeModules(path.join(assetsDir, 'middleware'));
+
+// 4. Main worker - Solo copiar
 let workerSrc = path.join(sourceDir, 'worker.js');
 if (!fs.existsSync(workerSrc)) workerSrc = path.join(sourceDir, 'cloudflare', '_worker.js');
 
@@ -47,12 +113,12 @@ if (fs.existsSync(workerSrc)) {
   console.log('  Copied _worker.js');
 }
 
-// 3. Generate _routes.json
+// 5. Generate _routes.json
 const routesConfig = {
   version: 1,
   include: ['/*'],
   exclude: [
-    '/_next/static/*', '/img/*', '/favicon.ico', '/robots.txt', '/site.webmanifest'
+    '/_next/static/*', '/img/*', '/favicon.ico', '/robots.txt', '/site.webmanifest', '/*.png', '/*.jpg', '/*.svg', '/*.ico', '/*.webp', '/*.txt'
   ],
 };
 fs.writeFileSync(path.join(assetsDir, '_routes.json'), JSON.stringify(routesConfig, null, 2));

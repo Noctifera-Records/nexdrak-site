@@ -6,7 +6,14 @@ import { defineCloudflareConfig } from "@opennextjs/cloudflare";
 export default defineCloudflareConfig({
   minify: true,
   external: [
-    // Dejamos que OpenNext maneje el empaquetado. 
-    // Cloudflare nodejs_compat se encargará de los módulos de Node.
+    "prisma",
+    "@prisma/client",
+    "@better-auth/prisma-adapter",
+    "@mrleebo/prisma-ast",
+    "@electric-sql/pglite",
+    "@electric-sql/pglite-socket",
+    "@electric-sql/pglite-tools",
+    "lucide-react",
+    "@radix-ui/react-dropdown-menu"
   ],
 });
