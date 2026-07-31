@@ -145,7 +145,7 @@ export default function MusicClient({ initialSongs, initialLinks }: MusicClientP
     <div className="container mx-auto px-4 py-24 mt-10 text-foreground">
       <div className="max-w-4xl mx-auto mb-12 text-center">
         <h1 className="text-4xl font-bold mb-4 text-foreground dark:text-white">MUSIC</h1>
-        <p className="text-muted-foreground dark:text-gray-300 mb-8">Explore NexDrak's complete discography, from albums to singles.</p>
+        <p className="text-muted-foreground dark:text-gray-300 mb-8">Explore NexDrak&apos;s complete discography, from albums to singles.</p>
         
         {/* Search Bar */}
         <div className="w-full max-w-[400px] mx-auto mb-8">
@@ -406,7 +406,7 @@ export default function MusicClient({ initialSongs, initialLinks }: MusicClientP
       <div className="max-w-2xl mx-auto p-8 bg-card/50 dark:bg-black/50 backdrop-blur-sm border border-border dark:border-white/20 rounded-xl text-center shadow-sm dark:shadow-none">
         <h2 className="text-2xl font-bold mb-4 text-foreground dark:text-white">LICENSING</h2>
         <p className="text-muted-foreground dark:text-gray-300 mb-6">
-          Interested in licensing NexDrak's music for your project, film, or commercial? 
+          Interested in licensing NexDrak&apos;s music for your project, film, or commercial? 
           Get in touch with our licensing team.
         </p>
         <Button className="bg-foreground text-background hover:bg-foreground/90 dark:bg-white dark:hover:bg-gray-200 dark:text-black transition-colors">

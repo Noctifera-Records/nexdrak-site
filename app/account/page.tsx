@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Loader2, User, Mail, Shield, Trash2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -145,11 +146,11 @@ export default function AccountPage() {
         <Card className="border-border bg-card/50 backdrop-blur-sm">
           <CardHeader>
             <CardTitle>Password & Security</CardTitle>
-            <CardDescription>To change your password, please use the "Forgot Password" link on the login page.</CardDescription>
+            <CardDescription>To change your password, please use the &quot;Forgot Password&quot; link on the login page.</CardDescription>
           </CardHeader>
           <CardFooter className="bg-muted/30 pt-6">
             <Button variant="outline" asChild>
-                <a href="/auth/reset-password">Change Password</a>
+                <Link href="/auth/reset-password">Change Password</Link>
             </Button>
           </CardFooter>
         </Card>

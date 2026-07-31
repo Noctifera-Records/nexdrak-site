@@ -100,11 +100,14 @@
     "undici": "^7.24.4",
     "postcss": "^8.5.25",
     "@babel/core": "^7.29.0",
-    "ajv": "^8.17.1",
     "better-auth": "^1.6.25",
     "drizzle-orm": "^0.45.2",
     "tar": "^7.5.22",
-    "minimatch@10": "10.2.6"
+    "minimatch@10": "10.2.6",
+    "brace-expansion@1": "1.1.18",
+    "brace-expansion@2": "2.1.4",
+    "js-yaml": "5.2.2",
+    "sharp": "0.35.3"
   },
   "engines": {
     "node": ">=20.0.0"

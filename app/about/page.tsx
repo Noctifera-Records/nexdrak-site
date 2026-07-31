@@ -39,7 +39,7 @@ export default function AboutPage() {
             </p>
             <p>
             Drawing inspiration from a wide range of influences, from classic experimental, ambient to punchier beats like Dubstep, DNB and ultimately Mid-Tempo and Riddim. 
-            NexDrak creates soundscapes that transport listeners to strange futuristic realms, hopefully this man doesn't know what hope means.
+            NexDrak creates soundscapes that transport listeners to strange futuristic realms, hopefully this man doesn&apos;t know what hope means.
             </p>
             <p>
             With each release and performance, Nex continues to push the boundaries of music or at least tries to, 
@@ -86,7 +86,7 @@ export default function AboutPage() {
               <h3 className="font-bold mb-2 text-foreground dark:text-white">Start on YouTube</h3>
               <p className="text-muted-foreground dark:text-gray-300">
               In this year he created his music channel and resubmitted many of his songs on this channel and formally adopted the name “NexDrak”, 
-              in this year he released “Loop Lovely” and “DownFall” laying the foundations of his musical genre, but let's not forget some 
+              in this year he released “Loop Lovely” and “DownFall” laying the foundations of his musical genre, but let&apos;s not forget some 
               very disastrous tracks that we prefer not to mention.
               </p>
             </div>
@@ -155,7 +155,7 @@ export default function AboutPage() {
           <h2 className="text-2xl font-bold mb-4 text-foreground dark:text-white">LIVE EXPERIENCE</h2>
           <div className="space-y-4 text-muted-foreground dark:text-gray-300">
             <p>
-              A NexDrak live performance is more than just music: it's a fully immersive sensory journey. 
+              A NexDrak live performance is more than just music: it&apos;s a fully immersive sensory journey. 
             </p>
             <p>
               Each show is unique, with custom-designed visuals that respond in real time to the music, creating a symbiotic relationship between sound and sight.

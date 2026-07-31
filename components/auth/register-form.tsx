@@ -67,7 +67,7 @@ export default function RegisterForm() {
         <div className="space-y-2">
           <h3 className="text-2xl font-semibold tracking-tight">Check your inbox</h3>
           <p className="text-muted-foreground max-w-xs mx-auto">
-            We've sent a verification link to <span className="font-medium text-foreground">{email}</span>.
+            We&apos;ve sent a verification link to <span className="font-medium text-foreground">{email}</span>.
           </p>
           <p className="text-sm text-muted-foreground/80">
             Please verify your email before logging in.
