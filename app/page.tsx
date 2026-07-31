@@ -12,6 +12,9 @@ export const metadata: Metadata = {
   title: "NexDrak | Official Artist Website",
   description: "Official website of NexDrak, electronic music artist specializing in Techno, House, and Darkwave. Listen to latest releases, see tour dates, and shop official merchandise.",
   keywords: ["NexDrak", "Electronic Music", "Techno", "House Music", "Darkwave", "Music Artist", "EDM", "NexDrak Music"],
+  alternates: {
+    canonical: "https://nexdrak.com",
+  },
   openGraph: {
     title: "NexDrak | Official Artist Website",
     description: "Official website of NexDrak. Listen to latest releases, see tour dates, and shop official merchandise.",
@@ -19,7 +22,7 @@ export const metadata: Metadata = {
     siteName: "NexDrak",
     images: [
       {
-        url: "/img/red.png",
+        url: "/nexdrak_opengraph.webp",
         width: 1200,
         height: 630,
         alt: "NexDrak Official Site",
@@ -32,7 +35,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "NexDrak | Official Artist Website",
     description: "Official website of NexDrak. Electronic music, tour dates, and more.",
-    images: ["/img/red.png"],
+    images: ["/nexdrak_opengraph.webp"],
     creator: "@nexdrak",
   },
 };
@@ -43,7 +46,6 @@ const LatestReleases = dynamicImport(() => import("@/components/latest-releases"
 const UpcomingEvents = dynamicImport(() => import("@/components/upcoming-events"), {
   loading: () => <div className="h-96 w-full animate-pulse bg-gray-900 rounded-lg" />,
 });
-const Newsletter = dynamicImport(() => import("@/components/newsletter"));
 
 export default async function Home() {
   const settings = await getSiteSettings();

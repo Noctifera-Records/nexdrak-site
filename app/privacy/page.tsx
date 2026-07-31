@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Privacy Policy | NexDrak",
   description: "Read the NexDrak Privacy Policy to understand how we collect, use, and protect your personal data when using our website and services.",
+  alternates: { canonical: "https://nexdrak.com/privacy" },
 };
 
 export default function PrivacyPolicyPage() {

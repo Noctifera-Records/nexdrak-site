@@ -1,11 +1,6 @@
 import { getPublicSongs } from "./actions";
 import MusicClient from "./music-client";
 
-export const metadata = {
-  title: 'Music',
-  description: 'Listen to the latest tracks, albums, and singles by NexDrak.',
-};
-
 export default async function MusicPage() {
   const { songs, streamingLinks } = await getPublicSongs();
 

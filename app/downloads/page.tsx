@@ -10,21 +10,27 @@ export const dynamic = "force-dynamic";
 export default async function DownloadsPage() {
   // Obtenemos la conexión compartida para TODA la petición
   const { db, client } = await getRequestContextDb();
-  
+
   let session;
   try {
     const auth = getAuth(db);
     session = await auth.api.getSession({
       headers: await headers()
     });
-    
-    if (!session) {
-      // Importante cerrar antes de redirigir
-      await client.end();
-      redirect('/login');
-    }
+  } catch (e) {
+    console.error("DownloadsPage Session Error:", e);
+    await client.end();
+    return <div>Something went wrong. Please try again.</div>;
+  }
 
-    // Al llamar a getDownloads, React usará la MISMA conexión 'db' gracias a cache()
+  // redirect() lanza un error interno NEXT_REDIRECT que NO debe atraparse
+  if (!session) {
+    await client.end();
+    redirect('/login');
+  }
+
+  try {
+    // getDownloads reutiliza la misma conexión 'db' dentro de esta petición
     const downloads = await getDownloads();
 
     if (!downloads) {
@@ -52,7 +58,6 @@ export default async function DownloadsPage() {
         </div>
       </div>
     );
-
   } catch (e) {
     console.error("DownloadsPage Error:", e);
     return <div>Something went wrong. Please try again.</div>;

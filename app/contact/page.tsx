@@ -1,7 +1,26 @@
+import type { Metadata } from "next"
 import { Mail, MapPin, Globe, ExternalLink, MessageSquare } from "lucide-react"
 import SocialLinks from "@/components/social-links"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+
+export const metadata: Metadata = {
+  title: "Contact",
+  description: "Get in touch with the NexDrak team for bookings, press inquiries, licensing, and general contact.",
+  alternates: { canonical: "https://nexdrak.com/contact" },
+  openGraph: {
+    title: "Contact | NexDrak",
+    description: "Bookings, press inquiries, and general contact for NexDrak.",
+    url: "https://nexdrak.com/contact",
+    siteName: "NexDrak",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Contact | NexDrak",
+    description: "Bookings, press inquiries, and general contact for NexDrak.",
+  },
+}
 
 export default function ContactPage() {
   return (

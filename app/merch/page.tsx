@@ -4,6 +4,19 @@ import MerchClient from "./merch-client";
 export const metadata = {
   title: "Merch",
   description: "Official NexDrak merchandise. Limited editions and exclusive designs.",
+  alternates: { canonical: "https://nexdrak.com/merch" },
+  openGraph: {
+    title: "Merch | NexDrak",
+    description: "Official NexDrak merchandise. Limited editions and exclusive designs.",
+    url: "https://nexdrak.com/merch",
+    siteName: "NexDrak",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Merch | NexDrak",
+    description: "Official NexDrak merchandise. Limited editions and exclusive designs.",
+  },
 };
 
 export default async function MerchPage() {

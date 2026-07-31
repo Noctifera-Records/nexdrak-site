@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: SongPageProps) {
   const title = `${data.song.title} | ${data.song.artist} | NexDrak`;
   const description = `Listen to ${data.song.title} ${data.song.type === 'album' ? 'Album' : 'Single'} by ${data.song.artist} on NexDrak. Explore streaming links and track details.`;
   const url = `https://nexdrak.com/${data.song.slug}`;
-  const imageUrl = data.song.cover_image_url || 'https://nexdrak.com/img/red.png';
+  const imageUrl = data.song.cover_image_url || 'https://nexdrak.com/nexdrak_opengraph.webp';
   
   return {
     title,

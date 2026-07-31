@@ -3,20 +3,20 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Upcoming Events | NexDrak',
   description: 'Catch NexDrak live at festivals, clubs, and venues worldwide. View the full schedule, tour dates, and secure your tickets for the ultimate audio-visual experience.',
-  alternates: { canonical: '/events' },
+  alternates: { canonical: 'https://nexdrak.com/events' },
   openGraph: {
     type: 'website',
-    url: '/events',
+    url: 'https://nexdrak.com/events',
     title: 'Upcoming Events | NexDrak',
     description: 'Catch NexDrak live. Full schedule, tour dates, and tickets.',
     siteName: 'NexDrak',
-    images: [{ url: '/img/red.png', width: 1200, height: 630, alt: 'NexDrak Live Events' }],
+    images: [{ url: 'https://nexdrak.com/nexdrak_opengraph.webp', width: 1200, height: 630, alt: 'NexDrak Live Events' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Upcoming Events | NexDrak',
     description: 'Upcoming live events and tour dates for NexDrak.',
-    images: ['/img/red.png'],
+    images: ['https://nexdrak.com/nexdrak_opengraph.webp'],
     creator: '@nexdrak',
   },
 };

@@ -66,11 +66,3 @@ export const getAuth = (db: any) => {
     rateLimit: { enabled: false },
   });
 };
-
-// Objeto de compatibilidad para evitar errores de importación en otros archivos
-export const auth = {
-  api: {
-    // Este es un hack temporal, deberías actualizar los otros archivos para usar getAuth(db)
-    getSession: async () => null 
-  }
-} as any;

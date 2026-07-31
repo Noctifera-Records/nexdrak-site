@@ -22,11 +22,17 @@ export const metadata: Metadata = {
     template: '%s | NexDrak',
   },
   description: 'Official NexDrak Website, Drop the bass.',
-  alternates: {
-    canonical: 'https://nexdrak.com',
-  },
   manifest: '/site.webmanifest',
-    twitter: {
+  openGraph: {
+    title: 'NexDrak',
+    description: 'Official website of NexDrak, electronic music artist. Listen to the latest releases, see tour dates, and explore exclusive content.',
+    url: 'https://nexdrak.com',
+    siteName: 'NexDrak',
+    locale: 'en_US',
+    type: 'website',
+    images: ['/nexdrak_opengraph.webp'],
+  },
+  twitter: {
     card: 'summary_large_image',
     title: 'Home | NexDrak',
     description: 'Official NexDrak Website, Drop the bass',
@@ -49,9 +55,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css';document.head.appendChild(l);})();`,
+          }}
         />
         <StructuredData />
       </head>

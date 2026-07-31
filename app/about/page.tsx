@@ -1,6 +1,25 @@
+import type { Metadata } from "next"
 import Image from "next/image"
 import { Instagram, Twitter, Youtube, AirplayIcon as Spotify, Facebook } from "lucide-react"
 import { Button } from "@/components/ui/button"
+
+export const metadata: Metadata = {
+  title: "About",
+  description: "The story, vision, and journey of NexDrak — electronic music artist blending dubstep, darkwave, and cinematic soundscapes.",
+  alternates: { canonical: "https://nexdrak.com/about" },
+  openGraph: {
+    title: "About | NexDrak",
+    description: "The story, vision, and journey of NexDrak.",
+    url: "https://nexdrak.com/about",
+    siteName: "NexDrak",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About | NexDrak",
+    description: "The story, vision, and journey of NexDrak.",
+  },
+}
 
 export default function AboutPage() {
   return (

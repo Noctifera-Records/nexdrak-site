@@ -7,6 +7,14 @@ import Link from "next/link";
 export const metadata = {
   title: "Press Kit | NexDrak",
   description: "Official press kit for NexDrak. Download high-resolution promotional photos, logos, and read the official artist biography for media and booking purposes.",
+  alternates: { canonical: "https://nexdrak.com/press-kit" },
+  openGraph: {
+    title: "Press Kit | NexDrak",
+    description: "Official press kit for NexDrak. Photos, logos, and artist biography.",
+    url: "https://nexdrak.com/press-kit",
+    siteName: "NexDrak",
+    type: "website",
+  },
 };
 
 export default function PressKitPage() {

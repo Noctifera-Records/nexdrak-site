@@ -41,17 +41,7 @@ export default function StructuredData() {
         "description": "Official website of NexDrak - Electronic Music Artist",
         "publisher": {
           "@id": "https://nexdrak.com/#musicgroup"
-        },
-        "potentialAction": [
-          {
-            "@type": "SearchAction",
-            "target": {
-              "@type": "EntryPoint",
-              "urlTemplate": "https://nexdrak.com/search?q={search_term_string}"
-            },
-            "query-input": "required name=search_term_string"
-          }
-        ]
+        }
       },
       {
         "@type": "Organization",

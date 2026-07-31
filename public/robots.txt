@@ -1,4 +1,4 @@
-# Robots.txt for NexDrak Official Website
+# robots.txt for NexDrak Official Website
 # https://nexdrak.com
 
 User-agent: *
@@ -6,35 +6,29 @@ Allow: /
 Disallow: /api/
 Disallow: /_next/
 Disallow: /admin/
+Disallow: /account/
 Disallow: /private/
 Disallow: /tmp/
 Disallow: /cgi-bin/
 
-# Allow important resources
-Allow: /music/
-Allow: /events/
-Allow: /merch/
-Allow: /about/
-Allow: /contact/
-Allow: /img/
-Allow: /favicon.ico
-Allow: /sitemap.xml
+# Allow AI crawlers and search assistants to index public content
+User-agent: GPTBot
+Allow: /
 
-# Crawl delay (optional)
-Crawl-delay: 1
+User-agent: ChatGPT-User
+Allow: /
 
-# Sitemaps
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+# Sitemap
 Sitemap: https://nexdrak.com/sitemap.xml
-
-# Specific bot instructions
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
-User-agent: Twitterbot
-Allow: /

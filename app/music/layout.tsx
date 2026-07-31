@@ -3,20 +3,20 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Music | NexDrak',
   description: 'Explore the full discography of NexDrak. Stream techno, house, and darkwave releases including albums, singles, and exclusive tracks with direct streaming links.',
-  alternates: { canonical: '/music' },
+  alternates: { canonical: 'https://nexdrak.com/music' },
   openGraph: {
     type: 'website',
-    url: '/music',
+    url: 'https://nexdrak.com/music',
     title: 'Music | NexDrak',
     description: 'Explore the full discography of NexDrak. Stream techno, house, and darkwave releases.',
     siteName: 'NexDrak',
-    images: [{ url: '/img/red.png', width: 1200, height: 630, alt: 'NexDrak Music' }],
+    images: [{ url: 'https://nexdrak.com/nexdrak_opengraph.webp', width: 1200, height: 630, alt: 'NexDrak Music' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Music | NexDrak',
     description: 'Listen to the latest electronic music releases from NexDrak.',
-    images: ['/img/red.png'],
+    images: ['https://nexdrak.com/nexdrak_opengraph.webp'],
     creator: '@nexdrak',
   },
 };

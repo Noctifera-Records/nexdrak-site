@@ -2,6 +2,13 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
   try {
+    // Guard: redirects URLs that leak internal error messages to the home page.
+    // e.g. /You%20must%20sign%20in%20to%20access%20downloads -> decoded path contains spaces
+    const pathname = request.nextUrl.pathname;
+    if (/[\s\u0000-\u001F]/.test(pathname)) {
+      return NextResponse.redirect(new URL('/', request.url), 308);
+    }
+
     // Check for session cookie presence
     // Better Auth uses "better-auth.session_token" or "__Secure-better-auth.session_token"
     const sessionToken = request.cookies.get("better-auth.session_token") || request.cookies.get("__Secure-better-auth.session_token");
@@ -30,8 +37,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/admin/:path*',
-    '/account/:path*',
-    '/downloads/:path*',
-  ]
+    '/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|site.webmanifest|apple-touch-icon|android-chrome|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|woff2?|txt)$).*)',
+  ],
 }
