@@ -11,6 +11,17 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
+/**
+ * Better Auth validates the email link at /api/auth/reset-password/:token and
+ * then redirects here with ?token=... in the query string. That token is
+ * mandatory for the POST /reset-password call, otherwise the API answers
+ * INVALID_TOKEN.
+ */
+function getTokenFromUrl(): string | undefined {
+  if (typeof window === "undefined") return undefined;
+  return new URLSearchParams(window.location.search).get("token") ?? undefined;
+}
+
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -30,24 +41,35 @@ export default function ResetPasswordPage() {
       return;
     }
 
+    const token = getTokenFromUrl();
+    if (!token) {
+      toast.error("This reset link is invalid or has expired. Please request a new one.");
+      return;
+    }
+
     setLoading(true);
 
-    await authClient.resetPassword(
-      {
-        newPassword: password,
-      },
-      {
-        onSuccess: () => {
-          toast.success("Password reset successfully");
-          router.push("/login");
+    try {
+      await authClient.resetPassword(
+        {
+          newPassword: password,
+          token,
         },
-        onError: (ctx) => {
-          toast.error(ctx.error.message || "Failed to reset password");
-        },
-      }
-    );
-
-    setLoading(false);
+        {
+          onSuccess: () => {
+            toast.success("Password reset successfully");
+            router.push("/login");
+          },
+          onError: (ctx) => {
+            toast.error(ctx.error.message || "Failed to reset password");
+          },
+        }
+      );
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to reset password");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

@@ -5,48 +5,119 @@ import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
+
+/**
+ * Where to send the user after signing in.
+ *
+ * Read at submit time (instead of via useSearchParams) so the login page stays
+ * statically renderable and no <Suspense> boundary is needed.
+ */
+function getCallbackUrl(fallback = "/") {
+  if (typeof window === "undefined") return fallback;
+  const raw = new URLSearchParams(window.location.search).get("callbackUrl");
+  if (!raw) return fallback;
+  // Only allow same-site paths, never an absolute URL from the query string.
+  if (!raw.startsWith("/") || raw.startsWith("//")) return fallback;
+  return raw;
+}
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [spotifyLoading, setSpotifyLoading] = useState(false);
-  const router = useRouter();
+
+  // Si el usuario llega a /login con una sesión ya activa se le ofrece continuar
+  // en lugar de dejarle reintentar el login (que era lo que producía el aviso
+  // de "sesión ya iniciada").
+  const { data: session, isPending } = authClient.useSession();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
     setLoading(true);
-    await authClient.signIn.email({
-      email,
-      password,
-    }, {
-      onSuccess: () => {
-        toast.success("Successfully logged in");
-        router.push("/");
-      },
-      onError: (ctx) => {
-        toast.error(ctx.error.message || "Failed to login");
-      }
-    });
-    setLoading(false);
+
+    try {
+      await authClient.signIn.email(
+        { email, password },
+        {
+          onSuccess: () => {
+            toast.success("Successfully logged in");
+            // Recarga completa a propósito: garantiza que la navbar y el resto
+            // de la UI reflejen la nueva sesión de inmediato, sin esperar a que
+            // el store de sesión se sincronice.
+            window.location.href = getCallbackUrl();
+          },
+          onError: (ctx) => {
+            toast.error(ctx.error.message || "Failed to login");
+          },
+        }
+      );
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to login");
+    } finally {
+      // Siempre, para que el botón nunca se quede bloqueado en "cargando".
+      setLoading(false);
+    }
   };
 
   const handleSpotifyLogin = async () => {
     setSpotifyLoading(true);
-    await authClient.signIn.social({
-        provider: "spotify",
-        callbackURL: "/"
-    }, {
-        onError: (ctx) => {
+    try {
+      await authClient.signIn.social(
+        {
+          provider: "spotify",
+          callbackURL: getCallbackUrl(),
+        },
+        {
+          onError: (ctx) => {
             toast.error(ctx.error.message || "Failed to login with Spotify");
             setSpotifyLoading(false);
+          },
         }
-    });
+      );
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to login with Spotify");
+      setSpotifyLoading(false);
+    }
   };
+
+  const handleSignOut = async () => {
+    try {
+      await authClient.signOut();
+    } catch {
+      // Ignoramos: el objetivo es simplemente liberar la pantalla de login.
+    }
+    window.location.href = "/login";
+  };
+
+  // Sesión ya activa: en lugar de dejar reintentar el login (que generaba el
+  // confuso aviso de "sesión ya iniciada") ofrecemos continuar o cambiar de
+  // cuenta.
+  if (!isPending && session?.user) {
+    return (
+      <div className="w-full max-w-sm space-y-4">
+        <div className="rounded-lg border border-border bg-muted/40 p-4 space-y-1">
+          <p className="text-sm font-medium">You are already signed in</p>
+          <p className="text-xs text-muted-foreground break-all">{session.user.email}</p>
+        </div>
+
+        <Button
+          className="w-full"
+          onClick={() => { window.location.href = getCallbackUrl(); }}
+        >
+          Continue
+        </Button>
+
+        <Button variant="outline" className="w-full" onClick={handleSignOut}>
+          Sign out and use another account
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-sm space-y-4">

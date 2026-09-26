@@ -1,9 +1,27 @@
 import { betterAuth } from "better-auth";
+import { admin } from "better-auth/plugins";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import * as authSchema from "./db/auth.schema";
 import { resetPasswordTemplate, verifyEmailTemplate } from "./email-templates";
 
 const fromEmail = process.env.EMAIL_FROM || "noreply@nexdrak.com";
+
+/**
+ * Origins allowed to talk to the auth endpoints.
+ *
+ * Both the public site and the admin panel share the same database and the same
+ * `user` / `session` tables, so the public site must accept requests coming from
+ * the admin domain (and vice versa) as well as localhost during development.
+ * Without this list Better Auth rejects mismatching Origin headers, which shows
+ * up as random failed sign-in / sign-out attempts.
+ */
+const trustedOrigins = [
+  "https://nexdrak.com",
+  "https://www.nexdrak.com",
+  "https://admin.nexdrak.com",
+  "http://localhost:3000",
+  "http://localhost:3001",
+];
 
 async function sendResendEmail({ to, subject, html }: { to: string, subject: string, html: string }) {
   const apiKey = process.env.RESEND_API_KEY;
@@ -37,6 +55,15 @@ export const getAuth = (db: any) => {
     }),
     baseURL,
     secret: process.env.BETTER_AUTH_SECRET || "development-secret-key-placeholder",
+    trustedOrigins,
+    /**
+     * The `admin` plugin is required to expose `user.role` in the session.
+     * The `user` table (shared with admin-nexdrak-site) already stores
+     * role/banned/ban_reason/ban_expires, but without this plugin the public
+     * site never receives `role`, so admins were not recognized and the
+     * "Admin Dashboard" entry never appeared in the navbar.
+     */
+    plugins: [admin()],
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: true,

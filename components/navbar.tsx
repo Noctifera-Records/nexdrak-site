@@ -21,29 +21,47 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 export default function Navbar() {
   const [isMainMenuOpen, setIsMainMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [hasTokenCookie, setHasTokenCookie] = useState(false);
-  
-  // Obtenemos la sesión. Importante: no la usamos directamente en el render inicial.
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  // Better Auth resuelve la sesión de forma asíncrona. Mientras no sepamos la
+  // respuesta mostramos un placeholder en lugar del botón LOGIN: mostrar LOGIN
+  // a un usuario que sí ha iniciado sesión era justo lo que hacía parecer que
+  // el login "no funcionaba". Ya no dependemos de leer la cookie con
+  // document.cookie (es httpOnly, así que nunca era visible desde el cliente).
   const session = authClient.useSession();
   const { settings } = useSiteSettings();
 
   useEffect(() => {
     setMounted(true);
-    // Verificamos si existe la cookie de sesión
-    const hasToken = document.cookie.includes('better-auth.session_token') || 
-                     document.cookie.includes('__Secure-better-auth.session_token');
-    setHasTokenCookie(hasToken);
   }, []);
 
   const handleLogout = async () => {
-    await authClient.signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          toast.success("Successfully logged out");
-          window.location.href = "/login";
+    if (loggingOut) return;
+    setLoggingOut(true);
+
+    try {
+      await authClient.signOut({
+        fetchOptions: {
+          onSuccess: () => {
+            toast.success("Successfully logged out");
+            // Recarga completa: descarta de una vez la cookie de sesión, el
+            // store de sesión del cliente y cualquier HTML/RSC cacheado.
+            window.location.href = "/";
+          },
+          onError: (ctx) => {
+            toast.error(ctx.error?.message || "Could not log out. Please try again.");
+          },
         },
-      },
-    });
+      });
+
+      // Deja el store compartido en su estado real (útil si el cierre de sesión
+      // falló y por tanto no hubo navegación).
+      await session.refetch?.();
+    } catch (error: any) {
+      toast.error(error?.message || "Could not log out. Please try again.");
+    } finally {
+      setLoggingOut(false);
+    }
   };
 
   const navItems = [
@@ -55,9 +73,10 @@ export default function Navbar() {
     { name: "BIO", href: "/about" },
   ];
 
-  // Solo evaluamos al usuario si estamos en el cliente (mounted)
-  const user = mounted ? session.data?.user : null;
-  const isPending = session.isPending;
+  // Mientras la sesión se está resolviendo (o aún no estamos montados) hay que
+  // mostrar el placeholder, nunca el botón de LOGIN.
+  const isResolving = !mounted || Boolean(session.isPending);
+  const user = isResolving ? null : session.data?.user ?? null;
   const isAdmin = user?.role === "admin";
 
   return (
@@ -89,7 +108,7 @@ export default function Navbar() {
             <div className="flex items-center gap-4">
               <ThemeToggle />
               
-              {!mounted ? (
+              {isResolving ? (
                 <div className="h-9 w-9 rounded-full bg-muted animate-pulse" />
               ) : user ? (
                 <DropdownMenu>
@@ -118,13 +137,11 @@ export default function Navbar() {
                       <Link href="/account" className="cursor-pointer">My Account</Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout} className="text-destructive cursor-pointer">
+                    <DropdownMenuItem onClick={handleLogout} disabled={loggingOut} className="text-destructive cursor-pointer">
                       Log out
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              ) : (isPending && hasTokenCookie) ? (
-                <div className="h-9 w-9 rounded-full bg-muted animate-pulse" />
               ) : (
                 <Button asChild size="sm" className="px-6 font-semibold">
                   <Link href="/login">LOGIN</Link>
@@ -161,7 +178,7 @@ export default function Navbar() {
               ))}
 
               <div className="pt-8">
-                {!mounted ? (
+                {isResolving ? (
                   <div className="h-16 w-16 rounded-full bg-muted animate-pulse mx-auto" />
                 ) : user ? (
                   <div className="flex flex-col items-center gap-4">
@@ -173,10 +190,8 @@ export default function Navbar() {
                       <p className="font-bold text-xl">{user.name}</p>
                       <p className="text-sm text-muted-foreground">{user.email}</p>
                     </div>
-                    <Button variant="destructive" onClick={handleLogout} className="w-full max-w-xs mt-4">Log out</Button>
+                    <Button variant="destructive" onClick={handleLogout} disabled={loggingOut} className="w-full max-w-xs mt-4">Log out</Button>
                   </div>
-                ) : (isPending && hasTokenCookie) ? (
-                  <div className="h-16 w-16 rounded-full bg-muted animate-pulse mx-auto" />
                 ) : (
                   <Button size="lg" className="w-full max-w-xs mx-auto text-xl py-6" asChild onClick={() => setIsMainMenuOpen(false)}>
                     <Link href="/login">LOGIN</Link>

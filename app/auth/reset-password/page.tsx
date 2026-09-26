@@ -17,21 +17,25 @@ export default function ResetPassword() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [isValidating, setIsValidating] = useState(true);
+  const [token, setToken] = useState<string | null>(null);
 
   const router = useRouter();
 
   useEffect(() => {
-    // Check if the user is authenticated (Better Auth session)
-    // Or if there's a token in the URL (if using token-based reset)
-    const checkSession = async () => {
-      const { data: session } = await authClient.useSession();
-      // If we are in the reset-password page, we usually come from a link with a token
-      // or we are already logged in and wanting to change it.
-      // Better Auth handles the token via its internal logic if we use the resetPassword action.
-      setIsValidating(false);
-    };
+    // Better Auth valida el enlace del correo en /api/auth/reset-password/:token
+    // y redirige aquí añadiendo ?token=...
+    //
+    // Antes se llamaba a `authClient.useSession()` dentro del efecto: eso es una
+    // llamada a un hook de React fuera del render (reglas de hooks), por lo que
+    // podía lanzar "Invalid hook call" y romper la página.
+    const params = new URLSearchParams(window.location.search);
+    setToken(params.get("token"));
 
-    checkSession();
+    if (params.get("error")) {
+      setError("This password reset link is invalid or has expired. Please request a new one.");
+    }
+
+    setIsValidating(false);
   }, []);
 
   const validatePassword = (pwd: string) => {
@@ -71,11 +75,18 @@ export default function ResetPassword() {
       return;
     }
 
+    // Better Auth's POST /reset-password requires the token from the email link.
+    if (!token) {
+      setError("This password reset link is invalid or has expired. Please request a new one.");
+      return;
+    }
+
     setLoading(true);
 
     try {
       const { error } = await authClient.resetPassword({
         newPassword: password,
+        token,
       });
 
       if (error) {
